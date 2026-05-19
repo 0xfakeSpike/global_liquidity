@@ -1,4 +1,5 @@
 import { formatNumber } from "../lib/format";
+import { dateTicks, type DateRange } from "../lib/chartAxis";
 import type { DataPoint } from "../types/liquidity";
 
 interface MultiLineSeries {
@@ -9,10 +10,7 @@ interface MultiLineSeries {
 
 interface MultiLineChartProps {
   series: MultiLineSeries[];
-  dateRange?: {
-    start: string;
-    end: string;
-  };
+  dateRange?: DateRange;
   height?: number;
   valueLabel?: string;
 }
@@ -39,6 +37,7 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
   const domainStart = Date.parse(`${domainStartLabel}T00:00:00Z`);
   const domainEnd = Date.parse(`${domainEndLabel}T00:00:00Z`);
   const domainRange = domainEnd - domainStart || 1;
+  const ticks = dateTicks({ start: domainStartLabel, end: domainEndLabel });
 
   const xForDate = (date: string) => {
     const timestamp = Date.parse(`${date}T00:00:00Z`);
@@ -87,12 +86,19 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
             </g>
           );
         })}
-        <text x={padding.left} y={height - 8}>
-          {domainStartLabel}
-        </text>
-        <text x={width - padding.right} y={height - 8} textAnchor="end">
-          {domainEndLabel}
-        </text>
+        {ticks.map((tick, index) => {
+          const x = xForDate(tick);
+          const isFirst = index === 0;
+          const isLast = index === ticks.length - 1;
+          return (
+            <g key={tick}>
+              <line x1={x} x2={x} y1={height - padding.bottom} y2={height - padding.bottom + 4} />
+              <text x={x} y={height - 8} textAnchor={isFirst ? "start" : isLast ? "end" : "middle"}>
+                {tick.slice(0, 7)}
+              </text>
+            </g>
+          );
+        })}
       </svg>
       <div className="multi-chart-legend">
         {series.map((item) => (

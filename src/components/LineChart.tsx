@@ -1,13 +1,11 @@
 import type { DataPoint } from "../types/liquidity";
 import { formatNumber } from "../lib/format";
+import { dateTicks, type DateRange } from "../lib/chartAxis";
 
 interface LineChartProps {
   series: DataPoint[];
   color?: string;
-  dateRange?: {
-    start: string;
-    end: string;
-  };
+  dateRange?: DateRange;
   height?: number;
   valueLabel?: string;
 }
@@ -28,6 +26,11 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
   const domainStart = Date.parse(`${dateRange?.start ?? series[0]?.date}T00:00:00Z`);
   const domainEnd = Date.parse(`${dateRange?.end ?? series.at(-1)?.date}T00:00:00Z`);
   const domainRange = domainEnd - domainStart || 1;
+  const domainLabels = {
+    start: dateRange?.start ?? series[0]?.date,
+    end: dateRange?.end ?? series.at(-1)?.date ?? series[0]?.date
+  };
+  const ticks = dateTicks(domainLabels);
 
   const xForDate = (date: string) => {
     const timestamp = Date.parse(`${date}T00:00:00Z`);
@@ -67,12 +70,19 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
         r="4"
         fill={color}
       />
-      <text x={padding.left} y={height - 8}>
-        {dateRange?.start ?? series[0]?.date}
-      </text>
-      <text x={width - padding.right} y={height - 8} textAnchor="end">
-        {dateRange?.end ?? latest?.date}
-      </text>
+      {ticks.map((tick, index) => {
+        const x = xForDate(tick);
+        const isFirst = index === 0;
+        const isLast = index === ticks.length - 1;
+        return (
+          <g key={tick}>
+            <line x1={x} x2={x} y1={height - padding.bottom} y2={height - padding.bottom + 4} />
+            <text x={x} y={height - 8} textAnchor={isFirst ? "start" : isLast ? "end" : "middle"}>
+              {tick.slice(0, 7)}
+            </text>
+          </g>
+        );
+      })}
     </svg>
   );
 }
