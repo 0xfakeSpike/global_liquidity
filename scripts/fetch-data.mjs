@@ -759,11 +759,11 @@ function normalizeToFirst(series) {
 }
 
 function riskMarketCharts(seriesMap) {
-  return [
-    {
-      title: "风险市场价格变化",
-      description: "BTC、纳斯达克综合指数、恒生科技指数跟踪代理均按各自首个可用日期归一为 100，便于比较风险资产节奏。",
-      series: riskDefinitions.map((definition) => ({
+  return riskDefinitions.map((definition) => ({
+    title: `${definition.label} 价格变化`,
+    description: `${definition.description} 曲线按该资产首个可用日期归一为 100，使用独立纵轴显示自身波动。`,
+    series: [
+      {
         key: definition.key,
         label: definition.label,
         color: definition.color,
@@ -772,9 +772,9 @@ function riskMarketCharts(seriesMap) {
         sourceUrl: definition.sourceUrl,
         description: definition.description,
         points: normalizeToFirst(seriesMap.get(definition.key) ?? [])
-      }))
-    }
-  ];
+      }
+    ]
+  }));
 }
 
 async function buildUsdDataset() {

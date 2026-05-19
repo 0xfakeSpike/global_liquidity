@@ -342,12 +342,15 @@ function RiskMarketTerminal({
         <p>Risk Market Terminal</p>
         <h2>风险市场价格变化</h2>
       </div>
+      <div className="overlay-note">
+        每个风险资产使用独立纵轴，横轴统一为全站时间区间；价格按该资产首个可用日期归一为 100。
+      </div>
       <div className="charts-stack">
         {charts.map((chart) => (
           <section className="chart-panel" key={chart.title}>
             <div className="chart-header">
               <div>
-                <span>Normalized Price</span>
+                <span>Normalized Price / Independent Y Axis</span>
                 <h3>{chart.title}</h3>
               </div>
             </div>

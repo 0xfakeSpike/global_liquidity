@@ -44,6 +44,8 @@ Risk market series:
 - FRED `NASDAQCOM`: Nasdaq Composite Index
 - Yahoo Finance `3033.HK`: CSOP Hang Seng TECH Index ETF, used as a Hang Seng TECH tracking proxy
 
+Risk market charts use one independent y-axis per asset and a shared 10-year x-axis.
+
 ## Local Development
 
 ```bash
