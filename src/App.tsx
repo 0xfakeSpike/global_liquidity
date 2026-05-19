@@ -195,6 +195,7 @@ function App() {
           dateRange={activeDataset.dateRange}
           eyebrow="Inflation / Real Rate"
           title="通胀与实际政策利率"
+          showRealRateImpact
         />
       ) : null}
 
@@ -208,6 +209,7 @@ function App() {
               dateRange={activeDataset.dateRange}
               eyebrow="Inflation / Real Rate"
               title="通胀与实际政策利率"
+              showRealRateImpact
             />
           ) : null}
         </>
@@ -335,12 +337,14 @@ function ChartGroupSection({
   charts,
   dateRange,
   eyebrow,
-  title
+  title,
+  showRealRateImpact = false
 }: {
   charts: InterestRateChart[];
   dateRange: LiquidityDataset["dateRange"];
   eyebrow: string;
   title: string;
+  showRealRateImpact?: boolean;
 }) {
   return (
     <section className="rate-section">
@@ -374,8 +378,68 @@ function ChartGroupSection({
           </div>
         ))}
       </div>
+      {showRealRateImpact ? <RealRateImpactPanel charts={charts} /> : null}
     </section>
   );
+}
+
+function RealRateImpactPanel({ charts }: { charts: InterestRateChart[] }) {
+  const realRateSignals = charts
+    .map((chart) => {
+      const realSeries = chart.series.find((item) => item.key.toLowerCase().includes("real"));
+      const latest = realSeries?.points.at(-1);
+      if (!realSeries || !latest) return null;
+      return {
+        market: chart.title.replace("通胀与实际政策利率", ""),
+        label: realSeries.label,
+        latest
+      };
+    })
+    .filter(Boolean) as { market: string; label: string; latest: DataPoint }[];
+
+  return (
+    <div className="real-rate-impact">
+      <div className="real-rate-impact-header">
+        <span>Asset Attraction Framework</span>
+        <h3>实际利率对其他资产吸引力的影响</h3>
+        <p>
+          名义短端利率决定账户里的现金收益、融资成本和 carry；实际政策利率决定现金在购买力维度是否真正变贵。
+          对 BTC、黄金、成长股、港股科技这类高久期或抗通胀资产，最关键的是名义利率和实际利率是否同时偏高。
+        </p>
+      </div>
+      <div className="real-rate-cards">
+        <div className="real-rate-card">
+          <strong>名义利率高</strong>
+          <p>货币基金、短债和保证金现金回报更有吸引力，风险资产必须提供更高的预期回报来补偿波动。</p>
+        </div>
+        <div className="real-rate-card">
+          <strong>实际利率高</strong>
+          <p>现金和短债的购买力回报上升，黄金、BTC 和高估值成长股的估值压力更强。</p>
+        </div>
+        <div className="real-rate-card">
+          <strong>实际利率低或为负</strong>
+          <p>名义现金收益可能看起来不低，但购买力回报不足，抗通胀资产和高久期资产的相对吸引力更容易恢复。</p>
+        </div>
+      </div>
+      {realRateSignals.length > 0 ? (
+        <div className="real-rate-signals">
+          {realRateSignals.map((signal) => (
+            <div className="real-rate-signal" key={signal.label}>
+              <span>{signal.market || signal.label}</span>
+              <strong>{formatNumber(signal.latest.value, 2)}%</strong>
+              <p>{realRatePressureText(signal.latest.value)}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function realRatePressureText(value: number) {
+  if (value >= 2) return "实际现金回报偏高，对 BTC、黄金和高久期权益资产形成较强压制。";
+  if (value >= 0) return "实际现金回报为正，风险资产需要盈利增长或流动性改善来抵消估值压力。";
+  return "实际现金回报为负，现金购买力仍在被通胀侵蚀，抗通胀资产的相对吸引力更强。";
 }
 
 function RiskMarketTerminal({
