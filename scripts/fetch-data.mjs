@@ -492,8 +492,9 @@ async function fetchFredSeries({ fredId, scale, start = startIso }) {
   return lines
     .map((line) => {
       const [date, raw] = line.split(",");
-      const numeric = Number(raw);
-      if (!date || raw === "." || Number.isNaN(numeric)) return null;
+      const value = raw?.trim();
+      const numeric = Number(value);
+      if (!date || !value || value === "." || Number.isNaN(numeric)) return null;
       return { date, value: round(numeric * scale, 4) };
     })
     .filter(Boolean);
