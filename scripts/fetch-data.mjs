@@ -4,14 +4,14 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..");
-const outputPath = resolve(repoRoot, "public/data/liquidity.json");
+const outputDir = resolve(repoRoot, "public/data");
 
 const lookbackYears = 10;
 const startDate = new Date();
 startDate.setUTCFullYear(startDate.getUTCFullYear() - lookbackYears);
 const startIso = startDate.toISOString().slice(0, 10);
 
-const definitions = [
+const usdDefinitions = [
   {
     key: "fedBalanceSheet",
     fredId: "WALCL",
@@ -152,7 +152,7 @@ const definitions = [
   }
 ];
 
-const derivedDefinitions = [
+const usdDerivedDefinitions = [
   {
     key: "netLiquidity",
     name: "综合净流动性指数",
@@ -181,6 +181,126 @@ const derivedDefinitions = [
   }
 ];
 
+const jpyDefinitions = [
+  {
+    key: "bojAssets",
+    fredId: "JPNASSETS",
+    name: "日本银行总资产",
+    shortName: "BOJ 总资产",
+    group: "央行资产负债表",
+    unit: "兆日元",
+    source: "FRED JPNASSETS / Bank of Japan Accounts",
+    sourceUrl: "https://fred.stlouisfed.org/series/JPNASSETS",
+    direction: "up_is_looser",
+    weight: 0.18,
+    scale: 1 / 10_000,
+    description: "BOJ 资产扩张通常代表央行向体系提供更多日元基础流动性，缩表则反向。"
+  },
+  {
+    key: "monetaryBase",
+    bojDb: "MD01",
+    bojCode: "MABS1AN11",
+    name: "货币基础平均余额",
+    shortName: "货币基础",
+    group: "基础货币",
+    unit: "兆日元",
+    source: "BOJ MD01 MABS1AN11",
+    sourceUrl: "https://www.stat-search.boj.or.jp/index_en.html",
+    direction: "up_is_looser",
+    weight: 0.18,
+    scale: 1 / 10_000,
+    description: "BOJ 定义的货币基础为纸币、硬币与日银当座存款之和，是日元基础流动性的核心口径。"
+  },
+  {
+    key: "bojCurrentAccounts",
+    bojDb: "MD01",
+    bojCode: "MABS1AN113",
+    name: "日银当座存款平均余额",
+    shortName: "当座存款",
+    group: "银行准备金",
+    unit: "兆日元",
+    source: "BOJ MD01 MABS1AN113",
+    sourceUrl: "https://www.stat-search.boj.or.jp/index_en.html",
+    direction: "up_is_looser",
+    weight: 0.16,
+    scale: 1 / 10_000,
+    description: "金融机构在 BOJ 的当座存款越高，银行体系可动用准备金越充足。"
+  },
+  {
+    key: "reserveBalances",
+    bojDb: "MD01",
+    bojCode: "MABS1AN114",
+    name: "准备金平均余额",
+    shortName: "准备金",
+    group: "银行准备金",
+    unit: "兆日元",
+    source: "BOJ MD01 MABS1AN114",
+    sourceUrl: "https://www.stat-search.boj.or.jp/index_en.html",
+    direction: "up_is_looser",
+    weight: 0.12,
+    scale: 1 / 10_000,
+    description: "准备金余额反映商业银行体系持有的央行货币，快速下降通常意味着边际流动性收缩。"
+  },
+  {
+    key: "m2Japan",
+    bojDb: "MD02",
+    bojCode: "MAM1NAM2M2MO",
+    name: "日本 M2 平均余额",
+    shortName: "M2",
+    group: "广义流动性",
+    unit: "兆日元",
+    source: "BOJ MD02 MAM1NAM2M2MO",
+    sourceUrl: "https://www.stat-search.boj.or.jp/index_en.html",
+    direction: "up_is_looser",
+    weight: 0.12,
+    scale: 1 / 10_000,
+    description: "M2 扩张代表居民、企业和部分金融机构可用存款货币增加，对国内信用环境更友好。"
+  },
+  {
+    key: "broadLiquidityJapan",
+    bojDb: "MD02",
+    bojCode: "MAM1NABLBLMO",
+    name: "广义定义流动性 L",
+    shortName: "L",
+    group: "广义流动性",
+    unit: "兆日元",
+    source: "BOJ MD02 MAM1NABLBLMO",
+    sourceUrl: "https://www.stat-search.boj.or.jp/index_en.html",
+    direction: "up_is_looser",
+    weight: 0.12,
+    scale: 1 / 10_000,
+    description: "BOJ 的 L 口径覆盖 M3 之外的信托、投信、银行债、金融机构 CP、国债和外债等高流动性资产。"
+  },
+  {
+    key: "jgb10y",
+    fredId: "IRLTLT01JPM156N",
+    name: "日本 10 年期国债收益率",
+    shortName: "JGB 10Y",
+    group: "利率与融资",
+    unit: "%",
+    source: "FRED IRLTLT01JPM156N / OECD",
+    sourceUrl: "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
+    direction: "up_is_tighter",
+    weight: 0.12,
+    scale: 1,
+    description: "JGB 长端收益率上行会提高日元融资成本，并压缩以低日元利率为基础的套利空间。"
+  },
+  {
+    key: "usdJpy",
+    fredId: "DEXJPUS",
+    name: "美元兑日元汇率",
+    shortName: "USD/JPY",
+    group: "汇率与套息",
+    unit: "日元/美元",
+    source: "FRED DEXJPUS",
+    sourceUrl: "https://fred.stlouisfed.org/series/DEXJPUS",
+    direction: "up_is_looser",
+    weight: 0.1,
+    scale: 1,
+    description: "USD/JPY 上升通常对应日元走弱和套息环境更顺；急速下行则容易触发日元空头和 carry trade 去杠杆。"
+  }
+];
+
 async function fetchFredSeries({ fredId, scale }) {
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${fredId}&cosd=${startIso}`;
   const response = await fetch(url, {
@@ -197,6 +317,37 @@ async function fetchFredSeries({ fredId, scale }) {
       const numeric = Number(raw);
       if (!date || raw === "." || Number.isNaN(numeric)) return null;
       return { date, value: round(numeric * scale, 4) };
+    })
+    .filter(Boolean);
+}
+
+async function fetchBojSeries({ bojDb, bojCode, scale }) {
+  const startMonth = startIso.slice(0, 7).replace("-", "");
+  const url = `https://www.stat-search.boj.or.jp/api/v1/getDataCode?format=json&lang=en&db=${bojDb}&startDate=${startMonth}&code=${bojCode}`;
+  const response = await fetch(url, {
+    headers: {
+      "accept": "application/json",
+      "user-agent": "global-liquidity-monitor/0.1"
+    }
+  });
+  if (!response.ok) {
+    throw new Error(`BOJ ${bojDb}/${bojCode} failed: ${response.status} ${response.statusText}`);
+  }
+  const payload = await response.json();
+  if (payload.STATUS !== 200) {
+    throw new Error(`BOJ ${bojDb}/${bojCode} failed: ${payload.MESSAGE ?? payload.STATUS}`);
+  }
+  const result = payload.RESULTSET?.find((item) => item.SERIES_CODE === bojCode);
+  const dates = result?.VALUES?.SURVEY_DATES ?? [];
+  const values = result?.VALUES?.VALUES ?? [];
+
+  return dates
+    .map((dateValue, index) => {
+      const raw = values[index];
+      const numeric = Number(raw);
+      const date = String(dateValue);
+      if (date.length !== 6 || raw === null || raw === "" || Number.isNaN(numeric)) return null;
+      return { date: `${date.slice(0, 4)}-${date.slice(4, 6)}-01`, value: round(numeric * scale, 4) };
     })
     .filter(Boolean);
 }
@@ -344,11 +495,28 @@ function labelForScore(score) {
 }
 
 async function main() {
-  const rawDefinitions = definitions.filter((definition) => definition.fredId);
+  await writeDataset("liquidity.json", await buildUsdDataset());
+  await writeDataset("yen-liquidity.json", await buildJpyDataset());
+}
+
+async function fetchSeriesForDefinitions(definitionsForFetch) {
   const entries = await Promise.all(
-    rawDefinitions.map(async (definition) => [definition.key, await fetchFredSeries(definition)])
+    definitionsForFetch
+      .filter((definition) => definition.fredId || definition.bojCode)
+      .map(async (definition) => [
+        definition.key,
+        definition.fredId ? await fetchFredSeries(definition) : await fetchBojSeries(definition)
+      ])
   );
-  const seriesMap = new Map(entries);
+  return new Map(entries);
+}
+
+function stripInternalFields(definitionsForOutput) {
+  return definitionsForOutput.map(({ fredId, bojDb, bojCode, scale, hidden, ...definition }) => definition);
+}
+
+async function buildUsdDataset() {
+  const seriesMap = await fetchSeriesForDefinitions(usdDefinitions);
 
   const net = netLiquidity(
     seriesMap.get("fedBalanceSheet") ?? [],
@@ -363,18 +531,18 @@ async function main() {
   seriesMap.set("sofrIorb", sofrIorb);
 
   const visibleDefinitions = [
-    ...definitions.filter((definition) => !definition.hidden),
-    ...derivedDefinitions
+    ...usdDefinitions.filter((definition) => !definition.hidden),
+    ...usdDerivedDefinitions
   ].sort((a, b) => b.weight - a.weight);
 
   const snapshots = visibleDefinitions.map((definition) => snapshot(definition, seriesMap.get(definition.key) ?? []));
   const composite = compositeSeries(visibleDefinitions, snapshots);
   const latestComposite = composite.at(-1) ?? null;
 
-  const dataset = {
+  return {
     generatedAt: new Date().toISOString(),
     lookbackYears,
-    indicators: visibleDefinitions.map(({ fredId, scale, hidden, ...definition }) => definition),
+    indicators: stripInternalFields(visibleDefinitions),
     snapshots,
     composite: {
       score: latestComposite?.value ?? null,
@@ -388,7 +556,36 @@ async function main() {
       "综合评分使用各指标十年历史 Z-score 的方向化加权值，转换为 0-100 区间；它是监控仪表盘，不是投资建议。"
     ]
   };
+}
 
+async function buildJpyDataset() {
+  const seriesMap = await fetchSeriesForDefinitions(jpyDefinitions);
+  const visibleDefinitions = [...jpyDefinitions].sort((a, b) => b.weight - a.weight);
+  const snapshots = visibleDefinitions.map((definition) => snapshot(definition, seriesMap.get(definition.key) ?? []));
+  const composite = compositeSeries(visibleDefinitions, snapshots);
+  const latestComposite = composite.at(-1) ?? null;
+
+  return {
+    generatedAt: new Date().toISOString(),
+    lookbackYears,
+    indicators: stripInternalFields(visibleDefinitions),
+    snapshots,
+    composite: {
+      score: latestComposite?.value ?? null,
+      label: labelForScore(latestComposite?.value ?? null),
+      date: latestComposite?.date ?? null,
+      series: composite
+    },
+    notes: [
+      "BOJ 官方 Time-Series Data Search API 在构建阶段抓取货币基础、当座存款、准备金、M2 与广义定义流动性 L。",
+      "BOJ 总资产、USD/JPY 和日本 10 年期国债收益率使用 FRED 无密钥 CSV 序列；其中 BOJ 总资产的原始来源仍为 Bank of Japan Accounts。",
+      "日元综合评分同样使用十年 Z-score 方向化加权。货币量、准备金和 USD/JPY 上升按偏宽松处理，JGB 10Y 上升按偏收紧处理。"
+    ]
+  };
+}
+
+async function writeDataset(fileName, dataset) {
+  const outputPath = resolve(outputDir, fileName);
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, `${JSON.stringify(dataset, null, 2)}\n`);
   console.log(`Wrote ${outputPath}`);

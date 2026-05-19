@@ -1,12 +1,15 @@
-# Global Dollar Liquidity Monitor
+# Global Liquidity Monitor
 
-React + Vite implementation of a dollar liquidity monitoring terminal inspired by DollarLiquidity-style indicator pages.
+React + Vite implementation of a global liquidity monitoring terminal inspired by DollarLiquidity-style indicator pages. It currently includes parallel USD and JPY liquidity pages.
 
 ## Data Sources
 
-The app does not fetch macro data from the browser. `scripts/fetch-data.mjs` pulls public data at build time and writes `public/data/liquidity.json`.
+The app does not fetch macro data from the browser. `scripts/fetch-data.mjs` pulls public data at build time and writes:
 
-Primary series:
+- `public/data/liquidity.json` for USD liquidity
+- `public/data/yen-liquidity.json` for JPY liquidity
+
+USD primary series:
 
 - FRED `WALCL`: Fed balance sheet total assets
 - FRED `WTREGEN`: Treasury General Account
@@ -19,6 +22,17 @@ Derived series:
 
 - Net liquidity = `WALCL - WTREGEN - RRPONTSYD`
 - Composite DLI score = direction-adjusted 10-year z-score weighted index, converted to a 0-100 range
+
+JPY primary series:
+
+- FRED `JPNASSETS`: Bank of Japan total assets
+- BOJ API `MD01/MABS1AN11`: monetary base
+- BOJ API `MD01/MABS1AN113`: current account balances at the BOJ
+- BOJ API `MD01/MABS1AN114`: reserve balances
+- BOJ API `MD02/MAM1NAM2M2MO`: M2 money stock
+- BOJ API `MD02/MAM1NABLBLMO`: broadly-defined liquidity `L`
+- FRED `IRLTLT01JPM156N`: Japan 10-year government bond yield
+- FRED `DEXJPUS`: USD/JPY exchange rate
 
 ## Local Development
 

@@ -1,33 +1,13 @@
-export type LiquiditySeriesKey =
-  | "fedBalanceSheet"
-  | "tga"
-  | "onRrp"
-  | "netLiquidity"
-  | "m2"
-  | "sofrIorb"
-  | "srf"
-  | "vix"
-  | "hyOas"
-  | "broadDollar"
-  | "realYield10y";
-
-export type IndicatorGroup =
-  | "政策与准备金"
-  | "融资与管道"
-  | "信用与中介"
-  | "风险与价格"
-  | "广义流动性";
-
 export interface DataPoint {
   date: string;
   value: number;
 }
 
 export interface IndicatorDefinition {
-  key: LiquiditySeriesKey;
+  key: string;
   name: string;
   shortName: string;
-  group: IndicatorGroup;
+  group: string;
   unit: string;
   source: string;
   sourceUrl: string;
@@ -38,7 +18,7 @@ export interface IndicatorDefinition {
 }
 
 export interface IndicatorSnapshot {
-  key: LiquiditySeriesKey;
+  key: string;
   latestDate: string;
   latestValue: number;
   previousValue: number | null;

@@ -2,21 +2,59 @@ import { Activity, Database, RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { LineChart } from "./components/LineChart";
 import { ScoreGauge } from "./components/ScoreGauge";
-import { loadLiquidityDataset } from "./lib/data";
+import { loadLiquidityDataset, type LiquidityMarket } from "./lib/data";
 import { formatChange, formatNumber, scoreTone } from "./lib/format";
 import type { IndicatorDefinition, IndicatorSnapshot, LiquidityDataset } from "./types/liquidity";
 import "./styles.css";
 
+const markets: Record<
+  LiquidityMarket,
+  {
+    label: string;
+    eyebrow: string;
+    title: string;
+    description: string;
+    sourceLabel: string;
+    updateLabel: string;
+  }
+> = {
+  usd: {
+    label: "美元流动性",
+    eyebrow: "美元全球流动性监控",
+    title: "把 Fed 资产、TGA、ON RRP、融资压力和风险价格放到一张表里。",
+    description: "每张图表按指标依次展开，构建阶段自动更新公开数据，页面端读取最新发布快照。",
+    sourceLabel: "FRED / NY Fed",
+    updateLabel: "Build-time JSON"
+  },
+  jpy: {
+    label: "日元流动性",
+    eyebrow: "日元全球流动性监控",
+    title: "把 BOJ 资产、基础货币、当座存款、广义流动性和日元融资压力放到一张表里。",
+    description: "数据来自 BOJ 官方统计 API 与 FRED 镜像序列，构建阶段生成日元流动性快照。",
+    sourceLabel: "BOJ / FRED",
+    updateLabel: "Build-time JSON"
+  }
+};
+
+function initialMarket(): LiquidityMarket {
+  return window.location.hash.includes("jpy") ? "jpy" : "usd";
+}
+
 function App() {
   const [dataset, setDataset] = useState<LiquidityDataset | null>(null);
+  const [market, setMarket] = useState<LiquidityMarket>(initialMarket);
 
   useEffect(() => {
-    loadLiquidityDataset().then(setDataset);
-  }, []);
+    window.location.hash = market === "jpy" ? "jpy" : "usd";
+    setDataset(null);
+    loadLiquidityDataset(market).then(setDataset);
+  }, [market]);
 
   const snapshotMap = useMemo(() => {
     return new Map(dataset?.snapshots.map((snapshot) => [snapshot.key, snapshot]) ?? []);
   }, [dataset]);
+
+  const marketConfig = markets[market];
 
   if (!dataset) {
     return <div className="loading">Loading liquidity monitor...</div>;
@@ -31,22 +69,42 @@ function App() {
         <nav>
           <div className="brand">
             <Activity size={21} />
-            <span>Global Dollar Liquidity</span>
+            <span>Global Liquidity Monitor</span>
+          </div>
+          <div className="market-tabs" aria-label="liquidity market">
+            {Object.entries(markets).map(([key, item]) => (
+              <button
+                className={key === market ? "active" : ""}
+                key={key}
+                onClick={() => setMarket(key as LiquidityMarket)}
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
           <div className="nav-meta">
-            <span>FRED</span>
-            <span>Treasury</span>
-            <span>NY Fed</span>
+            {market === "usd" ? (
+              <>
+                <span>FRED</span>
+                <span>Treasury</span>
+                <span>NY Fed</span>
+              </>
+            ) : (
+              <>
+                <span>BOJ</span>
+                <span>FRED</span>
+                <span>OECD</span>
+              </>
+            )}
           </div>
         </nav>
 
         <section className="hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">美元全球流动性监控</p>
-            <h1>把 Fed 资产、TGA、ON RRP、融资压力和风险价格放到一张表里。</h1>
-            <p className="hero-text">
-              每张图表按指标依次展开，构建阶段自动更新公开数据，页面端读取最新发布快照。
-            </p>
+            <p className="eyebrow">{marketConfig.eyebrow}</p>
+            <h1>{marketConfig.title}</h1>
+            <p className="hero-text">{marketConfig.description}</p>
             <div className="hero-actions">
               <a href="#terminal">查看图表</a>
               <a href="#terminal">图表数据来源</a>
@@ -68,8 +126,8 @@ function App() {
       </header>
 
       <section className="metric-strip">
-        <Metric icon={<Database size={20} />} label="公开数据源" value="FRED / NY Fed" />
-        <Metric icon={<RefreshCw size={20} />} label="更新方式" value="Build-time JSON" />
+        <Metric icon={<Database size={20} />} label="公开数据源" value={marketConfig.sourceLabel} />
+        <Metric icon={<RefreshCw size={20} />} label="更新方式" value={marketConfig.updateLabel} />
         <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${dataset.lookbackYears}Y Z-score`} />
       </section>
 
