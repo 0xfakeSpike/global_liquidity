@@ -1,39 +1,25 @@
 import { Activity, Database, RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { IndicatorCard } from "./components/IndicatorCard";
 import { LineChart } from "./components/LineChart";
 import { ScoreGauge } from "./components/ScoreGauge";
 import { SourceTable } from "./components/SourceTable";
 import { loadLiquidityDataset } from "./lib/data";
 import { formatChange, formatNumber, scoreTone } from "./lib/format";
-import type { IndicatorDefinition, IndicatorSnapshot, LiquidityDataset, LiquiditySeriesKey } from "./types/liquidity";
+import type { IndicatorDefinition, IndicatorSnapshot, LiquidityDataset } from "./types/liquidity";
 import "./styles.css";
 
 function App() {
   const [dataset, setDataset] = useState<LiquidityDataset | null>(null);
-  const [activeKey, setActiveKey] = useState<LiquiditySeriesKey>("netLiquidity");
 
   useEffect(() => {
-    loadLiquidityDataset().then((data) => {
-      setDataset(data);
-      if (!data.snapshots.some((item) => item.key === activeKey)) {
-        setActiveKey(data.snapshots[0]?.key ?? "fedBalanceSheet");
-      }
-    });
+    loadLiquidityDataset().then(setDataset);
   }, []);
 
   const snapshotMap = useMemo(() => {
     return new Map(dataset?.snapshots.map((snapshot) => [snapshot.key, snapshot]) ?? []);
   }, [dataset]);
 
-  const definitionMap = useMemo(() => {
-    return new Map(dataset?.indicators.map((indicator) => [indicator.key, indicator]) ?? []);
-  }, [dataset]);
-
-  const activeSnapshot = snapshotMap.get(activeKey) ?? dataset?.snapshots[0];
-  const activeDefinition = activeSnapshot ? definitionMap.get(activeSnapshot.key) : undefined;
-
-  if (!dataset || !activeSnapshot || !activeDefinition) {
+  if (!dataset) {
     return <div className="loading">Loading liquidity monitor...</div>;
   }
 
@@ -60,7 +46,7 @@ function App() {
             <p className="eyebrow">美元全球流动性监控</p>
             <h1>把 Fed 资产、TGA、ON RRP、融资压力和风险价格放到一张表里。</h1>
             <p className="hero-text">
-              参考 DollarLiquidity 的终端式结构，核心区别是把数据抓取脚本和前端展示拆开：构建阶段更新公开数据，页面端只读本地快照。
+              每张图表按指标依次展开，构建阶段自动更新公开数据，页面端读取最新发布快照。
             </p>
             <div className="hero-actions">
               <a href="#terminal">查看终端</a>
@@ -91,59 +77,15 @@ function App() {
       <section className="terminal" id="terminal">
         <div className="section-heading">
           <p>Indicator Terminal</p>
-          <h2>指标终端视图</h2>
+          <h2>全部指标图表</h2>
         </div>
 
-        <div className="terminal-layout">
-          <aside className="indicator-list">
-            {dataset.indicators.map((definition) => {
-              const snapshot = snapshotMap.get(definition.key);
-              if (!snapshot) return null;
-              return (
-                <IndicatorCard
-                  key={definition.key}
-                  definition={definition}
-                  snapshot={snapshot}
-                  active={activeKey === definition.key}
-                  onSelect={() => setActiveKey(definition.key)}
-                />
-              );
-            })}
-          </aside>
-
-          <section className="chart-panel">
-            <div className="chart-header">
-              <div>
-                <span>{activeDefinition.group}</span>
-                <h3>{activeDefinition.name}</h3>
-              </div>
-              <div className="latest-value">
-                <strong>{formatNumber(activeSnapshot.latestValue)}</strong>
-                <small>{activeDefinition.unit}</small>
-              </div>
-            </div>
-            <LineChart
-              series={activeSnapshot.series.slice(-520)}
-              color={activeDefinition.direction === "up_is_looser" ? "#16a34a" : "#dc2626"}
-              valueLabel={activeDefinition.name}
-            />
-            <div className="chart-stats">
-              <Stat label="最新日期" value={activeSnapshot.latestDate} />
-              <Stat label="1D 变化" value={formatChange(activeSnapshot.oneDayChange)} />
-              <Stat label="1M 变化" value={formatChange(activeSnapshot.oneMonthChange)} />
-              <Stat label="历史位置" value={activeSnapshot.percentile === null ? "n/a" : `${Math.round(activeSnapshot.percentile)}%`} />
-              <Stat label="Z-score" value={formatNumber(activeSnapshot.zScore, 2)} />
-            </div>
-            <div className="interpretation">
-              <strong>当前解读</strong>
-              <p>
-                {activeDefinition.shortName} 当前值为 {formatNumber(activeSnapshot.latestValue)} {activeDefinition.unit}。
-                方向定义为{activeDefinition.direction === "up_is_looser" ? "上升偏宽松" : "上升偏收紧"}；
-                当前对综合评分贡献为 {formatNumber(activeSnapshot.scoreContribution, 3)}。
-              </p>
-              <p>{activeDefinition.description}</p>
-            </div>
-          </section>
+        <div className="charts-stack">
+          {dataset.indicators.map((definition) => {
+            const snapshot = snapshotMap.get(definition.key);
+            if (!snapshot) return null;
+            return <IndicatorChart key={definition.key} definition={definition} snapshot={snapshot} />;
+          })}
         </div>
       </section>
 
@@ -192,6 +134,50 @@ function Stat({ label, value }: { label: string; value: string }) {
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
+  );
+}
+
+function IndicatorChart({
+  definition,
+  snapshot
+}: {
+  definition: IndicatorDefinition;
+  snapshot: IndicatorSnapshot;
+}) {
+  return (
+    <section className="chart-panel" id={definition.key}>
+      <div className="chart-header">
+        <div>
+          <span>{definition.group}</span>
+          <h3>{definition.name}</h3>
+        </div>
+        <div className="latest-value">
+          <strong>{formatNumber(snapshot.latestValue)}</strong>
+          <small>{definition.unit}</small>
+        </div>
+      </div>
+      <LineChart
+        series={snapshot.series.slice(-520)}
+        color={definition.direction === "up_is_looser" ? "#16a34a" : "#dc2626"}
+        valueLabel={definition.name}
+      />
+      <div className="chart-stats">
+        <Stat label="最新日期" value={snapshot.latestDate} />
+        <Stat label="1D 变化" value={formatChange(snapshot.oneDayChange)} />
+        <Stat label="1M 变化" value={formatChange(snapshot.oneMonthChange)} />
+        <Stat label="历史位置" value={snapshot.percentile === null ? "n/a" : `${Math.round(snapshot.percentile)}%`} />
+        <Stat label="Z-score" value={formatNumber(snapshot.zScore, 2)} />
+      </div>
+      <div className="interpretation">
+        <strong>当前解读</strong>
+        <p>
+          {definition.shortName} 当前值为 {formatNumber(snapshot.latestValue)} {definition.unit}。
+          方向定义为{definition.direction === "up_is_looser" ? "上升偏宽松" : "上升偏收紧"}；
+          当前对综合评分贡献为 {formatNumber(snapshot.scoreContribution, 3)}。
+        </p>
+        <p>{definition.description}</p>
+      </div>
+    </section>
   );
 }
 
