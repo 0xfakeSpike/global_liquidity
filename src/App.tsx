@@ -2,7 +2,6 @@ import { Activity, Database, RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { LineChart } from "./components/LineChart";
 import { ScoreGauge } from "./components/ScoreGauge";
-import { SourceTable } from "./components/SourceTable";
 import { loadLiquidityDataset } from "./lib/data";
 import { formatChange, formatNumber, scoreTone } from "./lib/format";
 import type { IndicatorDefinition, IndicatorSnapshot, LiquidityDataset } from "./types/liquidity";
@@ -49,8 +48,8 @@ function App() {
               每张图表按指标依次展开，构建阶段自动更新公开数据，页面端读取最新发布快照。
             </p>
             <div className="hero-actions">
-              <a href="#terminal">查看终端</a>
-              <a href="#sources">数据来源</a>
+              <a href="#terminal">查看图表</a>
+              <a href="#terminal">图表数据来源</a>
             </div>
           </div>
           <div className="summary-panel">
@@ -105,10 +104,6 @@ function App() {
           </div>
         </div>
       </section>
-
-      <div id="sources">
-        <SourceTable indicators={dataset.indicators} />
-      </div>
 
       <footer>
         <span>Generated at {new Date(dataset.generatedAt).toLocaleString("zh-CN")}</span>
@@ -176,6 +171,13 @@ function IndicatorChart({
           当前对综合评分贡献为 {formatNumber(snapshot.scoreContribution, 3)}。
         </p>
         <p>{definition.description}</p>
+      </div>
+      <div className="data-source">
+        <span>数据来源</span>
+        <a href={definition.sourceUrl} target="_blank" rel="noreferrer">
+          {definition.source}
+        </a>
+        <p>{definition.formula ?? definition.description}</p>
       </div>
     </section>
   );

@@ -132,7 +132,6 @@ h1 {
 .summary-panel,
 .chart-panel,
 .notes,
-.source-table a,
 .metric {
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid #e2e8f0;
@@ -237,8 +236,7 @@ footer {
 
 .metric-strip,
 .terminal,
-.composite-section,
-.source-section {
+.composite-section {
   margin: 0 auto;
   max-width: 1240px;
   padding: 26px clamp(18px, 4vw, 56px);
@@ -386,6 +384,38 @@ footer {
   margin: 8px 0 0;
 }
 
+.data-source {
+  border-top: 1px solid #e2e8f0;
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.data-source span {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.data-source a {
+  color: #0f172a;
+  font-weight: 760;
+  width: fit-content;
+}
+
+.data-source a:hover {
+  color: #0f766e;
+}
+
+.data-source p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+}
+
 .composite-grid {
   display: grid;
   gap: 18px;
@@ -404,36 +434,6 @@ footer {
 
 .notes p:last-child {
   margin-bottom: 0;
-}
-
-.source-table {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.source-table a {
-  box-shadow: none;
-  display: grid;
-  gap: 6px;
-  padding: 16px;
-}
-
-.source-table span {
-  color: #0f766e;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.source-table strong {
-  color: #0f172a;
-}
-
-.source-table em {
-  color: #64748b;
-  font-size: 13px;
-  font-style: normal;
-  line-height: 1.5;
 }
 
 footer {
@@ -465,7 +465,6 @@ footer {
   }
 
   .metric-strip,
-  .source-table,
   .chart-stats {
     grid-template-columns: 1fr;
   }
