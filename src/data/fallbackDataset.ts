@@ -3,6 +3,10 @@ import type { LiquidityDataset } from "../types/liquidity";
 export const fallbackDataset: LiquidityDataset = {
   generatedAt: "2026-05-19T00:00:00.000Z",
   lookbackYears: 10,
+  dateRange: {
+    start: "2016-05-19",
+    end: "2026-05-19"
+  },
   indicators: [
     {
       key: "fedBalanceSheet",

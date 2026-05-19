@@ -4,34 +4,45 @@ import { formatNumber } from "../lib/format";
 interface LineChartProps {
   series: DataPoint[];
   color?: string;
+  dateRange?: {
+    start: string;
+    end: string;
+  };
   height?: number;
   valueLabel?: string;
 }
 
-export function LineChart({ series, color = "#2563eb", height = 240, valueLabel }: LineChartProps) {
+export function LineChart({ series, color = "#2563eb", dateRange, height = 240, valueLabel }: LineChartProps) {
   const width = 760;
   const padding = { top: 18, right: 18, bottom: 28, left: 46 };
   const usableWidth = width - padding.left - padding.right;
   const usableHeight = height - padding.top - padding.bottom;
+  if (series.length === 0) {
+    return <div className="chart-empty">暂无数据</div>;
+  }
+
   const values = series.map((point) => point.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1;
+  const domainStart = Date.parse(`${dateRange?.start ?? series[0]?.date}T00:00:00Z`);
+  const domainEnd = Date.parse(`${dateRange?.end ?? series.at(-1)?.date}T00:00:00Z`);
+  const domainRange = domainEnd - domainStart || 1;
+
+  const xForDate = (date: string) => {
+    const timestamp = Date.parse(`${date}T00:00:00Z`);
+    return padding.left + ((timestamp - domainStart) / domainRange) * usableWidth;
+  };
 
   const path = series
     .map((point, index) => {
-      const x = padding.left + (index / Math.max(1, series.length - 1)) * usableWidth;
+      const x = xForDate(point.date);
       const y = padding.top + (1 - (point.value - min) / range) * usableHeight;
       return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
     })
     .join(" ");
 
-  if (series.length === 0) {
-    return <div className="chart-empty">暂无数据</div>;
-  }
-
   const latest = series[series.length - 1];
-  const first = series[0];
 
   return (
     <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={valueLabel ?? "指标走势图"}>
@@ -51,16 +62,16 @@ export function LineChart({ series, color = "#2563eb", height = 240, valueLabel 
       </text>
       <path d={path} stroke={color} />
       <circle
-        cx={width - padding.right}
+        cx={xForDate(latest.date)}
         cy={padding.top + (1 - (latest.value - min) / range) * usableHeight}
         r="4"
         fill={color}
       />
       <text x={padding.left} y={height - 8}>
-        {first?.date}
+        {dateRange?.start ?? series[0]?.date}
       </text>
       <text x={width - padding.right} y={height - 8} textAnchor="end">
-        {latest?.date}
+        {dateRange?.end ?? latest?.date}
       </text>
     </svg>
   );

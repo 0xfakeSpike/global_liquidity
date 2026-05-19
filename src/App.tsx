@@ -178,7 +178,7 @@ function App() {
         <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${activeDataset.lookbackYears}Y Z-score`} />
       </section>
 
-      {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} /> : null}
+      {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} /> : null}
 
       {market === "combined" && pairedDatasets ? (
         <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
@@ -194,7 +194,14 @@ function App() {
               {dataset.indicators.map((definition) => {
                 const snapshot = snapshotMap.get(definition.key);
                 if (!snapshot) return null;
-                return <IndicatorChart key={definition.key} definition={definition} snapshot={snapshot} />;
+                return (
+                  <IndicatorChart
+                    key={definition.key}
+                    definition={definition}
+                    snapshot={snapshot}
+                    dateRange={dataset.dateRange}
+                  />
+                );
               })}
             </div>
           </section>
@@ -206,7 +213,12 @@ function App() {
             </div>
             <div className="composite-grid">
               <div>
-                <LineChart series={dataset.composite.series.slice(-520)} color="#0f766e" valueLabel="综合流动性评分" />
+                <LineChart
+                  series={dataset.composite.series}
+                  color="#0f766e"
+                  dateRange={dataset.dateRange}
+                  valueLabel="综合流动性评分"
+                />
               </div>
               <div className="notes">
                 {dataset.notes.map((note) => (
@@ -245,7 +257,13 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function InterestRateSection({ charts }: { charts: InterestRateChart[] }) {
+function InterestRateSection({
+  charts,
+  dateRange
+}: {
+  charts: InterestRateChart[];
+  dateRange: LiquidityDataset["dateRange"];
+}) {
   return (
     <section className="rate-section">
       <div className="section-heading">
@@ -260,7 +278,7 @@ function InterestRateSection({ charts }: { charts: InterestRateChart[] }) {
               <p>{chart.description}</p>
             </div>
             <div className="rate-chart">
-              <MultiLineChart series={chart.series.map((item) => ({ ...item, points: item.points.slice(-520) }))} valueLabel={chart.title} />
+              <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
             </div>
             <div className="rate-sources">
               {chart.series.map((item) => {
@@ -284,10 +302,12 @@ function InterestRateSection({ charts }: { charts: InterestRateChart[] }) {
 
 function IndicatorChart({
   definition,
-  snapshot
+  snapshot,
+  dateRange
 }: {
   definition: IndicatorDefinition;
   snapshot: IndicatorSnapshot;
+  dateRange: LiquidityDataset["dateRange"];
 }) {
   return (
     <section className="chart-panel" id={definition.key}>
@@ -302,8 +322,9 @@ function IndicatorChart({
         </div>
       </div>
       <LineChart
-        series={snapshot.series.slice(-520)}
+        series={snapshot.series}
         color={definition.direction === "up_is_looser" ? "#16a34a" : "#dc2626"}
+        dateRange={dateRange}
         valueLabel={definition.name}
       />
       <div className="chart-stats">
@@ -405,9 +426,10 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
               </div>
               <MultiLineChart
                 series={[
-                  { label: pair.leftLabel, color: "#2563eb", points: series.left.slice(-520) },
-                  { label: pair.rightLabel, color: "#16a34a", points: series.right.slice(-520) }
+                  { label: pair.leftLabel, color: "#2563eb", points: series.left },
+                  { label: pair.rightLabel, color: "#16a34a", points: series.right }
                 ]}
+                dateRange={usd.dateRange}
                 valueLabel={pair.title}
               />
               <div className="interpretation">

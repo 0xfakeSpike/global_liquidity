@@ -50,6 +50,10 @@ export interface InterestRateChart {
 export interface LiquidityDataset {
   generatedAt: string;
   lookbackYears: number;
+  dateRange: {
+    start: string;
+    end: string;
+  };
   indicators: IndicatorDefinition[];
   snapshots: IndicatorSnapshot[];
   rateCharts?: InterestRateChart[];

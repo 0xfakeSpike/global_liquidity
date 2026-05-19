@@ -9,11 +9,15 @@ interface MultiLineSeries {
 
 interface MultiLineChartProps {
   series: MultiLineSeries[];
+  dateRange?: {
+    start: string;
+    end: string;
+  };
   height?: number;
   valueLabel?: string;
 }
 
-export function MultiLineChart({ series, height = 260, valueLabel }: MultiLineChartProps) {
+export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: MultiLineChartProps) {
   const width = 760;
   const padding = { top: 18, right: 18, bottom: 28, left: 46 };
   const usableWidth = width - padding.left - padding.right;
@@ -28,14 +32,23 @@ export function MultiLineChart({ series, height = 260, valueLabel }: MultiLineCh
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1;
-  const longest = Math.max(...series.map((item) => item.points.length));
   const firstDate = points.reduce((first, point) => (point.date < first ? point.date : first), points[0].date);
   const lastDate = points.reduce((last, point) => (point.date > last ? point.date : last), points[0].date);
+  const domainStartLabel = dateRange?.start ?? firstDate;
+  const domainEndLabel = dateRange?.end ?? lastDate;
+  const domainStart = Date.parse(`${domainStartLabel}T00:00:00Z`);
+  const domainEnd = Date.parse(`${domainEndLabel}T00:00:00Z`);
+  const domainRange = domainEnd - domainStart || 1;
+
+  const xForDate = (date: string) => {
+    const timestamp = Date.parse(`${date}T00:00:00Z`);
+    return padding.left + ((timestamp - domainStart) / domainRange) * usableWidth;
+  };
 
   const toPath = (items: DataPoint[]) =>
     items
       .map((point, index) => {
-        const x = padding.left + (index / Math.max(1, longest - 1)) * usableWidth;
+        const x = xForDate(point.date);
         const y = padding.top + (1 - (point.value - min) / range) * usableHeight;
         return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
       })
@@ -65,7 +78,7 @@ export function MultiLineChart({ series, height = 260, valueLabel }: MultiLineCh
               <path d={toPath(item.points)} stroke={item.color} />
               {latest ? (
                 <circle
-                  cx={padding.left + ((item.points.length - 1) / Math.max(1, longest - 1)) * usableWidth}
+                  cx={xForDate(latest.date)}
                   cy={padding.top + (1 - (latest.value - min) / range) * usableHeight}
                   r="4"
                   fill={item.color}
@@ -75,10 +88,10 @@ export function MultiLineChart({ series, height = 260, valueLabel }: MultiLineCh
           );
         })}
         <text x={padding.left} y={height - 8}>
-          {firstDate}
+          {domainStartLabel}
         </text>
         <text x={width - padding.right} y={height - 8} textAnchor="end">
-          {lastDate}
+          {domainEndLabel}
         </text>
       </svg>
       <div className="multi-chart-legend">

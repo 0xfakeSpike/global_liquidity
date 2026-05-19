@@ -10,6 +10,7 @@ const lookbackYears = 10;
 const startDate = new Date();
 startDate.setUTCFullYear(startDate.getUTCFullYear() - lookbackYears);
 const startIso = startDate.toISOString().slice(0, 10);
+const endIso = new Date().toISOString().slice(0, 10);
 
 const usdDefinitions = [
   {
@@ -428,7 +429,7 @@ async function fetchFredSeries({ fredId, scale }) {
       if (!date || raw === "." || Number.isNaN(numeric)) return null;
       return { date, value: round(numeric * scale, 4) };
     })
-    .filter(Boolean);
+    .filter((point) => point && point.date >= startIso);
 }
 
 async function fetchBojSeries({ bojDb, bojCode, scale }) {
@@ -465,7 +466,7 @@ async function fetchBojSeries({ bojDb, bojCode, scale }) {
           : `${date.slice(0, 4)}-${date.slice(4, 6)}-01`;
       return { date: isoDate, value: round(numeric * scale, 4) };
     })
-    .filter(Boolean);
+    .filter((point) => point && point.date >= startIso);
 }
 
 function byDate(series) {
@@ -709,6 +710,10 @@ async function buildUsdDataset() {
   return {
     generatedAt: new Date().toISOString(),
     lookbackYears,
+    dateRange: {
+      start: startIso,
+      end: endIso
+    },
     indicators: stripInternalFields(visibleDefinitions),
     snapshots,
     rateCharts: usdRateCharts(rateSeriesMap),
@@ -737,6 +742,10 @@ async function buildJpyDataset() {
   return {
     generatedAt: new Date().toISOString(),
     lookbackYears,
+    dateRange: {
+      start: startIso,
+      end: endIso
+    },
     indicators: stripInternalFields(visibleDefinitions),
     snapshots,
     rateCharts: jpyRateCharts(rateSeriesMap),
