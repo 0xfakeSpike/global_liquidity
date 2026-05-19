@@ -9,7 +9,7 @@ import type {
   DataPoint,
   IndicatorDefinition,
   IndicatorSnapshot,
-  InterestRateTable,
+  InterestRateChart,
   LiquidityDataset
 } from "./types/liquidity";
 import "./styles.css";
@@ -97,10 +97,10 @@ function App() {
 
   const looseCount = activeDataset.snapshots.filter((item) => (item.scoreContribution ?? 0) > 0).length;
   const tightCount = activeDataset.snapshots.filter((item) => (item.scoreContribution ?? 0) < 0).length;
-  const rateTables =
+  const rateCharts =
     market === "combined" && pairedDatasets
-      ? [...(pairedDatasets.usd.rateTables ?? []), ...(pairedDatasets.jpy.rateTables ?? [])]
-      : (activeDataset.rateTables ?? []);
+      ? [...(pairedDatasets.usd.rateCharts ?? []), ...(pairedDatasets.jpy.rateCharts ?? [])]
+      : (activeDataset.rateCharts ?? []);
 
   return (
     <main>
@@ -178,7 +178,7 @@ function App() {
         <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${activeDataset.lookbackYears}Y Z-score`} />
       </section>
 
-      {rateTables.length > 0 ? <InterestRateSection tables={rateTables} /> : null}
+      {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} /> : null}
 
       {market === "combined" && pairedDatasets ? (
         <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
@@ -245,70 +245,41 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function InterestRateSection({ tables }: { tables: InterestRateTable[] }) {
+function InterestRateSection({ charts }: { charts: InterestRateChart[] }) {
   return (
     <section className="rate-section">
       <div className="section-heading">
         <p>Policy Rates</p>
-        <h2>央行利率表</h2>
+        <h2>央行利率曲线</h2>
       </div>
       <div className="rate-grid">
-        {tables.map((table) => (
-          <div className="rate-card" key={table.title}>
+        {charts.map((chart) => (
+          <div className="rate-card" key={chart.title}>
             <div className="rate-card-header">
-              <h3>{table.title}</h3>
-              <p>{table.description}</p>
+              <h3>{chart.title}</h3>
+              <p>{chart.description}</p>
             </div>
-            <div className="rate-table-wrap">
-              <table className="rate-table">
-                <thead>
-                  <tr>
-                    <th>指标</th>
-                    <th>最新</th>
-                    <th>日期</th>
-                    <th>1D</th>
-                    <th>1M</th>
-                    <th>来源</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {table.rows.map((row) => (
-                    <tr key={row.key}>
-                      <td>
-                        <strong>{row.name}</strong>
-                        <span>{row.description}</span>
-                      </td>
-                      <td>{formatRateValue(row.latestValue, row.unit)}</td>
-                      <td>{row.latestDate || "n/a"}</td>
-                      <td>{formatRateMove(row.oneDayChange)}</td>
-                      <td>{formatRateMove(row.oneMonthChange)}</td>
-                      <td>
-                        <a href={row.sourceUrl} target="_blank" rel="noreferrer">
-                          {row.source}
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="rate-chart">
+              <MultiLineChart series={chart.series.map((item) => ({ ...item, points: item.points.slice(-520) }))} valueLabel={chart.title} />
+            </div>
+            <div className="rate-sources">
+              {chart.series.map((item) => {
+                const latest = item.points.at(-1);
+                return (
+                  <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
+                    <strong>{item.label}</strong>
+                    <span>
+                      {latest ? `${latest.date} ${formatNumber(latest.value, 3)}${item.unit}` : "n/a"} · {item.source}
+                    </span>
+                  </a>
+                );
+              })}
             </div>
           </div>
         ))}
       </div>
     </section>
   );
-}
-
-function formatRateValue(value: number | string, unit: string) {
-  if (typeof value === "string") return `${value}${unit}`;
-  return `${formatNumber(value, 3)}${unit}`;
-}
-
-function formatRateMove(value: number | null) {
-  if (value === null) return "n/a";
-  const bp = value * 100;
-  const sign = bp > 0 ? "+" : "";
-  return `${sign}${formatNumber(bp, 1)} bp`;
 }
 
 function IndicatorChart({

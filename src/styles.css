@@ -320,7 +320,6 @@ footer {
 .rate-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
 }
 
 .rate-card {
@@ -351,56 +350,36 @@ footer {
   margin: 0;
 }
 
-.rate-table-wrap {
-  overflow-x: auto;
+.rate-chart {
+  padding: 18px 18px 10px;
 }
 
-.rate-table {
-  border-collapse: collapse;
-  min-width: 760px;
-  width: 100%;
+.rate-sources {
+  border-top: 1px solid #e2e8f0;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  padding: 14px 18px 18px;
 }
 
-.rate-table th,
-.rate-table td {
-  border-bottom: 1px solid #e2e8f0;
-  padding: 13px 14px;
-  text-align: left;
-  vertical-align: top;
+.rate-sources a {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 10px;
 }
 
-.rate-table th {
-  background: #f8fafc;
-  color: #64748b;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.rate-table td {
+.rate-sources strong {
   color: #0f172a;
   font-size: 13px;
-  white-space: nowrap;
 }
 
-.rate-table td:first-child {
-  max-width: 300px;
-  white-space: normal;
-}
-
-.rate-table strong,
-.rate-table span {
-  display: block;
-}
-
-.rate-table span {
+.rate-sources span {
   color: #64748b;
+  font-size: 12px;
   line-height: 1.45;
-  margin-top: 5px;
-}
-
-.rate-table a {
-  color: #0f766e;
-  font-weight: 760;
 }
 
 .latest-value small {
