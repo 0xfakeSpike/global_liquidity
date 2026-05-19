@@ -179,10 +179,15 @@ function App() {
         <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${activeDataset.lookbackYears}Y Z-score`} />
       </section>
 
-      {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} /> : null}
+      {market !== "combined" && rateCharts.length > 0 ? (
+        <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
+      ) : null}
 
       {market === "combined" && pairedDatasets ? (
-        <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
+        <>
+          <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
+          {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} /> : null}
+        </>
       ) : market === "risk" ? (
         <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} notes={activeDataset.notes} />
       ) : dataset ? (
