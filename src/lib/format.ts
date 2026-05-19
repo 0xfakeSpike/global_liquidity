@@ -11,10 +11,3 @@ export function formatChange(value: number | null | undefined, digits = 2) {
   const sign = value > 0 ? "+" : "";
   return `${sign}${formatNumber(value, digits)}`;
 }
-
-export function scoreTone(score: number | null | undefined) {
-  if (score === null || score === undefined) return "neutral";
-  if (score >= 62) return "loose";
-  if (score <= 38) return "tight";
-  return "neutral";
-}

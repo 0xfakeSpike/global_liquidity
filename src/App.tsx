@@ -2,9 +2,8 @@ import { Activity, Database, RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { LineChart } from "./components/LineChart";
 import { MultiLineChart } from "./components/MultiLineChart";
-import { ScoreGauge } from "./components/ScoreGauge";
 import { loadLiquidityDataset, type LiquidityMarket } from "./lib/data";
-import { formatChange, formatNumber, scoreTone } from "./lib/format";
+import { formatChange, formatNumber } from "./lib/format";
 import type {
   DataPoint,
   IndicatorDefinition,
@@ -104,8 +103,6 @@ function App() {
     return <div className="loading">Loading liquidity monitor...</div>;
   }
 
-  const looseCount = activeDataset.snapshots.filter((item) => (item.scoreContribution ?? 0) > 0).length;
-  const tightCount = activeDataset.snapshots.filter((item) => (item.scoreContribution ?? 0) < 0).length;
   const rateCharts =
     market === "combined" && pairedDatasets
       ? [...(pairedDatasets.usd.rateCharts ?? []), ...(pairedDatasets.jpy.rateCharts ?? [])]
@@ -171,27 +168,6 @@ function App() {
             <div className="hero-actions">
               <a href="#terminal">查看图表</a>
               <a href="#terminal">图表数据来源</a>
-            </div>
-          </div>
-          <div className="summary-panel">
-            <ScoreGauge
-              score={activeDataset.composite.score}
-              label={market === "combined" ? "USD DLI" : activeDataset.composite.label}
-            />
-            <div className="summary-copy">
-              <span>最后更新 {activeDataset.composite.date ?? activeDataset.generatedAt}</span>
-              <strong className={scoreTone(activeDataset.composite.score)}>
-                {market === "risk"
-                  ? "Risk 100"
-                  : `DLI ${activeDataset.composite.score === null ? "n/a" : formatNumber(activeDataset.composite.score, 0)}`}
-              </strong>
-              <p>
-                {market === "risk"
-                  ? "风险市场页只比较价格相对走势，不纳入美元或日元流动性评分。"
-                  : market === "combined"
-                  ? "叠加页优先观察相对趋势，评分面板暂用美元 DLI 作风险资产基准。"
-                  : `宽松贡献 ${looseCount} 项，收紧贡献 ${tightCount} 项。评分采用十年 Z-score 方向化加权，作为流动性温度计而非交易信号。`}
-              </p>
             </div>
           </div>
         </section>

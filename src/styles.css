@@ -110,9 +110,6 @@ footer {
 }
 
 .hero-grid {
-  display: grid;
-  gap: 28px;
-  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.55fr);
   margin: 0 auto;
   max-width: 1240px;
 }
@@ -162,7 +159,6 @@ h1 {
   color: #0f172a;
 }
 
-.summary-panel,
 .chart-panel,
 .notes,
 .metric {
@@ -172,99 +168,11 @@ h1 {
   box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
 }
 
-.summary-panel {
-  align-self: end;
-  padding: 26px;
-}
-
-.score-gauge {
-  display: grid;
-  margin: 0 auto 22px;
-  max-width: 190px;
-  place-items: center;
-  position: relative;
-}
-
-.score-gauge svg {
-  transform: rotate(-90deg);
-  width: 100%;
-}
-
-.gauge-track,
-.gauge-progress {
-  fill: none;
-  stroke-width: 12;
-}
-
-.gauge-track {
-  stroke: #e2e8f0;
-}
-
-.gauge-progress {
-  stroke: #64748b;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.25s ease;
-}
-
-.score-gauge.loose .gauge-progress {
-  stroke: #16a34a;
-}
-
-.score-gauge.tight .gauge-progress {
-  stroke: #dc2626;
-}
-
-.gauge-content {
-  display: grid;
-  gap: 2px;
-  left: 50%;
-  place-items: center;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.gauge-content span {
-  color: #0f172a;
-  font-size: 40px;
-  font-weight: 800;
-}
-
-.gauge-content strong {
-  color: #64748b;
-  font-size: 14px;
-}
-
-.summary-copy span,
-.summary-copy p,
 .chart-header span,
 .stat span,
 footer {
   color: #64748b;
   font-size: 13px;
-}
-
-.summary-copy strong {
-  display: block;
-  font-size: 30px;
-  margin: 8px 0;
-}
-
-.loose {
-  color: #15803d;
-}
-
-.tight {
-  color: #b91c1c;
-}
-
-.neutral {
-  color: #334155;
-}
-
-.summary-copy p {
-  line-height: 1.6;
-  margin: 0;
 }
 
 .metric-strip,
