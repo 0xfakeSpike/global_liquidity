@@ -109,6 +109,12 @@ function App() {
       : market === "risk"
         ? []
         : (activeDataset.rateCharts ?? []);
+  const inflationCharts =
+    market === "combined" && pairedDatasets
+      ? [...(pairedDatasets.usd.inflationCharts ?? []), ...(pairedDatasets.jpy.inflationCharts ?? [])]
+      : market === "risk"
+        ? []
+        : (activeDataset.inflationCharts ?? []);
   const riskCharts = activeDataset.riskCharts ?? [];
 
   return (
@@ -183,10 +189,27 @@ function App() {
         <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
       ) : null}
 
+      {market !== "combined" && inflationCharts.length > 0 ? (
+        <ChartGroupSection
+          charts={inflationCharts}
+          dateRange={activeDataset.dateRange}
+          eyebrow="Inflation / Real Rate"
+          title="通胀与实际政策利率"
+        />
+      ) : null}
+
       {market === "combined" && pairedDatasets ? (
         <>
           <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
           {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} /> : null}
+          {inflationCharts.length > 0 ? (
+            <ChartGroupSection
+              charts={inflationCharts}
+              dateRange={activeDataset.dateRange}
+              eyebrow="Inflation / Real Rate"
+              title="通胀与实际政策利率"
+            />
+          ) : null}
         </>
       ) : market === "risk" ? (
         <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} notes={activeDataset.notes} />
@@ -277,6 +300,53 @@ function InterestRateSection({
       <div className="section-heading">
         <p>Policy Rates</p>
         <h2>央行利率曲线</h2>
+      </div>
+      <div className="rate-grid">
+        {charts.map((chart) => (
+          <div className="rate-card" key={chart.title}>
+            <div className="rate-card-header">
+              <h3>{chart.title}</h3>
+              <p>{chart.description}</p>
+            </div>
+            <div className="rate-chart">
+              <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
+            </div>
+            <div className="rate-sources">
+              {chart.series.map((item) => {
+                const latest = item.points.at(-1);
+                return (
+                  <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
+                    <strong>{item.label}</strong>
+                    <span>
+                      {latest ? `${latest.date} ${formatNumber(latest.value, 3)}${item.unit}` : "n/a"} · {item.source}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ChartGroupSection({
+  charts,
+  dateRange,
+  eyebrow,
+  title
+}: {
+  charts: InterestRateChart[];
+  dateRange: LiquidityDataset["dateRange"];
+  eyebrow: string;
+  title: string;
+}) {
+  return (
+    <section className="rate-section">
+      <div className="section-heading">
+        <p>{eyebrow}</p>
+        <h2>{title}</h2>
       </div>
       <div className="rate-grid">
         {charts.map((chart) => (

@@ -19,10 +19,12 @@ USD primary series:
 - FRED `SOFR` and `IORB`: SOFR-IORB spread
 - FRED `WM2NS`, `VIXCLS`, `BAMLH0A0HYM2`, `DTWEXBGS`, `DFII10`
 - FRED `EFFR`, `DFEDTARL`, `DFEDTARU`, `IORB`, `SOFR`: Fed rate curves
+- FRED `CPIAUCSL`: U.S. CPI-U All Items index, used to calculate CPI year-over-year inflation
 
 Derived series:
 
 - Net liquidity = `WALCL - WTREGEN - RRPONTSYD`
+- U.S. real policy rate = `EFFR - CPI YoY`
 - Composite DLI score = direction-adjusted 10-year z-score weighted index, converted to a 0-100 range
 
 JPY primary series:
@@ -37,6 +39,11 @@ JPY primary series:
 - BOJ API `IR01/MADR1Z@D`: basic discount rate and basic loan rate
 - FRED `IRLTLT01JPM156N`: Japan 10-year government bond yield
 - FRED `DEXJPUS`: USD/JPY exchange rate
+- e-Stat / Statistics Bureau of Japan CPI 2020-base: Japan All items CPI index, used to calculate CPI year-over-year inflation
+
+JPY derived series:
+
+- Japan real policy rate = `BOJ uncollateralized overnight call average - CPI YoY`
 
 Risk market series:
 

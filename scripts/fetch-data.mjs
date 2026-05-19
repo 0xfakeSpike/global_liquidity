@@ -14,6 +14,9 @@ const startDate = new Date();
 startDate.setUTCFullYear(startDate.getUTCFullYear() - lookbackYears);
 const startIso = startDate.toISOString().slice(0, 10);
 const endIso = new Date().toISOString().slice(0, 10);
+const inflationStartDate = new Date(startDate);
+inflationStartDate.setUTCMonth(inflationStartDate.getUTCMonth() - 14);
+const inflationStartIso = inflationStartDate.toISOString().slice(0, 10);
 
 const usdDefinitions = [
   {
@@ -238,6 +241,31 @@ const usdRateDefinitions = [
   }
 ];
 
+const usdInflationDefinitions = [
+  {
+    key: "usCpiIndex",
+    fredId: "CPIAUCSL",
+    label: "美国 CPI 同比",
+    unit: "%",
+    source: "FRED CPIAUCSL / U.S. Bureau of Labor Statistics",
+    sourceUrl: "https://fred.stlouisfed.org/series/CPIAUCSL",
+    scale: 1,
+    description: "美国 CPI-U All Items，使用 FRED 的月度指数序列计算同比变化。"
+  }
+];
+
+const jpyInflationDefinitions = [
+  {
+    key: "japanCpiIndex",
+    label: "日本 CPI 同比",
+    unit: "%",
+    source: "e-Stat / Statistics Bureau of Japan CPI 2020-base",
+    sourceUrl: "https://www.e-stat.go.jp/en/stat-search/files?stat_infid=000032103842",
+    scale: 1,
+    description: "日本全国 CPI All items，使用日本 e-Stat/总务省统计局 2020 基准月度指数计算同比变化。"
+  }
+];
+
 const jpyDefinitions = [
   {
     key: "bojAssets",
@@ -451,8 +479,8 @@ const riskDefinitions = [
   }
 ];
 
-async function fetchFredSeries({ fredId, scale }) {
-  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${fredId}&cosd=${startIso}`;
+async function fetchFredSeries({ fredId, scale, start = startIso }) {
+  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${fredId}&cosd=${start}`;
   const response = await fetch(url, {
     headers: { "user-agent": "global-liquidity-monitor/0.1" }
   });
@@ -468,7 +496,33 @@ async function fetchFredSeries({ fredId, scale }) {
       if (!date || raw === "." || Number.isNaN(numeric)) return null;
       return { date, value: round(numeric * scale, 4) };
     })
-    .filter((point) => point && point.date >= startIso);
+    .filter(Boolean);
+}
+
+async function fetchJapanCpiSeries() {
+  const url = "https://www.e-stat.go.jp/en/stat-search/file-download?fileKind=1&statInfId=000032103842";
+  const response = await fetch(url, {
+    headers: { "user-agent": "global-liquidity-monitor/0.1" }
+  });
+  if (!response.ok) {
+    throw new Error(`e-Stat Japan CPI failed: ${response.status} ${response.statusText}`);
+  }
+  const buffer = await response.arrayBuffer();
+  const csv = new TextDecoder("shift_jis").decode(buffer);
+  return csv
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => {
+      const columns = line.split(",");
+      const period = columns[0];
+      const raw = columns[1];
+      if (!/^\d{6}$/.test(period) || !raw) return null;
+      const numeric = Number(raw);
+      if (Number.isNaN(numeric)) return null;
+      const date = `${period.slice(0, 4)}-${period.slice(4, 6)}-01`;
+      return { date, value: round(numeric, 4) };
+    })
+    .filter(Boolean);
 }
 
 async function fetchBojSeries({ bojDb, bojCode, scale }) {
@@ -553,6 +607,28 @@ function latestBeforeOrOn(map, date) {
   if (map.has(date)) return map.get(date);
   const keys = [...map.keys()].filter((item) => item <= date).sort();
   return keys.length > 0 ? map.get(keys[keys.length - 1]) : undefined;
+}
+
+function yearOverYear(series) {
+  const map = byDate(series);
+  return series
+    .map((point) => {
+      const previous = map.get(offsetMonths(point.date, -12));
+      if (!previous || previous === 0) return null;
+      return { date: point.date, value: round((point.value / previous - 1) * 100, 4) };
+    })
+    .filter((point) => point && point.date >= startIso);
+}
+
+function realPolicyRate(policyRateSeries, inflationSeries) {
+  const policyMap = byDate(policyRateSeries);
+  return inflationSeries
+    .map((point) => {
+      const policyRate = latestBeforeOrOn(policyMap, point.date);
+      if (policyRate === undefined) return null;
+      return { date: point.date, value: round(policyRate - point.value, 4) };
+    })
+    .filter(Boolean);
 }
 
 function netLiquidity(fed, tga, onRrp) {
@@ -660,6 +736,12 @@ function offsetDate(date, days) {
   return parsed.toISOString().slice(0, 10);
 }
 
+function offsetMonths(date, months) {
+  const parsed = new Date(`${date}T00:00:00Z`);
+  parsed.setUTCMonth(parsed.getUTCMonth() + months);
+  return parsed.toISOString().slice(0, 10);
+}
+
 function round(value, digits = 2) {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
@@ -752,6 +834,72 @@ function jpyRateCharts(seriesMap) {
   ];
 }
 
+function usdInflationCharts(rateSeriesMap, inflationSeriesMap) {
+  const cpiYoy = inflationSeriesMap.get("usCpiYoy") ?? [];
+  const realEffr = realPolicyRate(rateSeriesMap.get("effr") ?? [], cpiYoy);
+  return [
+    {
+      title: "美国通胀与实际政策利率",
+      description: "美国 CPI 同比与 EFFR 扣除 CPI 同比后的实际政策利率。实际政策利率使用常见口径：名义政策利率 - 通胀同比。",
+      series: [
+        {
+          key: "usCpiYoy",
+          label: "美国 CPI同比",
+          color: "#dc2626",
+          unit: "%",
+          source: usdInflationDefinitions[0].source,
+          sourceUrl: usdInflationDefinitions[0].sourceUrl,
+          description: usdInflationDefinitions[0].description,
+          points: cpiYoy
+        },
+        {
+          key: "usRealEffr",
+          label: "实际政策利率（EFFR-CPI）",
+          color: "#2563eb",
+          unit: "%",
+          source: "FRED EFFR, CPIAUCSL",
+          sourceUrl: "https://fred.stlouisfed.org/series/EFFR",
+          description: "使用 EFFR 减去美国 CPI 同比，观察扣除通胀后的短端美元政策利率。",
+          points: realEffr
+        }
+      ]
+    }
+  ];
+}
+
+function jpyInflationCharts(rateSeriesMap, inflationSeriesMap) {
+  const cpiYoy = inflationSeriesMap.get("japanCpiYoy") ?? [];
+  const realCallRate = realPolicyRate(rateSeriesMap.get("jpyCallAverage") ?? [], cpiYoy);
+  return [
+    {
+      title: "日本通胀与实际政策利率",
+      description: "日本 CPI 同比与 BOJ 无担保隔夜拆借平均利率扣除 CPI 同比后的实际政策利率。",
+      series: [
+        {
+          key: "japanCpiYoy",
+          label: "日本 CPI同比",
+          color: "#dc2626",
+          unit: "%",
+          source: jpyInflationDefinitions[0].source,
+          sourceUrl: jpyInflationDefinitions[0].sourceUrl,
+          description: jpyInflationDefinitions[0].description,
+          points: cpiYoy
+        },
+        {
+          key: "japanRealCallRate",
+          label: "实际政策利率（隔夜利率-CPI）",
+          color: "#2563eb",
+          unit: "%",
+          source: "BOJ FM01 STRDCLUCON, e-Stat CPI",
+          sourceUrl: "https://www.boj.or.jp/en/statistics/market/short/mutan/index.htm",
+          description: "使用 BOJ 无担保隔夜拆借平均利率减去日本 CPI 同比，观察扣除通胀后的短端日元政策利率。",
+          points: realCallRate
+        }
+      ]
+    }
+  ];
+}
+
 function normalizeToFirst(series) {
   const first = series.find((point) => point.value !== 0);
   if (!first) return [];
@@ -780,6 +928,10 @@ function riskMarketCharts(seriesMap) {
 async function buildUsdDataset() {
   const seriesMap = await fetchSeriesForDefinitions(usdDefinitions);
   const rateSeriesMap = await fetchSeriesForDefinitions(usdRateDefinitions);
+  const inflationSeriesMap = await fetchSeriesForDefinitions(
+    usdInflationDefinitions.map((definition) => ({ ...definition, start: inflationStartIso }))
+  );
+  inflationSeriesMap.set("usCpiYoy", yearOverYear(inflationSeriesMap.get("usCpiIndex") ?? []));
 
   const net = netLiquidity(
     seriesMap.get("fedBalanceSheet") ?? [],
@@ -812,6 +964,7 @@ async function buildUsdDataset() {
     indicators: stripInternalFields(visibleDefinitions),
     snapshots,
     rateCharts: usdRateCharts(rateSeriesMap),
+    inflationCharts: usdInflationCharts(rateSeriesMap, inflationSeriesMap),
     composite: {
       score: latestComposite?.value ?? null,
       label: labelForScore(latestComposite?.value ?? null),
@@ -820,6 +973,7 @@ async function buildUsdDataset() {
     },
     notes: [
       "FRED CSV 在构建阶段抓取，前端只读取本仓库生成的 JSON，避免 GitHub Pages 运行时跨域和限流问题。",
+      "美国通胀使用 FRED CPIAUCSL 月度指数计算同比；实际政策利率使用 EFFR - CPI同比。",
       "净流动性采用近似口径：Fed 总资产 - TGA - ON RRP；不同机构可能使用准备金、财政现金和 RRP 的不同组合。",
       "综合评分使用各指标十年历史 Z-score 的方向化加权值，转换为 0-100 区间；它是监控仪表盘，不是投资建议。"
     ]
@@ -829,6 +983,9 @@ async function buildUsdDataset() {
 async function buildJpyDataset() {
   const seriesMap = await fetchSeriesForDefinitions(jpyDefinitions);
   const rateSeriesMap = await fetchSeriesForDefinitions(jpyRateDefinitions);
+  const inflationSeriesMap = new Map();
+  inflationSeriesMap.set("japanCpiIndex", (await fetchJapanCpiSeries()).filter((point) => point.date >= inflationStartIso));
+  inflationSeriesMap.set("japanCpiYoy", yearOverYear(inflationSeriesMap.get("japanCpiIndex") ?? []));
   const visibleDefinitions = [...jpyDefinitions].sort((a, b) => b.weight - a.weight);
   const snapshots = visibleDefinitions.map((definition) => snapshot(definition, seriesMap.get(definition.key) ?? []));
   const composite = compositeSeries(visibleDefinitions, snapshots);
@@ -844,6 +1001,7 @@ async function buildJpyDataset() {
     indicators: stripInternalFields(visibleDefinitions),
     snapshots,
     rateCharts: jpyRateCharts(rateSeriesMap),
+    inflationCharts: jpyInflationCharts(rateSeriesMap, inflationSeriesMap),
     composite: {
       score: latestComposite?.value ?? null,
       label: labelForScore(latestComposite?.value ?? null),
@@ -852,6 +1010,7 @@ async function buildJpyDataset() {
     },
     notes: [
       "BOJ 官方 Time-Series Data Search API 在构建阶段抓取货币基础、当座存款、准备金、M2 与广义定义流动性 L。",
+      "日本通胀使用 e-Stat/总务省统计局 2020 基准全国 CPI All items 月度指数计算同比；实际政策利率使用 BOJ 无担保隔夜拆借平均利率 - CPI同比。",
       "BOJ 总资产、USD/JPY 和日本 10 年期国债收益率使用 FRED 无密钥 CSV 序列；其中 BOJ 总资产的原始来源仍为 Bank of Japan Accounts。",
       "日元综合评分同样使用十年 Z-score 方向化加权。货币量、准备金和 USD/JPY 上升按偏宽松处理，JGB 10Y 上升按偏收紧处理。"
     ]
