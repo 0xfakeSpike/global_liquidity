@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-19T08:24:21.465Z",
+  "generatedAt": "2026-05-19T09:41:08.048Z",
   "lookbackYears": 10,
   "indicators": [
     {
@@ -68902,6 +68902,62 @@
         {
           "date": "2026-05-15",
           "value": 2.1
+        }
+      ]
+    }
+  ],
+  "rateTables": [
+    {
+      "title": "美联储利率",
+      "description": "跟踪 FOMC 目标区间、有效联邦基金利率、准备金利率和 SOFR，观察 Fed 政策利率走廊与隔夜融资状态。",
+      "rows": [
+        {
+          "key": "fedTargetRange",
+          "name": "联邦基金目标区间",
+          "latestDate": "2026-05-18",
+          "latestValue": "3.50 - 3.75",
+          "unit": "%",
+          "oneDayChange": null,
+          "oneMonthChange": null,
+          "source": "FRED DFEDTARL / DFEDTARU",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DFEDTARU",
+          "description": "FOMC 设定的联邦基金目标区间下限。 FOMC 设定的联邦基金目标区间上限。"
+        },
+        {
+          "key": "effr",
+          "name": "有效联邦基金利率",
+          "latestDate": "2026-05-15",
+          "latestValue": 3.63,
+          "unit": "%",
+          "oneDayChange": 0,
+          "oneMonthChange": -0.01,
+          "source": "FRED EFFR / Federal Reserve Bank of New York",
+          "sourceUrl": "https://fred.stlouisfed.org/series/EFFR",
+          "description": "EFFR 是隔夜无担保联邦基金交易的成交量加权中位数，是 Fed 政策传导的核心市场利率。"
+        },
+        {
+          "key": "fedIorb",
+          "name": "准备金余额利率",
+          "latestDate": "2026-05-19",
+          "latestValue": 3.65,
+          "unit": "%",
+          "oneDayChange": 0,
+          "oneMonthChange": 0,
+          "source": "FRED IORB / Federal Reserve Board",
+          "sourceUrl": "https://fred.stlouisfed.org/series/IORB",
+          "description": "IORB 是 Fed 支付给银行准备金余额的利率，通常构成货币市场利率走廊的重要锚。"
+        },
+        {
+          "key": "fedSofr",
+          "name": "SOFR 隔夜担保融资利率",
+          "latestDate": "2026-05-15",
+          "latestValue": 3.55,
+          "unit": "%",
+          "oneDayChange": -0.01,
+          "oneMonthChange": -0.17,
+          "source": "FRED SOFR / Federal Reserve Bank of New York",
+          "sourceUrl": "https://fred.stlouisfed.org/series/SOFR",
+          "description": "SOFR 反映以美国国债回购为抵押的隔夜融资成本，可观察担保融资市场压力。"
         }
       ]
     }

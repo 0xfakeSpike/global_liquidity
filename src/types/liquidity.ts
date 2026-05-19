@@ -30,11 +30,31 @@ export interface IndicatorSnapshot {
   series: DataPoint[];
 }
 
+export interface InterestRateRow {
+  key: string;
+  name: string;
+  latestDate: string;
+  latestValue: number | string;
+  unit: string;
+  oneDayChange: number | null;
+  oneMonthChange: number | null;
+  source: string;
+  sourceUrl: string;
+  description: string;
+}
+
+export interface InterestRateTable {
+  title: string;
+  description: string;
+  rows: InterestRateRow[];
+}
+
 export interface LiquidityDataset {
   generatedAt: string;
   lookbackYears: number;
   indicators: IndicatorDefinition[];
   snapshots: IndicatorSnapshot[];
+  rateTables?: InterestRateTable[];
   composite: {
     score: number | null;
     label: string;

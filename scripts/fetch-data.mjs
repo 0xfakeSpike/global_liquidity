@@ -181,6 +181,59 @@ const usdDerivedDefinitions = [
   }
 ];
 
+const usdRateDefinitions = [
+  {
+    key: "effr",
+    fredId: "EFFR",
+    name: "有效联邦基金利率",
+    unit: "%",
+    source: "FRED EFFR / Federal Reserve Bank of New York",
+    sourceUrl: "https://fred.stlouisfed.org/series/EFFR",
+    scale: 1,
+    description: "EFFR 是隔夜无担保联邦基金交易的成交量加权中位数，是 Fed 政策传导的核心市场利率。"
+  },
+  {
+    key: "fedTargetUpper",
+    fredId: "DFEDTARU",
+    name: "联邦基金目标区间上限",
+    unit: "%",
+    source: "FRED DFEDTARU / Federal Reserve Board",
+    sourceUrl: "https://fred.stlouisfed.org/series/DFEDTARU",
+    scale: 1,
+    description: "FOMC 设定的联邦基金目标区间上限。"
+  },
+  {
+    key: "fedTargetLower",
+    fredId: "DFEDTARL",
+    name: "联邦基金目标区间下限",
+    unit: "%",
+    source: "FRED DFEDTARL / Federal Reserve Board",
+    sourceUrl: "https://fred.stlouisfed.org/series/DFEDTARL",
+    scale: 1,
+    description: "FOMC 设定的联邦基金目标区间下限。"
+  },
+  {
+    key: "fedIorb",
+    fredId: "IORB",
+    name: "准备金余额利率",
+    unit: "%",
+    source: "FRED IORB / Federal Reserve Board",
+    sourceUrl: "https://fred.stlouisfed.org/series/IORB",
+    scale: 1,
+    description: "IORB 是 Fed 支付给银行准备金余额的利率，通常构成货币市场利率走廊的重要锚。"
+  },
+  {
+    key: "fedSofr",
+    fredId: "SOFR",
+    name: "SOFR 隔夜担保融资利率",
+    unit: "%",
+    source: "FRED SOFR / Federal Reserve Bank of New York",
+    sourceUrl: "https://fred.stlouisfed.org/series/SOFR",
+    scale: 1,
+    description: "SOFR 反映以美国国债回购为抵押的隔夜融资成本，可观察担保融资市场压力。"
+  }
+];
+
 const jpyDefinitions = [
   {
     key: "bojAssets",
@@ -301,6 +354,63 @@ const jpyDefinitions = [
   }
 ];
 
+const jpyRateDefinitions = [
+  {
+    key: "jpyCallAverage",
+    bojDb: "FM01",
+    bojCode: "STRDCLUCON",
+    name: "无担保隔夜拆借利率 平均",
+    unit: "%",
+    source: "BOJ FM01 STRDCLUCON",
+    sourceUrl: "https://www.boj.or.jp/en/statistics/market/short/mutan/index.htm",
+    scale: 1,
+    description: "日本无担保隔夜拆借平均利率，是观察 BOJ 政策目标传导和日元隔夜资金成本的核心市场利率。"
+  },
+  {
+    key: "jpyCallHigh",
+    bojDb: "FM01",
+    bojCode: "STRDCLUCONH",
+    name: "无担保隔夜拆借利率 最高",
+    unit: "%",
+    source: "BOJ FM01 STRDCLUCONH",
+    sourceUrl: "https://www.boj.or.jp/en/statistics/market/short/mutan/index.htm",
+    scale: 1,
+    description: "当日无担保隔夜拆借成交利率高点，可用于观察日内资金紧张尾部。"
+  },
+  {
+    key: "jpyCallLow",
+    bojDb: "FM01",
+    bojCode: "STRDCLUCONL",
+    name: "无担保隔夜拆借利率 最低",
+    unit: "%",
+    source: "BOJ FM01 STRDCLUCONL",
+    sourceUrl: "https://www.boj.or.jp/en/statistics/market/short/mutan/index.htm",
+    scale: 1,
+    description: "当日无担保隔夜拆借成交利率低点，可与平均值和高点一起观察拆借市场分布。"
+  },
+  {
+    key: "jpyBasicLoanRate",
+    bojDb: "IR01",
+    bojCode: "MADR1Z@D",
+    name: "基本贴现率与基本贷款利率",
+    unit: "%",
+    source: "BOJ IR01 MADR1Z@D",
+    sourceUrl: "https://www.boj.or.jp/en/statistics/boj/other/discount/discount.htm",
+    scale: 1,
+    description: "BOJ 基本贴现率与基本贷款利率，属于日央行公布的官方贷款利率口径。"
+  },
+  {
+    key: "jpyJgb10yRate",
+    fredId: "IRLTLT01JPM156N",
+    name: "日本 10 年期国债收益率",
+    unit: "%",
+    source: "FRED IRLTLT01JPM156N / OECD",
+    sourceUrl: "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
+    scale: 1,
+    description: "日本 10 年期国债收益率代表日元长期无风险利率约束。"
+  }
+];
+
 async function fetchFredSeries({ fredId, scale }) {
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${fredId}&cosd=${startIso}`;
   const response = await fetch(url, {
@@ -346,8 +456,14 @@ async function fetchBojSeries({ bojDb, bojCode, scale }) {
       const raw = values[index];
       const numeric = Number(raw);
       const date = String(dateValue);
-      if (date.length !== 6 || raw === null || raw === "" || Number.isNaN(numeric)) return null;
-      return { date: `${date.slice(0, 4)}-${date.slice(4, 6)}-01`, value: round(numeric * scale, 4) };
+      if ((date.length !== 6 && date.length !== 8) || raw === null || raw === "" || Number.isNaN(numeric)) {
+        return null;
+      }
+      const isoDate =
+        date.length === 8
+          ? `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`
+          : `${date.slice(0, 4)}-${date.slice(4, 6)}-01`;
+      return { date: isoDate, value: round(numeric * scale, 4) };
     })
     .filter(Boolean);
 }
@@ -515,8 +631,99 @@ function stripInternalFields(definitionsForOutput) {
   return definitionsForOutput.map(({ fredId, bojDb, bojCode, scale, hidden, ...definition }) => definition);
 }
 
+function latestPoint(series) {
+  return [...series].sort((a, b) => a.date.localeCompare(b.date)).at(-1) ?? null;
+}
+
+function rateChange(sorted, latest, days) {
+  const previous = sorted.findLast((item) => item.date <= offsetDate(latest.date, -days));
+  return previous ? round(latest.value - previous.value, 4) : null;
+}
+
+function interestRateRow(definition, series) {
+  const sorted = [...series].sort((a, b) => a.date.localeCompare(b.date));
+  const latest = sorted.at(-1);
+  if (!latest) {
+    return {
+      key: definition.key,
+      name: definition.name,
+      latestDate: "",
+      latestValue: "n/a",
+      unit: definition.unit,
+      oneDayChange: null,
+      oneMonthChange: null,
+      source: definition.source,
+      sourceUrl: definition.sourceUrl,
+      description: definition.description
+    };
+  }
+  const previous = sorted.at(-2) ?? null;
+  return {
+    key: definition.key,
+    name: definition.name,
+    latestDate: latest.date,
+    latestValue: latest.value,
+    unit: definition.unit,
+    oneDayChange: previous ? round(latest.value - previous.value, 4) : null,
+    oneMonthChange: rateChange(sorted, latest, 30),
+    source: definition.source,
+    sourceUrl: definition.sourceUrl,
+    description: definition.description
+  };
+}
+
+function fedTargetRangeRow(seriesMap) {
+  const lowerDefinition = usdRateDefinitions.find((definition) => definition.key === "fedTargetLower");
+  const upperDefinition = usdRateDefinitions.find((definition) => definition.key === "fedTargetUpper");
+  const lower = latestPoint(seriesMap.get("fedTargetLower") ?? []);
+  const upper = latestPoint(seriesMap.get("fedTargetUpper") ?? []);
+  const latestDate = [lower?.date, upper?.date].filter(Boolean).sort().at(-1) ?? "";
+
+  return {
+    key: "fedTargetRange",
+    name: "联邦基金目标区间",
+    latestDate,
+    latestValue: lower && upper ? `${formatRateValue(lower.value)} - ${formatRateValue(upper.value)}` : "n/a",
+    unit: "%",
+    oneDayChange: null,
+    oneMonthChange: null,
+    source: "FRED DFEDTARL / DFEDTARU",
+    sourceUrl: "https://fred.stlouisfed.org/series/DFEDTARU",
+    description: `${lowerDefinition?.description ?? ""}${upperDefinition?.description ? ` ${upperDefinition.description}` : ""}`
+  };
+}
+
+function formatRateValue(value) {
+  return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(2);
+}
+
+function usdRateTable(seriesMap) {
+  const rows = [
+    fedTargetRangeRow(seriesMap),
+    ...["effr", "fedIorb", "fedSofr"].map((key) => {
+      const definition = usdRateDefinitions.find((item) => item.key === key);
+      return interestRateRow(definition, seriesMap.get(key) ?? []);
+    })
+  ];
+
+  return {
+    title: "美联储利率",
+    description: "跟踪 FOMC 目标区间、有效联邦基金利率、准备金利率和 SOFR，观察 Fed 政策利率走廊与隔夜融资状态。",
+    rows
+  };
+}
+
+function jpyRateTable(seriesMap) {
+  return {
+    title: "日本利率",
+    description: "跟踪 BOJ 无担保隔夜拆借利率、基本贷款利率和 JGB 10Y，观察日元短端政策传导与长端约束。",
+    rows: jpyRateDefinitions.map((definition) => interestRateRow(definition, seriesMap.get(definition.key) ?? []))
+  };
+}
+
 async function buildUsdDataset() {
   const seriesMap = await fetchSeriesForDefinitions(usdDefinitions);
+  const rateSeriesMap = await fetchSeriesForDefinitions(usdRateDefinitions);
 
   const net = netLiquidity(
     seriesMap.get("fedBalanceSheet") ?? [],
@@ -544,6 +751,7 @@ async function buildUsdDataset() {
     lookbackYears,
     indicators: stripInternalFields(visibleDefinitions),
     snapshots,
+    rateTables: [usdRateTable(rateSeriesMap)],
     composite: {
       score: latestComposite?.value ?? null,
       label: labelForScore(latestComposite?.value ?? null),
@@ -560,6 +768,7 @@ async function buildUsdDataset() {
 
 async function buildJpyDataset() {
   const seriesMap = await fetchSeriesForDefinitions(jpyDefinitions);
+  const rateSeriesMap = await fetchSeriesForDefinitions(jpyRateDefinitions);
   const visibleDefinitions = [...jpyDefinitions].sort((a, b) => b.weight - a.weight);
   const snapshots = visibleDefinitions.map((definition) => snapshot(definition, seriesMap.get(definition.key) ?? []));
   const composite = compositeSeries(visibleDefinitions, snapshots);
@@ -570,6 +779,7 @@ async function buildJpyDataset() {
     lookbackYears,
     indicators: stripInternalFields(visibleDefinitions),
     snapshots,
+    rateTables: [jpyRateTable(rateSeriesMap)],
     composite: {
       score: latestComposite?.value ?? null,
       label: labelForScore(latestComposite?.value ?? null),

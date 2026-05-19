@@ -85,7 +85,9 @@ footer {
   background: #e2e8f0;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
+  flex-wrap: wrap;
   gap: 2px;
+  justify-content: center;
   padding: 3px;
 }
 
@@ -98,6 +100,7 @@ footer {
   font-weight: 760;
   min-height: 34px;
   padding: 7px 12px;
+  white-space: nowrap;
 }
 
 .market-tabs button.active {
@@ -265,6 +268,7 @@ footer {
 }
 
 .metric-strip,
+.rate-section,
 .terminal,
 .composite-section {
   margin: 0 auto;
@@ -311,6 +315,92 @@ footer {
 .charts-stack {
   display: grid;
   gap: 18px;
+}
+
+.rate-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+}
+
+.rate-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.rate-card-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 18px 18px 14px;
+}
+
+.rate-card-header h3 {
+  color: #0f172a;
+  font-size: 22px;
+  letter-spacing: 0;
+  margin: 0 0 8px;
+}
+
+.rate-card-header p {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.rate-table-wrap {
+  overflow-x: auto;
+}
+
+.rate-table {
+  border-collapse: collapse;
+  min-width: 760px;
+  width: 100%;
+}
+
+.rate-table th,
+.rate-table td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 13px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.rate-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rate-table td {
+  color: #0f172a;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.rate-table td:first-child {
+  max-width: 300px;
+  white-space: normal;
+}
+
+.rate-table strong,
+.rate-table span {
+  display: block;
+}
+
+.rate-table span {
+  color: #64748b;
+  line-height: 1.45;
+  margin-top: 5px;
+}
+
+.rate-table a {
+  color: #0f766e;
+  font-weight: 760;
 }
 
 .latest-value small {
@@ -363,6 +453,47 @@ footer {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2.8;
+}
+
+.multi-chart-wrap {
+  display: grid;
+  gap: 12px;
+}
+
+.multi-chart-legend {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-left: 46px;
+}
+
+.multi-chart-legend span {
+  align-items: center;
+  color: #475569;
+  display: flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 7px;
+}
+
+.multi-chart-legend i {
+  border-radius: 999px;
+  display: inline-block;
+  height: 9px;
+  width: 9px;
+}
+
+.overlay-note {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 auto 18px;
+  max-width: 1240px;
+  padding: 14px 16px;
 }
 
 .line-chart text {

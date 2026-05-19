@@ -17,6 +17,7 @@ USD primary series:
 - FRED `RPONTSYD`: standing repo facility usage, sourced from NY Fed repo operations through FRED
 - FRED `SOFR` and `IORB`: SOFR-IORB spread
 - FRED `WM2NS`, `VIXCLS`, `BAMLH0A0HYM2`, `DTWEXBGS`, `DFII10`
+- FRED `EFFR`, `DFEDTARL`, `DFEDTARU`, `IORB`, `SOFR`: Fed rate table
 
 Derived series:
 
@@ -31,6 +32,8 @@ JPY primary series:
 - BOJ API `MD01/MABS1AN114`: reserve balances
 - BOJ API `MD02/MAM1NAM2M2MO`: M2 money stock
 - BOJ API `MD02/MAM1NABLBLMO`: broadly-defined liquidity `L`
+- BOJ API `FM01/STRDCLUCON`, `STRDCLUCONH`, `STRDCLUCONL`: uncollateralized overnight call rate table
+- BOJ API `IR01/MADR1Z@D`: basic discount rate and basic loan rate
 - FRED `IRLTLT01JPM156N`: Japan 10-year government bond yield
 - FRED `DEXJPUS`: USD/JPY exchange rate
 

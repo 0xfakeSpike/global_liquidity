@@ -1,14 +1,23 @@
 import { Activity, Database, RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { LineChart } from "./components/LineChart";
+import { MultiLineChart } from "./components/MultiLineChart";
 import { ScoreGauge } from "./components/ScoreGauge";
 import { loadLiquidityDataset, type LiquidityMarket } from "./lib/data";
 import { formatChange, formatNumber, scoreTone } from "./lib/format";
-import type { IndicatorDefinition, IndicatorSnapshot, LiquidityDataset } from "./types/liquidity";
+import type {
+  DataPoint,
+  IndicatorDefinition,
+  IndicatorSnapshot,
+  InterestRateTable,
+  LiquidityDataset
+} from "./types/liquidity";
 import "./styles.css";
 
+type ViewMode = LiquidityMarket | "combined";
+
 const markets: Record<
-  LiquidityMarket,
+  ViewMode,
   {
     label: string;
     eyebrow: string;
@@ -33,21 +42,38 @@ const markets: Record<
     description: "数据来自 BOJ 官方统计 API 与 FRED 镜像序列，构建阶段生成日元流动性快照。",
     sourceLabel: "BOJ / FRED",
     updateLabel: "Build-time JSON"
+  },
+  combined: {
+    label: "美元+日元叠加",
+    eyebrow: "美元与日元流动性叠加监控",
+    title: "把美元和日元对应指标标准化到同一坐标系，观察全球资金主轴的相对变化。",
+    description: "每组曲线以首个共同日期为 100，避免美元、日元单位和频率不同导致误读。",
+    sourceLabel: "FRED / NY Fed / BOJ",
+    updateLabel: "Normalized overlay"
   }
 };
 
-function initialMarket(): LiquidityMarket {
+function initialMarket(): ViewMode {
+  if (window.location.hash.includes("combined")) return "combined";
   return window.location.hash.includes("jpy") ? "jpy" : "usd";
 }
 
 function App() {
   const [dataset, setDataset] = useState<LiquidityDataset | null>(null);
-  const [market, setMarket] = useState<LiquidityMarket>(initialMarket);
+  const [pairedDatasets, setPairedDatasets] = useState<{ usd: LiquidityDataset; jpy: LiquidityDataset } | null>(null);
+  const [market, setMarket] = useState<ViewMode>(initialMarket);
 
   useEffect(() => {
-    window.location.hash = market === "jpy" ? "jpy" : "usd";
+    window.location.hash = market;
     setDataset(null);
-    loadLiquidityDataset(market).then(setDataset);
+    setPairedDatasets(null);
+    if (market === "combined") {
+      Promise.all([loadLiquidityDataset("usd"), loadLiquidityDataset("jpy")]).then(([usd, jpy]) =>
+        setPairedDatasets({ usd, jpy })
+      );
+    } else {
+      loadLiquidityDataset(market).then(setDataset);
+    }
   }, [market]);
 
   const snapshotMap = useMemo(() => {
@@ -56,12 +82,25 @@ function App() {
 
   const marketConfig = markets[market];
 
-  if (!dataset) {
+  if (market !== "combined" && !dataset) {
     return <div className="loading">Loading liquidity monitor...</div>;
   }
 
-  const looseCount = dataset.snapshots.filter((item) => (item.scoreContribution ?? 0) > 0).length;
-  const tightCount = dataset.snapshots.filter((item) => (item.scoreContribution ?? 0) < 0).length;
+  if (market === "combined" && !pairedDatasets) {
+    return <div className="loading">Loading liquidity monitor...</div>;
+  }
+
+  const activeDataset = dataset ?? pairedDatasets?.usd ?? null;
+  if (!activeDataset) {
+    return <div className="loading">Loading liquidity monitor...</div>;
+  }
+
+  const looseCount = activeDataset.snapshots.filter((item) => (item.scoreContribution ?? 0) > 0).length;
+  const tightCount = activeDataset.snapshots.filter((item) => (item.scoreContribution ?? 0) < 0).length;
+  const rateTables =
+    market === "combined" && pairedDatasets
+      ? [...(pairedDatasets.usd.rateTables ?? []), ...(pairedDatasets.jpy.rateTables ?? [])]
+      : (activeDataset.rateTables ?? []);
 
   return (
     <main>
@@ -76,7 +115,7 @@ function App() {
               <button
                 className={key === market ? "active" : ""}
                 key={key}
-                onClick={() => setMarket(key as LiquidityMarket)}
+                onClick={() => setMarket(key as ViewMode)}
                 type="button"
               >
                 {item.label}
@@ -84,7 +123,13 @@ function App() {
             ))}
           </div>
           <div className="nav-meta">
-            {market === "usd" ? (
+            {market === "combined" ? (
+              <>
+                <span>FRED</span>
+                <span>BOJ</span>
+                <span>Overlay</span>
+              </>
+            ) : market === "usd" ? (
               <>
                 <span>FRED</span>
                 <span>Treasury</span>
@@ -111,14 +156,16 @@ function App() {
             </div>
           </div>
           <div className="summary-panel">
-            <ScoreGauge score={dataset.composite.score} label={dataset.composite.label} />
+            <ScoreGauge score={activeDataset.composite.score} label={market === "combined" ? "USD DLI" : activeDataset.composite.label} />
             <div className="summary-copy">
-              <span>最后更新 {dataset.composite.date ?? "n/a"}</span>
-              <strong className={scoreTone(dataset.composite.score)}>
-                DLI {dataset.composite.score === null ? "n/a" : formatNumber(dataset.composite.score, 0)}
+              <span>最后更新 {activeDataset.composite.date ?? "n/a"}</span>
+              <strong className={scoreTone(activeDataset.composite.score)}>
+                DLI {activeDataset.composite.score === null ? "n/a" : formatNumber(activeDataset.composite.score, 0)}
               </strong>
               <p>
-                宽松贡献 {looseCount} 项，收紧贡献 {tightCount} 项。评分采用十年 Z-score 方向化加权，作为流动性温度计而非交易信号。
+                {market === "combined"
+                  ? "叠加页优先观察相对趋势，评分面板暂用美元 DLI 作风险资产基准。"
+                  : `宽松贡献 ${looseCount} 项，收紧贡献 ${tightCount} 项。评分采用十年 Z-score 方向化加权，作为流动性温度计而非交易信号。`}
               </p>
             </div>
           </div>
@@ -128,43 +175,51 @@ function App() {
       <section className="metric-strip">
         <Metric icon={<Database size={20} />} label="公开数据源" value={marketConfig.sourceLabel} />
         <Metric icon={<RefreshCw size={20} />} label="更新方式" value={marketConfig.updateLabel} />
-        <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${dataset.lookbackYears}Y Z-score`} />
+        <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${activeDataset.lookbackYears}Y Z-score`} />
       </section>
 
-      <section className="terminal" id="terminal">
-        <div className="section-heading">
-          <p>Indicator Terminal</p>
-          <h2>全部指标图表</h2>
-        </div>
+      {rateTables.length > 0 ? <InterestRateSection tables={rateTables} /> : null}
 
-        <div className="charts-stack">
-          {dataset.indicators.map((definition) => {
-            const snapshot = snapshotMap.get(definition.key);
-            if (!snapshot) return null;
-            return <IndicatorChart key={definition.key} definition={definition} snapshot={snapshot} />;
-          })}
-        </div>
-      </section>
+      {market === "combined" && pairedDatasets ? (
+        <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
+      ) : dataset ? (
+        <>
+          <section className="terminal" id="terminal">
+            <div className="section-heading">
+              <p>Indicator Terminal</p>
+              <h2>全部指标图表</h2>
+            </div>
 
-      <section className="composite-section">
-        <div className="section-heading">
-          <p>Composite DLI</p>
-          <h2>综合流动性指数</h2>
-        </div>
-        <div className="composite-grid">
-          <div>
-            <LineChart series={dataset.composite.series.slice(-520)} color="#0f766e" valueLabel="综合流动性评分" />
-          </div>
-          <div className="notes">
-            {dataset.notes.map((note) => (
-              <p key={note}>{note}</p>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="charts-stack">
+              {dataset.indicators.map((definition) => {
+                const snapshot = snapshotMap.get(definition.key);
+                if (!snapshot) return null;
+                return <IndicatorChart key={definition.key} definition={definition} snapshot={snapshot} />;
+              })}
+            </div>
+          </section>
+
+          <section className="composite-section">
+            <div className="section-heading">
+              <p>Composite DLI</p>
+              <h2>综合流动性指数</h2>
+            </div>
+            <div className="composite-grid">
+              <div>
+                <LineChart series={dataset.composite.series.slice(-520)} color="#0f766e" valueLabel="综合流动性评分" />
+              </div>
+              <div className="notes">
+                {dataset.notes.map((note) => (
+                  <p key={note}>{note}</p>
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      ) : null}
 
       <footer>
-        <span>Generated at {new Date(dataset.generatedAt).toLocaleString("zh-CN")}</span>
+        <span>Generated at {new Date(activeDataset.generatedAt).toLocaleString("zh-CN")}</span>
         <span>仅供研究与教育用途，不构成投资建议。</span>
       </footer>
     </main>
@@ -188,6 +243,72 @@ function Stat({ label, value }: { label: string; value: string }) {
       <strong>{value}</strong>
     </div>
   );
+}
+
+function InterestRateSection({ tables }: { tables: InterestRateTable[] }) {
+  return (
+    <section className="rate-section">
+      <div className="section-heading">
+        <p>Policy Rates</p>
+        <h2>央行利率表</h2>
+      </div>
+      <div className="rate-grid">
+        {tables.map((table) => (
+          <div className="rate-card" key={table.title}>
+            <div className="rate-card-header">
+              <h3>{table.title}</h3>
+              <p>{table.description}</p>
+            </div>
+            <div className="rate-table-wrap">
+              <table className="rate-table">
+                <thead>
+                  <tr>
+                    <th>指标</th>
+                    <th>最新</th>
+                    <th>日期</th>
+                    <th>1D</th>
+                    <th>1M</th>
+                    <th>来源</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row) => (
+                    <tr key={row.key}>
+                      <td>
+                        <strong>{row.name}</strong>
+                        <span>{row.description}</span>
+                      </td>
+                      <td>{formatRateValue(row.latestValue, row.unit)}</td>
+                      <td>{row.latestDate || "n/a"}</td>
+                      <td>{formatRateMove(row.oneDayChange)}</td>
+                      <td>{formatRateMove(row.oneMonthChange)}</td>
+                      <td>
+                        <a href={row.sourceUrl} target="_blank" rel="noreferrer">
+                          {row.source}
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function formatRateValue(value: number | string, unit: string) {
+  if (typeof value === "string") return `${value}${unit}`;
+  return `${formatNumber(value, 3)}${unit}`;
+}
+
+function formatRateMove(value: number | null) {
+  if (value === null) return "n/a";
+  const bp = value * 100;
+  const sign = bp > 0 ? "+" : "";
+  return `${sign}${formatNumber(bp, 1)} bp`;
 }
 
 function IndicatorChart({
@@ -239,6 +360,129 @@ function IndicatorChart({
       </div>
     </section>
   );
+}
+
+function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityDataset }) {
+  const usdMap = new Map(usd.snapshots.map((item) => [item.key, item]));
+  const jpyMap = new Map(jpy.snapshots.map((item) => [item.key, item]));
+  const pairs = [
+    {
+      title: "央行资产负债表",
+      description: "Fed 总资产与 BOJ 总资产，观察两大央行基础流动性的相对扩张或收缩。",
+      left: usdMap.get("fedBalanceSheet"),
+      right: jpyMap.get("bojAssets"),
+      leftLabel: "Fed WALCL",
+      rightLabel: "BOJ JPNASSETS"
+    },
+    {
+      title: "广义货币",
+      description: "美国 M2 与日本 M2，观察两国广义货币环境的中周期方向。",
+      left: usdMap.get("m2"),
+      right: jpyMap.get("m2Japan"),
+      leftLabel: "US M2",
+      rightLabel: "Japan M2"
+    },
+    {
+      title: "央行综合流动性评分",
+      description: "美元 DLI 与日元 DLI 使用同一 0-100 评分区间，可直接比较宽松/收紧温度。",
+      left: { series: usd.composite.series } as IndicatorSnapshot,
+      right: { series: jpy.composite.series } as IndicatorSnapshot,
+      leftLabel: "USD DLI",
+      rightLabel: "JPY DLI",
+      rawScale: true
+    },
+    {
+      title: "长端利率约束",
+      description: "美国 10Y 实际利率与日本 10Y 国债收益率，观察资金价格是否同步抬升。",
+      left: usdMap.get("realYield10y"),
+      right: jpyMap.get("jgb10y"),
+      leftLabel: "US 10Y TIPS",
+      rightLabel: "JGB 10Y"
+    },
+    {
+      title: "汇率压力",
+      description: "广义美元指数与 USD/JPY，观察美元强弱和日元套息环境是否同步变化。",
+      left: usdMap.get("broadDollar"),
+      right: jpyMap.get("usdJpy"),
+      leftLabel: "Broad Dollar",
+      rightLabel: "USD/JPY"
+    }
+  ];
+
+  return (
+    <section className="terminal" id="terminal">
+      <div className="section-heading">
+        <p>Overlay Terminal</p>
+        <h2>美元与日元对应指标叠加</h2>
+      </div>
+      <div className="overlay-note">
+        除 DLI 评分外，每组曲线均以首个共同日期归一为 100。这里看的是相对方向和节奏，不是绝对规模。
+      </div>
+      <div className="charts-stack">
+        {pairs.map((pair) => {
+          if (!pair.left || !pair.right) return null;
+          const series = pair.rawScale
+            ? alignPair(pair.left.series, pair.right.series)
+            : normalizePair(pair.left.series, pair.right.series);
+          return (
+            <section className="chart-panel" key={pair.title}>
+              <div className="chart-header">
+                <div>
+                  <span>USD / JPY Overlay</span>
+                  <h3>{pair.title}</h3>
+                </div>
+              </div>
+              <MultiLineChart
+                series={[
+                  { label: pair.leftLabel, color: "#2563eb", points: series.left.slice(-520) },
+                  { label: pair.rightLabel, color: "#16a34a", points: series.right.slice(-520) }
+                ]}
+                valueLabel={pair.title}
+              />
+              <div className="interpretation">
+                <strong>当前解读</strong>
+                <p>{pair.description}</p>
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function alignPair(left: DataPoint[], right: DataPoint[]) {
+  const rightMap = new Map(right.map((point) => [point.date, point.value]));
+  const aligned = left
+    .map((point) => {
+      const rightValue = latestBeforeOrOn(rightMap, point.date);
+      if (rightValue === undefined) return null;
+      return { date: point.date, left: point.value, right: rightValue };
+    })
+    .filter(Boolean) as { date: string; left: number; right: number }[];
+
+  return {
+    left: aligned.map((point) => ({ date: point.date, value: point.left })),
+    right: aligned.map((point) => ({ date: point.date, value: point.right }))
+  };
+}
+
+function normalizePair(left: DataPoint[], right: DataPoint[]) {
+  const aligned = alignPair(left, right);
+  const leftBase = aligned.left[0]?.value;
+  const rightBase = aligned.right[0]?.value;
+  if (!leftBase || !rightBase) return aligned;
+
+  return {
+    left: aligned.left.map((point) => ({ date: point.date, value: (point.value / leftBase) * 100 })),
+    right: aligned.right.map((point) => ({ date: point.date, value: (point.value / rightBase) * 100 }))
+  };
+}
+
+function latestBeforeOrOn(map: Map<string, number>, date: string) {
+  if (map.has(date)) return map.get(date);
+  const keys = [...map.keys()].filter((item) => item <= date).sort();
+  return keys.length > 0 ? map.get(keys[keys.length - 1]) : undefined;
 }
 
 export default App;

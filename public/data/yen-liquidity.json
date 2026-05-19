@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-19T08:24:24.349Z",
+  "generatedAt": "2026-05-19T09:41:12.077Z",
   "lookbackYears": 10,
   "indicators": [
     {
@@ -13989,6 +13989,74 @@
         {
           "date": "2026-05-15",
           "value": 158.69
+        }
+      ]
+    }
+  ],
+  "rateTables": [
+    {
+      "title": "日本利率",
+      "description": "跟踪 BOJ 无担保隔夜拆借利率、基本贷款利率和 JGB 10Y，观察日元短端政策传导与长端约束。",
+      "rows": [
+        {
+          "key": "jpyCallAverage",
+          "name": "无担保隔夜拆借利率 平均",
+          "latestDate": "2026-05-15",
+          "latestValue": 0.727,
+          "unit": "%",
+          "oneDayChange": 0,
+          "oneMonthChange": 0,
+          "source": "BOJ FM01 STRDCLUCON",
+          "sourceUrl": "https://www.boj.or.jp/en/statistics/market/short/mutan/index.htm",
+          "description": "日本无担保隔夜拆借平均利率，是观察 BOJ 政策目标传导和日元隔夜资金成本的核心市场利率。"
+        },
+        {
+          "key": "jpyCallHigh",
+          "name": "无担保隔夜拆借利率 最高",
+          "latestDate": "2026-05-15",
+          "latestValue": 0.728,
+          "unit": "%",
+          "oneDayChange": -0.047,
+          "oneMonthChange": -0.047,
+          "source": "BOJ FM01 STRDCLUCONH",
+          "sourceUrl": "https://www.boj.or.jp/en/statistics/market/short/mutan/index.htm",
+          "description": "当日无担保隔夜拆借成交利率高点，可用于观察日内资金紧张尾部。"
+        },
+        {
+          "key": "jpyCallLow",
+          "name": "无担保隔夜拆借利率 最低",
+          "latestDate": "2026-05-15",
+          "latestValue": 0.7,
+          "unit": "%",
+          "oneDayChange": 0,
+          "oneMonthChange": 0,
+          "source": "BOJ FM01 STRDCLUCONL",
+          "sourceUrl": "https://www.boj.or.jp/en/statistics/market/short/mutan/index.htm",
+          "description": "当日无担保隔夜拆借成交利率低点，可与平均值和高点一起观察拆借市场分布。"
+        },
+        {
+          "key": "jpyBasicLoanRate",
+          "name": "基本贴现率与基本贷款利率",
+          "latestDate": "2026-05-17",
+          "latestValue": 1,
+          "unit": "%",
+          "oneDayChange": 0,
+          "oneMonthChange": 0,
+          "source": "BOJ IR01 MADR1Z@D",
+          "sourceUrl": "https://www.boj.or.jp/en/statistics/boj/other/discount/discount.htm",
+          "description": "BOJ 基本贴现率与基本贷款利率，属于日央行公布的官方贷款利率口径。"
+        },
+        {
+          "key": "jpyJgb10yRate",
+          "name": "日本 10 年期国债收益率",
+          "latestDate": "2026-04-01",
+          "latestValue": 2.515,
+          "unit": "%",
+          "oneDayChange": 0.17,
+          "oneMonthChange": 0.17,
+          "source": "FRED IRLTLT01JPM156N / OECD",
+          "sourceUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
+          "description": "日本 10 年期国债收益率代表日元长期无风险利率约束。"
         }
       ]
     }
