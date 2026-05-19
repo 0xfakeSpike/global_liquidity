@@ -43,6 +43,14 @@ const markets: Record<
     sourceLabel: "BOJ / FRED",
     updateLabel: "Build-time JSON"
   },
+  risk: {
+    label: "风险市场",
+    eyebrow: "风险资产价格监控",
+    title: "把 BTC、纳斯达克和恒生科技放到同一时间轴里。",
+    description: "三条价格曲线按首个可用日期归一为 100，用来观察风险资产之间的相对强弱和节奏。",
+    sourceLabel: "FRED / Yahoo",
+    updateLabel: "Normalized prices"
+  },
   combined: {
     label: "美元+日元叠加",
     eyebrow: "美元与日元流动性叠加监控",
@@ -55,6 +63,7 @@ const markets: Record<
 
 function initialMarket(): ViewMode {
   if (window.location.hash.includes("combined")) return "combined";
+  if (window.location.hash.includes("risk")) return "risk";
   return window.location.hash.includes("jpy") ? "jpy" : "usd";
 }
 
@@ -100,7 +109,10 @@ function App() {
   const rateCharts =
     market === "combined" && pairedDatasets
       ? [...(pairedDatasets.usd.rateCharts ?? []), ...(pairedDatasets.jpy.rateCharts ?? [])]
-      : (activeDataset.rateCharts ?? []);
+      : market === "risk"
+        ? []
+        : (activeDataset.rateCharts ?? []);
+  const riskCharts = activeDataset.riskCharts ?? [];
 
   return (
     <main>
@@ -129,6 +141,12 @@ function App() {
                 <span>BOJ</span>
                 <span>Overlay</span>
               </>
+            ) : market === "risk" ? (
+              <>
+                <span>BTC</span>
+                <span>Nasdaq</span>
+                <span>HSTECH</span>
+              </>
             ) : market === "usd" ? (
               <>
                 <span>FRED</span>
@@ -156,14 +174,21 @@ function App() {
             </div>
           </div>
           <div className="summary-panel">
-            <ScoreGauge score={activeDataset.composite.score} label={market === "combined" ? "USD DLI" : activeDataset.composite.label} />
+            <ScoreGauge
+              score={activeDataset.composite.score}
+              label={market === "combined" ? "USD DLI" : activeDataset.composite.label}
+            />
             <div className="summary-copy">
-              <span>最后更新 {activeDataset.composite.date ?? "n/a"}</span>
+              <span>最后更新 {activeDataset.composite.date ?? activeDataset.generatedAt}</span>
               <strong className={scoreTone(activeDataset.composite.score)}>
-                DLI {activeDataset.composite.score === null ? "n/a" : formatNumber(activeDataset.composite.score, 0)}
+                {market === "risk"
+                  ? "Risk 100"
+                  : `DLI ${activeDataset.composite.score === null ? "n/a" : formatNumber(activeDataset.composite.score, 0)}`}
               </strong>
               <p>
-                {market === "combined"
+                {market === "risk"
+                  ? "风险市场页只比较价格相对走势，不纳入美元或日元流动性评分。"
+                  : market === "combined"
                   ? "叠加页优先观察相对趋势，评分面板暂用美元 DLI 作风险资产基准。"
                   : `宽松贡献 ${looseCount} 项，收紧贡献 ${tightCount} 项。评分采用十年 Z-score 方向化加权，作为流动性温度计而非交易信号。`}
               </p>
@@ -182,6 +207,8 @@ function App() {
 
       {market === "combined" && pairedDatasets ? (
         <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
+      ) : market === "risk" ? (
+        <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} notes={activeDataset.notes} />
       ) : dataset ? (
         <>
           <section className="terminal" id="terminal">
@@ -294,6 +321,60 @@ function InterestRateSection({
               })}
             </div>
           </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RiskMarketTerminal({
+  charts,
+  dateRange,
+  notes
+}: {
+  charts: InterestRateChart[];
+  dateRange: LiquidityDataset["dateRange"];
+  notes: string[];
+}) {
+  return (
+    <section className="terminal" id="terminal">
+      <div className="section-heading">
+        <p>Risk Market Terminal</p>
+        <h2>风险市场价格变化</h2>
+      </div>
+      <div className="charts-stack">
+        {charts.map((chart) => (
+          <section className="chart-panel" key={chart.title}>
+            <div className="chart-header">
+              <div>
+                <span>Normalized Price</span>
+                <h3>{chart.title}</h3>
+              </div>
+            </div>
+            <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
+            <div className="interpretation">
+              <strong>当前解读</strong>
+              <p>{chart.description}</p>
+            </div>
+            <div className="rate-sources">
+              {chart.series.map((item) => {
+                const latest = item.points.at(-1);
+                return (
+                  <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
+                    <strong>{item.label}</strong>
+                    <span>
+                      {latest ? `${latest.date} ${formatNumber(latest.value, 2)}` : "n/a"} · {item.source}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+      <div className="notes risk-notes">
+        {notes.map((note) => (
+          <p key={note}>{note}</p>
         ))}
       </div>
     </section>

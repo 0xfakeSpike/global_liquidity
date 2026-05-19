@@ -1,10 +1,13 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { dirname, resolve } from "node:path";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..");
 const outputDir = resolve(repoRoot, "public/data");
+const execFileAsync = promisify(execFile);
 
 const lookbackYears = 10;
 const startDate = new Date();
@@ -412,6 +415,42 @@ const jpyRateDefinitions = [
   }
 ];
 
+const riskDefinitions = [
+  {
+    key: "btc",
+    fredId: "CBBTCUSD",
+    label: "BTC",
+    unit: "Index",
+    source: "FRED CBBTCUSD / Coinbase",
+    sourceUrl: "https://fred.stlouisfed.org/series/CBBTCUSD",
+    scale: 1,
+    color: "#f59e0b",
+    description: "Bitcoin 美元现货价格，使用 FRED 的 Coinbase BTC/USD 日频序列。"
+  },
+  {
+    key: "nasdaq",
+    fredId: "NASDAQCOM",
+    label: "纳斯达克综合指数",
+    unit: "Index",
+    source: "FRED NASDAQCOM / Nasdaq",
+    sourceUrl: "https://fred.stlouisfed.org/series/NASDAQCOM",
+    scale: 1,
+    color: "#2563eb",
+    description: "纳斯达克综合指数，代表美国成长和科技风险偏好的核心公开市场指标。"
+  },
+  {
+    key: "hangSengTech",
+    yahooSymbol: "3033.HK",
+    label: "恒生科技指数代理",
+    unit: "Index",
+    source: "Yahoo Finance 3033.HK / CSOP Hang Seng TECH Index ETF",
+    sourceUrl: "https://finance.yahoo.com/quote/3033.HK/history/",
+    scale: 1,
+    color: "#16a34a",
+    description: "恒生科技指数跟踪代理。HSTECH.HK 历史接口不稳定，使用 3033.HK ETF 作为可自动更新的历史序列。"
+  }
+];
+
 async function fetchFredSeries({ fredId, scale }) {
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${fredId}&cosd=${startIso}`;
   const response = await fetch(url, {
@@ -465,6 +504,32 @@ async function fetchBojSeries({ bojDb, bojCode, scale }) {
           ? `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`
           : `${date.slice(0, 4)}-${date.slice(4, 6)}-01`;
       return { date: isoDate, value: round(numeric * scale, 4) };
+    })
+    .filter((point) => point && point.date >= startIso);
+}
+
+async function fetchYahooSeries({ yahooSymbol, scale }) {
+  const period1 = Math.floor(startDate.getTime() / 1000);
+  const period2 = Math.floor(new Date(endIso).getTime() / 1000) + 86400;
+  const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
+    yahooSymbol
+  )}?period1=${period1}&period2=${period2}&interval=1d&events=history`;
+  const { stdout } = await execFileAsync("curl", ["-fsSL", url, "-H", "User-Agent: Mozilla/5.0"], {
+    maxBuffer: 8 * 1024 * 1024
+  });
+  const payload = JSON.parse(stdout);
+  const result = payload.chart?.result?.[0];
+  if (!result) {
+    throw new Error(`Yahoo ${yahooSymbol} failed: ${payload.chart?.error?.description ?? "no result"}`);
+  }
+  const timestamps = result.timestamp ?? [];
+  const closes = result.indicators?.quote?.[0]?.close ?? [];
+
+  return timestamps
+    .map((timestamp, index) => {
+      const value = closes[index];
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return null;
+      return { date: new Date(timestamp * 1000).toISOString().slice(0, 10), value: round(Number(value) * scale, 4) };
     })
     .filter((point) => point && point.date >= startIso);
 }
@@ -614,15 +679,20 @@ function labelForScore(score) {
 async function main() {
   await writeDataset("liquidity.json", await buildUsdDataset());
   await writeDataset("yen-liquidity.json", await buildJpyDataset());
+  await writeDataset("risk-markets.json", await buildRiskDataset());
 }
 
 async function fetchSeriesForDefinitions(definitionsForFetch) {
   const entries = await Promise.all(
     definitionsForFetch
-      .filter((definition) => definition.fredId || definition.bojCode)
+      .filter((definition) => definition.fredId || definition.bojCode || definition.yahooSymbol)
       .map(async (definition) => [
         definition.key,
-        definition.fredId ? await fetchFredSeries(definition) : await fetchBojSeries(definition)
+        definition.fredId
+          ? await fetchFredSeries(definition)
+          : definition.bojCode
+            ? await fetchBojSeries(definition)
+            : await fetchYahooSeries(definition)
       ])
   );
   return new Map(entries);
@@ -678,6 +748,31 @@ function jpyRateCharts(seriesMap) {
         interestRateSeries(rateDefinition("jpyCallLow", jpyRateDefinitions), seriesMap, "#16a34a"),
         interestRateSeries(rateDefinition("jpyBasicLoanRate", jpyRateDefinitions), seriesMap, "#0f766e")
       ]
+    }
+  ];
+}
+
+function normalizeToFirst(series) {
+  const first = series.find((point) => point.value !== 0);
+  if (!first) return [];
+  return series.map((point) => ({ date: point.date, value: round((point.value / first.value) * 100, 4) }));
+}
+
+function riskMarketCharts(seriesMap) {
+  return [
+    {
+      title: "风险市场价格变化",
+      description: "BTC、纳斯达克综合指数、恒生科技指数跟踪代理均按各自首个可用日期归一为 100，便于比较风险资产节奏。",
+      series: riskDefinitions.map((definition) => ({
+        key: definition.key,
+        label: definition.label,
+        color: definition.color,
+        unit: definition.unit,
+        source: definition.source,
+        sourceUrl: definition.sourceUrl,
+        description: definition.description,
+        points: normalizeToFirst(seriesMap.get(definition.key) ?? [])
+      }))
     }
   ];
 }
@@ -759,6 +854,31 @@ async function buildJpyDataset() {
       "BOJ 官方 Time-Series Data Search API 在构建阶段抓取货币基础、当座存款、准备金、M2 与广义定义流动性 L。",
       "BOJ 总资产、USD/JPY 和日本 10 年期国债收益率使用 FRED 无密钥 CSV 序列；其中 BOJ 总资产的原始来源仍为 Bank of Japan Accounts。",
       "日元综合评分同样使用十年 Z-score 方向化加权。货币量、准备金和 USD/JPY 上升按偏宽松处理，JGB 10Y 上升按偏收紧处理。"
+    ]
+  };
+}
+
+async function buildRiskDataset() {
+  const seriesMap = await fetchSeriesForDefinitions(riskDefinitions);
+  return {
+    generatedAt: new Date().toISOString(),
+    lookbackYears,
+    dateRange: {
+      start: startIso,
+      end: endIso
+    },
+    indicators: [],
+    snapshots: [],
+    riskCharts: riskMarketCharts(seriesMap),
+    composite: {
+      score: null,
+      label: "风险市场",
+      date: endIso,
+      series: []
+    },
+    notes: [
+      "风险市场页使用归一化价格曲线，不参与美元或日元流动性评分。",
+      "BTC 和纳斯达克综合指数来自 FRED；恒生科技指数使用可自动更新的 3033.HK ETF 作为跟踪代理。"
     ]
   };
 }

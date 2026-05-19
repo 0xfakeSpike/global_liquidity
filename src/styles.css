@@ -576,6 +576,10 @@ footer {
   margin-bottom: 0;
 }
 
+.risk-notes {
+  margin-top: 18px;
+}
+
 footer {
   border-top: 1px solid #e2e8f0;
   justify-content: space-between;

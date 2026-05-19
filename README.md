@@ -8,6 +8,7 @@ The app does not fetch macro data from the browser. `scripts/fetch-data.mjs` pul
 
 - `public/data/liquidity.json` for USD liquidity
 - `public/data/yen-liquidity.json` for JPY liquidity
+- `public/data/risk-markets.json` for normalized risk-market prices
 
 USD primary series:
 
@@ -36,6 +37,12 @@ JPY primary series:
 - BOJ API `IR01/MADR1Z@D`: basic discount rate and basic loan rate
 - FRED `IRLTLT01JPM156N`: Japan 10-year government bond yield
 - FRED `DEXJPUS`: USD/JPY exchange rate
+
+Risk market series:
+
+- FRED `CBBTCUSD`: Bitcoin price
+- FRED `NASDAQCOM`: Nasdaq Composite Index
+- Yahoo Finance `3033.HK`: CSOP Hang Seng TECH Index ETF, used as a Hang Seng TECH tracking proxy
 
 ## Local Development
 

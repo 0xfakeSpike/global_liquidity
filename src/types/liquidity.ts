@@ -57,6 +57,7 @@ export interface LiquidityDataset {
   indicators: IndicatorDefinition[];
   snapshots: IndicatorSnapshot[];
   rateCharts?: InterestRateChart[];
+  riskCharts?: InterestRateChart[];
   composite: {
     score: number | null;
     label: string;
