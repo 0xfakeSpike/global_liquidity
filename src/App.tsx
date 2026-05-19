@@ -417,6 +417,11 @@ function IndicatorChart({
 function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityDataset }) {
   const usdMap = new Map(usd.snapshots.map((item) => [item.key, item]));
   const jpyMap = new Map(jpy.snapshots.map((item) => [item.key, item]));
+  const usdEffr = usd.rateCharts?.flatMap((chart) => chart.series).find((item) => item.key === "effr");
+  const jpyCallAverage = jpy.rateCharts
+    ?.flatMap((chart) => chart.series)
+    .find((item) => item.key === "jpyCallAverage");
+  const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
   const pairs = [
     {
       title: "央行资产负债表",
@@ -471,6 +476,35 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
         除 DLI 评分外，每组曲线均以首个共同日期归一为 100。这里看的是相对方向和节奏，不是绝对规模。
       </div>
       <div className="charts-stack">
+        {rateSpread.length > 0 ? (
+          <section className="chart-panel">
+            <div className="chart-header">
+              <div>
+                <span>USD - JPY Rate Spread</span>
+                <h3>美元-日元隔夜利差</h3>
+              </div>
+              <div className="latest-value">
+                <strong>{formatNumber(rateSpread.at(-1)?.value, 3)}</strong>
+                <small>pct</small>
+              </div>
+            </div>
+            <LineChart series={rateSpread} color="#7c3aed" dateRange={usd.dateRange} valueLabel="美元-日元隔夜利差" />
+            <div className="interpretation">
+              <strong>当前解读</strong>
+              <p>
+                使用 EFFR 减去 BOJ 无担保隔夜拆借平均利率，观察美元相对日元的短端套息空间。
+                利差扩大通常强化美元资产和美元融资回报优势；利差收窄则削弱日元融资 carry 的吸引力。
+              </p>
+            </div>
+            <div className="data-source">
+              <span>数据来源</span>
+              <a href="https://fred.stlouisfed.org/series/EFFR" target="_blank" rel="noreferrer">
+                FRED EFFR / BOJ FM01 STRDCLUCON
+              </a>
+              <p>公式：EFFR - BOJ 无担保隔夜拆借平均利率。</p>
+            </div>
+          </section>
+        ) : null}
         {pairs.map((pair) => {
           if (!pair.left || !pair.right) return null;
           const series = pair.rawScale
@@ -530,6 +564,17 @@ function normalizePair(left: DataPoint[], right: DataPoint[]) {
     left: aligned.left.map((point) => ({ date: point.date, value: (point.value / leftBase) * 100 })),
     right: aligned.right.map((point) => ({ date: point.date, value: (point.value / rightBase) * 100 }))
   };
+}
+
+function spreadSeries(left: DataPoint[], right: DataPoint[]) {
+  const rightMap = new Map(right.map((point) => [point.date, point.value]));
+  return left
+    .map((point) => {
+      const rightValue = latestBeforeOrOn(rightMap, point.date);
+      if (rightValue === undefined) return null;
+      return { date: point.date, value: point.value - rightValue };
+    })
+    .filter(Boolean) as DataPoint[];
 }
 
 function latestBeforeOrOn(map: Map<string, number>, date: string) {
