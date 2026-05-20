@@ -2,6 +2,7 @@ import { useState, type PointerEvent } from "react";
 import type { DataPoint } from "../types/liquidity";
 import { formatNumber } from "../lib/format";
 import { dateTicks, type DateRange } from "../lib/chartAxis";
+import { gridTicks } from "../lib/chartGrid";
 
 interface LineChartProps {
   series: DataPoint[];
@@ -35,6 +36,7 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
     end: dateRange?.end ?? series.at(-1)?.date ?? series[0]?.date
   };
   const ticks = dateTicks(domainLabels);
+  const yTicks = gridTicks(min, max);
 
   const xForDate = (date: string) => {
     const timestamp = Date.parse(`${date}T00:00:00Z`);
@@ -80,20 +82,17 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
   return (
     <div className="chart-interactive-wrap" onPointerLeave={() => setHovered(null)} onPointerMove={handlePointerMove}>
       <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={valueLabel ?? "指标走势图"}>
-      <line x1={padding.left} x2={width - padding.right} y1={padding.top} y2={padding.top} />
-      <line
-        x1={padding.left}
-        x2={width - padding.right}
-        y1={padding.top + usableHeight / 2}
-        y2={padding.top + usableHeight / 2}
-      />
-      <line x1={padding.left} x2={width - padding.right} y1={height - padding.bottom} y2={height - padding.bottom} />
-      <text x={padding.left - 8} y={padding.top + 4} textAnchor="end">
-        {formatNumber(max)}
-      </text>
-      <text x={padding.left - 8} y={height - padding.bottom} textAnchor="end">
-        {formatNumber(min)}
-      </text>
+      {yTicks.map((tick) => {
+        const y = yForValue(tick);
+        return (
+          <g className={tick === 0 ? "chart-grid zero" : "chart-grid"} key={tick}>
+            <line x1={padding.left} x2={width - padding.right} y1={y} y2={y} />
+            <text x={padding.left - 8} y={y + 4} textAnchor="end">
+              {formatNumber(tick)}
+            </text>
+          </g>
+        );
+      })}
       <path d={path} stroke={color} />
       <circle
         cx={xForDate(latest.date)}
@@ -107,6 +106,7 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
         const isLast = index === ticks.length - 1;
         return (
           <g key={tick}>
+            <line className="chart-x-grid" x1={x} x2={x} y1={padding.top} y2={height - padding.bottom} />
             <line x1={x} x2={x} y1={height - padding.bottom} y2={height - padding.bottom + 4} />
             <text x={x} y={height - 8} textAnchor={isFirst ? "start" : isLast ? "end" : "middle"}>
               {tick.slice(0, 7)}
