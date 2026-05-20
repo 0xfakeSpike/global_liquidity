@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T04:11:42.406Z",
+  "generatedAt": "2026-05-20T05:38:19.819Z",
   "lookbackYears": 10,
   "dateRange": {
     "start": "2016-05-20",
@@ -60769,6 +60769,88 @@
       "date": "2025-07-01"
     }
   ],
+  "foreignHolderShares": [
+    {
+      "key": "japan",
+      "label": "Japan",
+      "value": 1.1916,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#2563eb"
+    },
+    {
+      "key": "united-kingdom",
+      "label": "United Kingdom",
+      "value": 0.9269,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#dc2626"
+    },
+    {
+      "key": "china-mainland",
+      "label": "China, Mainland",
+      "value": 0.6523,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#16a34a"
+    },
+    {
+      "key": "cayman-islands",
+      "label": "Cayman Islands",
+      "value": 0.4594,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#7c3aed"
+    },
+    {
+      "key": "belgium",
+      "label": "Belgium",
+      "value": 0.454,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#f59e0b"
+    },
+    {
+      "key": "canada",
+      "label": "Canada",
+      "value": 0.4394,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#0f766e"
+    },
+    {
+      "key": "luxembourg",
+      "label": "Luxembourg",
+      "value": 0.432,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#64748b"
+    },
+    {
+      "key": "france",
+      "label": "France",
+      "value": 0.393,
+      "unit": "万亿美元",
+      "source": "Treasury TIC Table 5 / Major Foreign Holders",
+      "sourceUrl": "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      "date": "2026-03-01",
+      "color": "#9333ea"
+    }
+  ],
   "composite": {
     "score": null,
     "label": "美债市场",
@@ -60778,6 +60860,7 @@
   "notes": [
     "美债页使用 FRED 无密钥 CSV 抓取，总债务、公众持有债务和持有人结构的原始来源为 U.S. Treasury Fiscal Service。",
     "持有人饼图采用公众持有债务近似拆分：美国国内私人部门 = Private Investors - Foreign and International Investors；另列海外/国际投资者与 Federal Reserve Banks。",
+    "海外持有人细分使用 Treasury TIC Table 5 Major Foreign Holders。该表按托管/报告地口径统计，财政部提示它不一定精确代表最终受益所有人。",
     "收益率曲线使用 Federal Reserve H.15 的 3M、2Y、10Y、30Y 常数期限美债收益率；利差使用 FRED T10Y2Y 与 T10Y3M。"
   ]
 }

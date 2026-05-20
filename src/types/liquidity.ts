@@ -72,6 +72,7 @@ export interface LiquidityDataset {
   riskCharts?: InterestRateChart[];
   treasuryCharts?: InterestRateChart[];
   holderShares?: HolderShare[];
+  foreignHolderShares?: HolderShare[];
   composite: {
     score: number | null;
     label: string;

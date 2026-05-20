@@ -63,6 +63,7 @@ U.S. Treasury market series:
 - FRED `DGS3MO`, `DGS2`, `DGS10`, `DGS30`: Treasury constant maturity yields
 - FRED `T10Y2Y`, `T10Y3M`: yield curve spreads
 - FRED `FDHBFRBN`, `FDHBPIN`, `FDHBFIN`: Treasury holder structure. The holder pie approximates domestic private ownership as `FDHBPIN - FDHBFIN`, then separately shows foreign/international investors and Federal Reserve Banks.
+- Treasury TIC Table 5 `slt_table5.txt`: latest major foreign holders by country/region, including Japan, Mainland China, United Kingdom, Cayman Islands, Belgium, and others. TIC country data are reported by custody/reporting location and may not identify the final beneficial owner.
 
 ## Local Development
 

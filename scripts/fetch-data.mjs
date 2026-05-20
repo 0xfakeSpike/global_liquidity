@@ -1191,6 +1191,47 @@ function treasuryHolderShares(seriesMap) {
   ];
 }
 
+async function fetchMajorForeignHolders() {
+  const url = "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt";
+  const response = await fetch(url, {
+    headers: { "user-agent": "global-liquidity-monitor/0.1" }
+  });
+  if (!response.ok) {
+    throw new Error(`TIC major foreign holders failed: ${response.status} ${response.statusText}`);
+  }
+  const text = await response.text();
+  const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const headerIndex = lines.findIndex((line) => /^Country\s+\d{4}-\d{2}/.test(line));
+  if (headerIndex < 0) throw new Error("TIC major foreign holders header not found");
+
+  const headers = lines[headerIndex].split(/\s+/);
+  const latestDate = headers[1];
+  const colors = ["#2563eb", "#dc2626", "#16a34a", "#7c3aed", "#f59e0b", "#0f766e", "#64748b", "#9333ea"];
+  const countryRows = [];
+
+  for (const line of lines.slice(headerIndex + 1)) {
+    if (line.startsWith("Grand Total") || line.startsWith("Of Which:") || line.startsWith("Notes:")) break;
+    const match = line.match(/^(.+?)\s+(-?\d+(?:\.\d+)?)\s+(?:-?\d+(?:\.\d+)?\s*)*$/);
+    if (!match) continue;
+    const label = match[1].trim();
+    if (label === "All Other") continue;
+    countryRows.push({
+      key: label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+      label,
+      value: round(Number(match[2]) / 1_000, 4),
+      unit: "万亿美元",
+      source: "Treasury TIC Table 5 / Major Foreign Holders",
+      sourceUrl: "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt",
+      date: `${latestDate}-01`
+    });
+  }
+
+  return countryRows.slice(0, 8).map((item, index) => ({
+    ...item,
+    color: colors[index % colors.length]
+  }));
+}
+
 async function buildUsdDataset() {
   const seriesMap = await fetchSeriesForDefinitions(usdDefinitions);
   const rateSeriesMap = await fetchSeriesForDefinitions(usdRateDefinitions);
@@ -1313,6 +1354,7 @@ async function buildTreasuryDataset() {
   const holderSeriesMap = await fetchSeriesForDefinitions(treasuryHolderDefinitions);
   const charts = treasuryMarketCharts(seriesMap);
   const holderShares = treasuryHolderShares(holderSeriesMap);
+  const foreignHolderShares = await fetchMajorForeignHolders();
   const latestDebt = latestPoint(seriesMap.get("totalPublicDebt") ?? []);
   return {
     generatedAt: new Date().toISOString(),
@@ -1325,6 +1367,7 @@ async function buildTreasuryDataset() {
     snapshots: [],
     treasuryCharts: charts,
     holderShares,
+    foreignHolderShares,
     composite: {
       score: null,
       label: "美债市场",
@@ -1334,6 +1377,7 @@ async function buildTreasuryDataset() {
     notes: [
       "美债页使用 FRED 无密钥 CSV 抓取，总债务、公众持有债务和持有人结构的原始来源为 U.S. Treasury Fiscal Service。",
       "持有人饼图采用公众持有债务近似拆分：美国国内私人部门 = Private Investors - Foreign and International Investors；另列海外/国际投资者与 Federal Reserve Banks。",
+      "海外持有人细分使用 Treasury TIC Table 5 Major Foreign Holders。该表按托管/报告地口径统计，财政部提示它不一定精确代表最终受益所有人。",
       "收益率曲线使用 Federal Reserve H.15 的 3M、2Y、10Y、30Y 常数期限美债收益率；利差使用 FRED T10Y2Y 与 T10Y3M。"
     ]
   };
