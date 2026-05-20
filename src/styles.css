@@ -568,6 +568,33 @@ footer {
   stroke-width: 2.8;
 }
 
+.chart-hitbox {
+  cursor: crosshair;
+  fill: transparent;
+  pointer-events: all;
+}
+
+.chart-crosshair {
+  stroke: #94a3b8;
+  stroke-dasharray: 4 4;
+  stroke-width: 1;
+}
+
+.chart-tooltip {
+  pointer-events: none;
+}
+
+.chart-tooltip rect {
+  fill: rgba(15, 23, 42, 0.92);
+  stroke: rgba(255, 255, 255, 0.18);
+}
+
+.chart-tooltip text {
+  fill: #f8fafc;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .multi-chart-wrap {
   display: grid;
   gap: 12px;

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { DataPoint } from "../types/liquidity";
 import { formatNumber } from "../lib/format";
 import { dateTicks, type DateRange } from "../lib/chartAxis";
@@ -11,6 +12,7 @@ interface LineChartProps {
 }
 
 export function LineChart({ series, color = "#2563eb", dateRange, height = 240, valueLabel }: LineChartProps) {
+  const [hovered, setHovered] = useState<{ point: DataPoint; x: number; y: number } | null>(null);
   const width = 760;
   const padding = { top: 18, right: 18, bottom: 28, left: 46 };
   const usableWidth = width - padding.left - padding.right;
@@ -35,6 +37,24 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
   const xForDate = (date: string) => {
     const timestamp = Date.parse(`${date}T00:00:00Z`);
     return padding.left + ((timestamp - domainStart) / domainRange) * usableWidth;
+  };
+  const yForValue = (value: number) => padding.top + (1 - (value - min) / range) * usableHeight;
+
+  const nearestPoint = (x: number) => {
+    const timestamp = domainStart + ((x - padding.left) / usableWidth) * domainRange;
+    return series.reduce((nearest, point) => {
+      const distance = Math.abs(Date.parse(`${point.date}T00:00:00Z`) - timestamp);
+      const nearestDistance = Math.abs(Date.parse(`${nearest.date}T00:00:00Z`) - timestamp);
+      return distance < nearestDistance ? point : nearest;
+    }, series[0]);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<SVGRectElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const rawX = ((event.clientX - rect.left) / rect.width) * width;
+    const x = Math.max(padding.left, Math.min(width - padding.right, rawX));
+    const point = nearestPoint(x);
+    setHovered({ point, x: xForDate(point.date), y: yForValue(point.value) });
   };
 
   const path = series
@@ -66,7 +86,7 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
       <path d={path} stroke={color} />
       <circle
         cx={xForDate(latest.date)}
-        cy={padding.top + (1 - (latest.value - min) / range) * usableHeight}
+        cy={yForValue(latest.value)}
         r="4"
         fill={color}
       />
@@ -83,6 +103,27 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
           </g>
         );
       })}
+      <rect
+        className="chart-hitbox"
+        x={padding.left}
+        y={padding.top}
+        width={usableWidth}
+        height={usableHeight}
+        onPointerLeave={() => setHovered(null)}
+        onPointerMove={handlePointerMove}
+      />
+      {hovered ? (
+        <g className="chart-tooltip">
+          <line className="chart-crosshair" x1={hovered.x} x2={hovered.x} y1={padding.top} y2={height - padding.bottom} />
+          <line className="chart-crosshair" x1={padding.left} x2={width - padding.right} y1={hovered.y} y2={hovered.y} />
+          <circle cx={hovered.x} cy={hovered.y} r="4" fill={color} />
+          <g transform={`translate(${Math.min(hovered.x + 12, width - 172)}, ${Math.max(8, hovered.y - 52)})`}>
+            <rect width="160" height="44" rx="6" />
+            <text x="10" y="17">{hovered.point.date}</text>
+            <text x="10" y="34">{formatNumber(hovered.point.value, 3)}</text>
+          </g>
+        </g>
+      ) : null}
     </svg>
   );
 }

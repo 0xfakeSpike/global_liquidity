@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { formatNumber } from "../lib/format";
 import { dateTicks, type DateRange } from "../lib/chartAxis";
 import type { DataPoint } from "../types/liquidity";
@@ -16,6 +17,11 @@ interface MultiLineChartProps {
 }
 
 export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: MultiLineChartProps) {
+  const [hovered, setHovered] = useState<{
+    date: string;
+    items: { label: string; color: string; point: DataPoint }[];
+    x: number;
+  } | null>(null);
   const width = 760;
   const padding = { top: 18, right: 18, bottom: 28, left: 46 };
   const usableWidth = width - padding.left - padding.right;
@@ -42,6 +48,29 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
   const xForDate = (date: string) => {
     const timestamp = Date.parse(`${date}T00:00:00Z`);
     return padding.left + ((timestamp - domainStart) / domainRange) * usableWidth;
+  };
+  const yForValue = (value: number) => padding.top + (1 - (value - min) / range) * usableHeight;
+
+  const nearestPoint = (items: DataPoint[], timestamp: number) =>
+    items.reduce((nearest, point) => {
+      const distance = Math.abs(Date.parse(`${point.date}T00:00:00Z`) - timestamp);
+      const nearestDistance = Math.abs(Date.parse(`${nearest.date}T00:00:00Z`) - timestamp);
+      return distance < nearestDistance ? point : nearest;
+    }, items[0]);
+
+  const handlePointerMove = (event: React.PointerEvent<SVGRectElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const rawX = ((event.clientX - rect.left) / rect.width) * width;
+    const x = Math.max(padding.left, Math.min(width - padding.right, rawX));
+    const timestamp = domainStart + ((x - padding.left) / usableWidth) * domainRange;
+    const anchor = nearestPoint(points, timestamp);
+    const items = series
+      .map((item) => {
+        if (item.points.length === 0) return null;
+        return { label: item.label, color: item.color, point: nearestPoint(item.points, timestamp) };
+      })
+      .filter(Boolean) as { label: string; color: string; point: DataPoint }[];
+    setHovered({ date: anchor.date, items, x: xForDate(anchor.date) });
   };
 
   const toPath = (items: DataPoint[]) =>
@@ -78,7 +107,7 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
               {latest ? (
                 <circle
                   cx={xForDate(latest.date)}
-                  cy={padding.top + (1 - (latest.value - min) / range) * usableHeight}
+                  cy={yForValue(latest.value)}
                   r="4"
                   fill={item.color}
                 />
@@ -99,6 +128,38 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
             </g>
           );
         })}
+        <rect
+          className="chart-hitbox"
+          x={padding.left}
+          y={padding.top}
+          width={usableWidth}
+          height={usableHeight}
+          onPointerLeave={() => setHovered(null)}
+          onPointerMove={handlePointerMove}
+        />
+        {hovered ? (
+          <g className="chart-tooltip">
+            <line className="chart-crosshair" x1={hovered.x} x2={hovered.x} y1={padding.top} y2={height - padding.bottom} />
+            {hovered.items.map((item) => (
+              <circle
+                cx={xForDate(item.point.date)}
+                cy={yForValue(item.point.value)}
+                fill={item.color}
+                key={item.label}
+                r="3.5"
+              />
+            ))}
+            <g transform={`translate(${Math.min(hovered.x + 12, width - 248)}, ${padding.top + 4})`}>
+              <rect width="236" height={Math.min(26 + hovered.items.length * 17, height - 36)} rx="6" />
+              <text x="10" y="17">{hovered.date}</text>
+              {hovered.items.map((item, index) => (
+                <text key={item.label} x="10" y={36 + index * 17}>
+                  <tspan fill={item.color}>●</tspan> {item.label}: {formatNumber(item.point.value, 3)}
+                </text>
+              ))}
+            </g>
+          </g>
+        ) : null}
       </svg>
       <div className="multi-chart-legend">
         {series.map((item) => (
