@@ -228,6 +228,11 @@ function App() {
             treasury={pairedDatasets.treasury}
             usd={pairedDatasets.usd}
           />
+          <YenCarryStressTerminal
+            jpy={pairedDatasets.jpy}
+            treasury={pairedDatasets.treasury}
+            usd={pairedDatasets.usd}
+          />
           {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} /> : null}
           {inflationCharts.length > 0 ? (
             <ChartGroupSection
@@ -833,6 +838,135 @@ function momentumSignal(label: string, rawValue: number | undefined, unit: strin
   return { label, value, text };
 }
 
+function YenCarryStressTerminal({
+  jpy,
+  treasury,
+  usd
+}: {
+  jpy: LiquidityDataset;
+  treasury: LiquidityDataset;
+  usd: LiquidityDataset;
+}) {
+  const jpyMap = new Map(jpy.snapshots.map((item) => [item.key, item]));
+  const usdEffr = usd.rateCharts?.flatMap((chart) => chart.series).find((item) => item.key === "effr");
+  const jpyCallAverage = jpy.rateCharts
+    ?.flatMap((chart) => chart.series)
+    .find((item) => item.key === "jpyCallAverage");
+  const dgs10 = treasury.treasuryCharts?.flatMap((chart) => chart.series).find((item) => item.key === "dgs10");
+  const dgs30 = treasury.treasuryCharts?.flatMap((chart) => chart.series).find((item) => item.key === "dgs30");
+  const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
+  const usdJpy = jpyMap.get("usdJpy")?.series ?? [];
+  const jgb10y = jpyMap.get("jgb10y")?.series ?? [];
+  const jpyCall = jpyCallAverage?.points ?? [];
+
+  const stressComponents = standardizeSeries([
+    { label: "美日利差收窄", color: "#2563eb", points: invertSeries(absoluteChangeSeries(rateSpread, 91)) },
+    { label: "日元升值", color: "#16a34a", points: invertSeries(percentChangeSeries(usdJpy, 91)) },
+    { label: "JGB上行", color: "#dc2626", points: absoluteChangeSeries(jgb10y, 91) },
+    { label: "US10Y上行", color: "#7c3aed", points: absoluteChangeSeries(dgs10?.points ?? [], 91) },
+    { label: "US30Y上行", color: "#f59e0b", points: absoluteChangeSeries(dgs30?.points ?? [], 91) },
+    { label: "BOJ隔夜利率上行", color: "#0f766e", points: absoluteChangeSeries(jpyCall, 91) }
+  ]);
+  const stressIndex = averageAlignedSeries(stressComponents);
+  const latestStress = stressIndex.at(-1)?.value;
+
+  const carrySignals = [
+    carrySignal("当前美日隔夜利差", rateSpread.at(-1)?.value, "pct", false),
+    carrySignal("美日利差 13W", absoluteChangeSeries(rateSpread, 91).at(-1)?.value, "pct", false),
+    carrySignal("USDJPY 13W", percentChangeSeries(usdJpy, 91).at(-1)?.value, "%", false),
+    carrySignal("Carry压力指数", latestStress, "z", true)
+  ];
+
+  return (
+    <section className="terminal">
+      <div className="section-heading">
+        <p>Yen Carry Stress</p>
+        <h2>日元 Carry Trade 压力</h2>
+      </div>
+      <div className="overlay-note">
+        这里衡量的是日元融资套利的市场压力代理，不是完整资金规模。CFTC 可看期货拥挤度，BIS 可看中长期日元融资规模；本页先用更高频的利差、汇率、JGB 和美债长端收益率观察 unwind 风险。
+      </div>
+      <div className="momentum-summary">
+        {carrySignals.map((signal) => (
+          <div className="momentum-signal" key={signal.label}>
+            <span>{signal.label}</span>
+            <strong>{signal.value}</strong>
+            <p>{signal.text}</p>
+          </div>
+        ))}
+      </div>
+      <div className="charts-stack">
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Carry Return Base</span>
+              <h3>日元融资套利基础</h3>
+            </div>
+          </div>
+          <MultiLineChart
+            dateRange={usd.dateRange}
+            series={[
+              { label: "美日隔夜利差", color: "#2563eb", points: rateSpread },
+              { label: "USDJPY 13W%", color: "#16a34a", points: percentChangeSeries(usdJpy, 91) }
+            ]}
+            valueLabel="日元融资套利基础"
+          />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>
+              美日利差代表 carry 收益基础，USDJPY 代表汇率方向。如果利差收窄且日元升值，carry trade 的收益和本金两端都会恶化。
+            </p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Unwind Pressure</span>
+              <h3>Carry Unwind 压力指数</h3>
+            </div>
+            <div className="latest-value">
+              <strong>{formatNumber(latestStress, 2)}</strong>
+              <small>z</small>
+            </div>
+          </div>
+          <LineChart series={stressIndex} color="#dc2626" dateRange={usd.dateRange} valueLabel="Carry Unwind 压力指数" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>
+              指数越高，代表日元融资 carry 的 unwind 压力越大：美日利差收窄、日元升值、JGB 上行、美国长端利率上行、BOJ 隔夜利率上行都会推高压力。
+            </p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Stress Components</span>
+              <h3>Carry 压力分项</h3>
+            </div>
+          </div>
+          <MultiLineChart series={stressComponents} dateRange={usd.dateRange} valueLabel="Carry 压力分项" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>
+              分项全部方向化并标准化，向上都是 carry 压力上升。这样可以区分是利差压缩、日元升值、JGB 上行，还是美元长端收益率上行在主导压力。
+            </p>
+          </div>
+        </section>
+      </div>
+    </section>
+  );
+}
+
+function carrySignal(label: string, rawValue: number | undefined, unit: string, higherIsStress: boolean) {
+  if (rawValue === undefined) {
+    return { label, value: "n/a", text: "数据不足，暂不判断。" };
+  }
+  const value = `${rawValue > 0 ? "+" : ""}${formatNumber(rawValue, 2)}${unit}`;
+  const stressText = rawValue > 0 ? "压力上升。" : rawValue < 0 ? "压力下降。" : "压力中性。";
+  const tailwindText = rawValue > 0 ? "carry 顺风。" : rawValue < 0 ? "carry 逆风。" : "carry 中性。";
+  return { label, value, text: higherIsStress ? stressText : tailwindText };
+}
+
 function IndicatorChart({
   definition,
   snapshot,
@@ -1087,6 +1221,23 @@ function standardizeSeries(series: { label: string; color: string; points: DataP
       points: item.points.map((point) => ({ date: point.date, value: (point.value - mean) / standardDeviation }))
     };
   });
+}
+
+function averageAlignedSeries(series: { label: string; color: string; points: DataPoint[] }[]) {
+  const maps = series.map((item) => new Map(item.points.map((point) => [point.date, point.value])));
+  const dates = [...new Set(series.flatMap((item) => item.points.map((point) => point.date)))].sort();
+  const minimumComponents = Math.max(2, Math.ceil(series.length / 2));
+
+  return dates
+    .map((date) => {
+      const values = maps
+        .map((map) => latestBeforeOrOn(map, date))
+        .filter((value): value is number => value !== undefined);
+
+      if (values.length < minimumComponents) return null;
+      return { date, value: values.reduce((sum, value) => sum + value, 0) / values.length };
+    })
+    .filter(Boolean) as DataPoint[];
 }
 
 function offsetDate(date: string, days: number) {
