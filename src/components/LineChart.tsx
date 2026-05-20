@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type PointerEvent } from "react";
 import type { DataPoint } from "../types/liquidity";
 import { formatNumber } from "../lib/format";
 import { dateTicks, type DateRange } from "../lib/chartAxis";
@@ -12,7 +12,9 @@ interface LineChartProps {
 }
 
 export function LineChart({ series, color = "#2563eb", dateRange, height = 240, valueLabel }: LineChartProps) {
-  const [hovered, setHovered] = useState<{ point: DataPoint; x: number; y: number } | null>(null);
+  const [hovered, setHovered] = useState<{ point: DataPoint; x: number; y: number; tooltipX: number; tooltipY: number } | null>(
+    null
+  );
   const width = 760;
   const padding = { top: 18, right: 18, bottom: 28, left: 46 };
   const usableWidth = width - padding.left - padding.right;
@@ -49,12 +51,20 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
     }, series[0]);
   };
 
-  const handlePointerMove = (event: React.PointerEvent<SVGRectElement>) => {
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const rawX = ((event.clientX - rect.left) / rect.width) * width;
     const x = Math.max(padding.left, Math.min(width - padding.right, rawX));
     const point = nearestPoint(x);
-    setHovered({ point, x: xForDate(point.date), y: yForValue(point.value) });
+    const chartX = xForDate(point.date);
+    const chartY = yForValue(point.value);
+    setHovered({
+      point,
+      x: chartX,
+      y: chartY,
+      tooltipX: Math.min((chartX / width) * rect.width + 12, rect.width - 172),
+      tooltipY: Math.max((chartY / height) * rect.height - 52, 8)
+    });
   };
 
   const path = series
@@ -68,7 +78,8 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
   const latest = series[series.length - 1];
 
   return (
-    <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={valueLabel ?? "指标走势图"}>
+    <div className="chart-interactive-wrap" onPointerLeave={() => setHovered(null)} onPointerMove={handlePointerMove}>
+      <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={valueLabel ?? "指标走势图"}>
       <line x1={padding.left} x2={width - padding.right} y1={padding.top} y2={padding.top} />
       <line
         x1={padding.left}
@@ -103,27 +114,20 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
           </g>
         );
       })}
-      <rect
-        className="chart-hitbox"
-        x={padding.left}
-        y={padding.top}
-        width={usableWidth}
-        height={usableHeight}
-        onPointerLeave={() => setHovered(null)}
-        onPointerMove={handlePointerMove}
-      />
       {hovered ? (
         <g className="chart-tooltip">
           <line className="chart-crosshair" x1={hovered.x} x2={hovered.x} y1={padding.top} y2={height - padding.bottom} />
           <line className="chart-crosshair" x1={padding.left} x2={width - padding.right} y1={hovered.y} y2={hovered.y} />
           <circle cx={hovered.x} cy={hovered.y} r="4" fill={color} />
-          <g transform={`translate(${Math.min(hovered.x + 12, width - 172)}, ${Math.max(8, hovered.y - 52)})`}>
-            <rect width="160" height="44" rx="6" />
-            <text x="10" y="17">{hovered.point.date}</text>
-            <text x="10" y="34">{formatNumber(hovered.point.value, 3)}</text>
-          </g>
         </g>
       ) : null}
-    </svg>
+      </svg>
+      {hovered ? (
+        <div className="chart-floating-tooltip" style={{ left: hovered.tooltipX, top: hovered.tooltipY }}>
+          <strong>{hovered.point.date}</strong>
+          <span>{formatNumber(hovered.point.value, 3)}</span>
+        </div>
+      ) : null}
+    </div>
   );
 }

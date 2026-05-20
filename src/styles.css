@@ -568,6 +568,11 @@ footer {
   stroke-width: 2.8;
 }
 
+.chart-interactive-wrap {
+  cursor: crosshair;
+  position: relative;
+}
+
 .chart-hitbox {
   cursor: crosshair;
   fill: transparent;
@@ -593,6 +598,42 @@ footer {
   fill: #f8fafc;
   font-size: 12px;
   font-weight: 700;
+}
+
+.chart-floating-tooltip {
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  color: #f8fafc;
+  display: grid;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 5px;
+  min-width: 150px;
+  padding: 8px 10px;
+  pointer-events: none;
+  position: absolute;
+  z-index: 10;
+}
+
+.chart-floating-tooltip.multi {
+  max-width: 260px;
+  min-width: 220px;
+}
+
+.chart-floating-tooltip span {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  line-height: 1.35;
+}
+
+.chart-floating-tooltip i {
+  border-radius: 999px;
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 8px;
+  width: 8px;
 }
 
 .multi-chart-wrap {
