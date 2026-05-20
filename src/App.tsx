@@ -64,7 +64,7 @@ const markets: Record<
     eyebrow: "美元与日元流动性叠加监控",
     title: "把美元和日元对应指标标准化到同一坐标系，观察全球资金主轴的相对变化。",
     description: "每组曲线以首个共同日期为 100，避免美元、日元单位和频率不同导致误读。",
-    sourceLabel: "FRED / NY Fed / BOJ",
+    sourceLabel: "FRED / NY Fed / BOJ / Treasury",
     updateLabel: "Normalized overlay"
   }
 };
@@ -78,7 +78,11 @@ function initialMarket(): ViewMode {
 
 function App() {
   const [dataset, setDataset] = useState<LiquidityDataset | null>(null);
-  const [pairedDatasets, setPairedDatasets] = useState<{ usd: LiquidityDataset; jpy: LiquidityDataset } | null>(null);
+  const [pairedDatasets, setPairedDatasets] = useState<{
+    usd: LiquidityDataset;
+    jpy: LiquidityDataset;
+    treasury: LiquidityDataset;
+  } | null>(null);
   const [market, setMarket] = useState<ViewMode>(initialMarket);
 
   useEffect(() => {
@@ -86,8 +90,8 @@ function App() {
     setDataset(null);
     setPairedDatasets(null);
     if (market === "combined") {
-      Promise.all([loadLiquidityDataset("usd"), loadLiquidityDataset("jpy")]).then(([usd, jpy]) =>
-        setPairedDatasets({ usd, jpy })
+      Promise.all([loadLiquidityDataset("usd"), loadLiquidityDataset("jpy"), loadLiquidityDataset("treasury")]).then(
+        ([usd, jpy, treasury]) => setPairedDatasets({ usd, jpy, treasury })
       );
     } else {
       loadLiquidityDataset(market).then(setDataset);
@@ -219,6 +223,11 @@ function App() {
       {market === "combined" && pairedDatasets ? (
         <>
           <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
+          <LiquidityMomentumTerminal
+            jpy={pairedDatasets.jpy}
+            treasury={pairedDatasets.treasury}
+            usd={pairedDatasets.usd}
+          />
           {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} /> : null}
           {inflationCharts.length > 0 ? (
             <ChartGroupSection
@@ -682,6 +691,148 @@ function PieChart({ shares }: { shares: HolderShare[] }) {
   );
 }
 
+function LiquidityMomentumTerminal({
+  jpy,
+  treasury,
+  usd
+}: {
+  jpy: LiquidityDataset;
+  treasury: LiquidityDataset;
+  usd: LiquidityDataset;
+}) {
+  const usdMap = new Map(usd.snapshots.map((item) => [item.key, item]));
+  const jpyMap = new Map(jpy.snapshots.map((item) => [item.key, item]));
+  const usdEffr = usd.rateCharts?.flatMap((chart) => chart.series).find((item) => item.key === "effr");
+  const jpyCallAverage = jpy.rateCharts
+    ?.flatMap((chart) => chart.series)
+    .find((item) => item.key === "jpyCallAverage");
+  const dgs10 = treasury.treasuryCharts?.flatMap((chart) => chart.series).find((item) => item.key === "dgs10");
+  const dgs30 = treasury.treasuryCharts?.flatMap((chart) => chart.series).find((item) => item.key === "dgs30");
+  const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
+
+  const netLiquidity = usdMap.get("netLiquidity")?.series ?? [];
+  const bojAssets = jpyMap.get("bojAssets")?.series ?? [];
+  const fedAssets = usdMap.get("fedBalanceSheet")?.series ?? [];
+  const usM2 = usdMap.get("m2")?.series ?? [];
+  const japanM2 = jpyMap.get("m2Japan")?.series ?? [];
+  const usdJpy = jpyMap.get("usdJpy")?.series ?? [];
+  const jgb10y = jpyMap.get("jgb10y")?.series ?? [];
+
+  const netLiquidityMomentum = [
+    {
+      label: "Δ4W",
+      color: "#16a34a",
+      points: absoluteChangeSeries(netLiquidity, 28)
+    },
+    {
+      label: "Δ13W",
+      color: "#2563eb",
+      points: absoluteChangeSeries(netLiquidity, 91)
+    },
+    {
+      label: "Δ26W",
+      color: "#7c3aed",
+      points: absoluteChangeSeries(netLiquidity, 182)
+    }
+  ];
+
+  const quantityMomentum = [
+    { label: "Fed净流动性 13W%", color: "#2563eb", points: percentChangeSeries(netLiquidity, 91) },
+    { label: "Fed资产 13W%", color: "#0f766e", points: percentChangeSeries(fedAssets, 91) },
+    { label: "BOJ资产 13W%", color: "#dc2626", points: percentChangeSeries(bojAssets, 91) },
+    { label: "US M2 13W%", color: "#7c3aed", points: percentChangeSeries(usM2, 91) },
+    { label: "Japan M2 13W%", color: "#f59e0b", points: percentChangeSeries(japanM2, 91) }
+  ];
+
+  const fundingImpulse = standardizeSeries([
+    { label: "美日利差扩大", color: "#2563eb", points: absoluteChangeSeries(rateSpread, 91) },
+    { label: "USDJPY上行", color: "#16a34a", points: percentChangeSeries(usdJpy, 91) },
+    { label: "JGB下行", color: "#dc2626", points: invertSeries(absoluteChangeSeries(jgb10y, 91)) },
+    { label: "US10Y下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)) },
+    { label: "US30Y下行", color: "#f59e0b", points: invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)) }
+  ]);
+
+  const latestSignals = [
+    momentumSignal("美元净流动性 Δ13W", absoluteChangeSeries(netLiquidity, 91).at(-1)?.value, "万亿美元"),
+    momentumSignal("美日利差 Δ13W", absoluteChangeSeries(rateSpread, 91).at(-1)?.value, "pct"),
+    momentumSignal("USDJPY 13W", percentChangeSeries(usdJpy, 91).at(-1)?.value, "%"),
+    momentumSignal("US10Y 下行冲击", invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)).at(-1)?.value, "pct")
+  ];
+
+  return (
+    <section className="terminal">
+      <div className="section-heading">
+        <p>Global Liquidity Momentum</p>
+        <h2>全球流动性动量</h2>
+      </div>
+      <div className="overlay-note">
+        存量决定水位，变化量决定方向，变化率的变化决定拐点。这里把数量流动性和融资条件都转成 4W、13W、26W 或 13W 动量观察，重点看风险资产的边际顺风/逆风。
+      </div>
+      <div className="momentum-summary">
+        {latestSignals.map((signal) => (
+          <div className="momentum-signal" key={signal.label}>
+            <span>{signal.label}</span>
+            <strong>{signal.value}</strong>
+            <p>{signal.text}</p>
+          </div>
+        ))}
+      </div>
+      <div className="charts-stack">
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Quantity Momentum</span>
+              <h3>美元净流动性变化量</h3>
+            </div>
+          </div>
+          <MultiLineChart series={netLiquidityMomentum} dateRange={usd.dateRange} valueLabel="美元净流动性变化量" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>4W、13W、26W 分别对应短线、季度和半年度流动性动量。风险资产更敏感的是这些斜率变化，而不是净流动性绝对水位。</p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Balance Sheet / Money Momentum</span>
+              <h3>数量流动性 13周增速</h3>
+            </div>
+          </div>
+          <MultiLineChart series={quantityMomentum} dateRange={usd.dateRange} valueLabel="数量流动性 13周增速" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>把 Fed 净流动性、Fed 资产、BOJ 资产和两国 M2 都转为 13 周百分比变化，用来观察主要水位是否在同步加速或减速。</p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Funding Momentum</span>
+              <h3>融资条件 13周风险顺风指数</h3>
+            </div>
+          </div>
+          <MultiLineChart series={fundingImpulse} dateRange={usd.dateRange} valueLabel="融资条件 13周风险顺风指数" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>
+              每条曲线已方向化并标准化：向上代表风险资产顺风，向下代表逆风。美日利差扩大、USDJPY 上行、JGB/US10Y/US30Y 下行都按顺风处理。
+            </p>
+          </div>
+        </section>
+      </div>
+    </section>
+  );
+}
+
+function momentumSignal(label: string, rawValue: number | undefined, unit: string) {
+  if (rawValue === undefined) {
+    return { label, value: "n/a", text: "数据不足，暂不判断。" };
+  }
+  const value = `${rawValue > 0 ? "+" : ""}${formatNumber(rawValue, 2)}${unit}`;
+  const text = rawValue > 0 ? "边际顺风。" : rawValue < 0 ? "边际逆风。" : "边际中性。";
+  return { label, value, text };
+}
+
 function IndicatorChart({
   definition,
   snapshot,
@@ -897,6 +1048,51 @@ function spreadSeries(left: DataPoint[], right: DataPoint[]) {
       return { date: point.date, value: point.value - rightValue };
     })
     .filter(Boolean) as DataPoint[];
+}
+
+function absoluteChangeSeries(series: DataPoint[], days: number) {
+  const map = new Map(series.map((point) => [point.date, point.value]));
+  return series
+    .map((point) => {
+      const base = latestBeforeOrOn(map, offsetDate(point.date, -days));
+      if (base === undefined) return null;
+      return { date: point.date, value: point.value - base };
+    })
+    .filter(Boolean) as DataPoint[];
+}
+
+function percentChangeSeries(series: DataPoint[], days: number) {
+  const map = new Map(series.map((point) => [point.date, point.value]));
+  return series
+    .map((point) => {
+      const base = latestBeforeOrOn(map, offsetDate(point.date, -days));
+      if (base === undefined || base === 0) return null;
+      return { date: point.date, value: ((point.value / base) - 1) * 100 };
+    })
+    .filter(Boolean) as DataPoint[];
+}
+
+function invertSeries(series: DataPoint[]) {
+  return series.map((point) => ({ date: point.date, value: -point.value }));
+}
+
+function standardizeSeries(series: { label: string; color: string; points: DataPoint[] }[]) {
+  return series.map((item) => {
+    const values = item.points.map((point) => point.value);
+    const mean = values.reduce((sum, value) => sum + value, 0) / (values.length || 1);
+    const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / Math.max(values.length - 1, 1);
+    const standardDeviation = Math.sqrt(variance) || 1;
+    return {
+      ...item,
+      points: item.points.map((point) => ({ date: point.date, value: (point.value - mean) / standardDeviation }))
+    };
+  });
+}
+
+function offsetDate(date: string, days: number) {
+  const parsed = new Date(`${date}T00:00:00Z`);
+  parsed.setUTCDate(parsed.getUTCDate() + days);
+  return parsed.toISOString().slice(0, 10);
 }
 
 function latestBeforeOrOn(map: Map<string, number>, date: string) {

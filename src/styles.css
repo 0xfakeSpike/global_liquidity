@@ -365,6 +365,42 @@ footer {
   font-size: 24px;
 }
 
+.momentum-summary {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.momentum-signal {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+}
+
+.momentum-signal span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.momentum-signal strong {
+  color: #0f172a;
+  font-size: 24px;
+}
+
+.momentum-signal p {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
 .holder-panel {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e2e8f0;
@@ -717,6 +753,7 @@ footer {
 
   .metric-strip,
   .chart-stats,
+  .momentum-summary,
   .real-rate-cards,
   .real-rate-signals {
     grid-template-columns: 1fr;

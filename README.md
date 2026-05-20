@@ -46,6 +46,12 @@ JPY derived series:
 
 - Japan real policy rate = `BOJ uncollateralized overnight call average - CPI YoY`
 
+Combined liquidity momentum:
+
+- USD net liquidity 4-week, 13-week, and 26-week absolute changes
+- 13-week percentage changes for Fed net liquidity, Fed assets, BOJ assets, U.S. M2, and Japan M2
+- Directional 13-week funding-condition momentum using USD-JPY rate spread, USD/JPY, JGB 10Y, U.S. 10Y, and U.S. 30Y. The funding chart is standardized so higher means more risk-asset tailwind.
+
 Risk market series:
 
 - FRED `CBBTCUSD`: Bitcoin price
