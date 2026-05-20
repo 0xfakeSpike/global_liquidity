@@ -47,6 +47,17 @@ export interface InterestRateChart {
   series: InterestRateSeries[];
 }
 
+export interface HolderShare {
+  key: string;
+  label: string;
+  value: number;
+  unit: string;
+  color: string;
+  source: string;
+  sourceUrl: string;
+  date: string;
+}
+
 export interface LiquidityDataset {
   generatedAt: string;
   lookbackYears: number;
@@ -59,6 +70,8 @@ export interface LiquidityDataset {
   rateCharts?: InterestRateChart[];
   inflationCharts?: InterestRateChart[];
   riskCharts?: InterestRateChart[];
+  treasuryCharts?: InterestRateChart[];
+  holderShares?: HolderShare[];
   composite: {
     score: number | null;
     label: string;

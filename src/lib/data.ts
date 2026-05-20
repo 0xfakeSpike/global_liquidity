@@ -1,12 +1,13 @@
 import { fallbackDataset } from "../data/fallbackDataset";
 import type { LiquidityDataset } from "../types/liquidity";
 
-export type LiquidityMarket = "usd" | "jpy" | "risk";
+export type LiquidityMarket = "usd" | "jpy" | "risk" | "treasury";
 
 const dataFiles: Record<LiquidityMarket, string> = {
   usd: "liquidity.json",
   jpy: "yen-liquidity.json",
-  risk: "risk-markets.json"
+  risk: "risk-markets.json",
+  treasury: "treasury-markets.json"
 };
 
 export async function loadLiquidityDataset(market: LiquidityMarket = "usd"): Promise<LiquidityDataset> {

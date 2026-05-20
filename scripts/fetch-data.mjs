@@ -479,6 +479,155 @@ const riskDefinitions = [
   }
 ];
 
+const treasuryDefinitions = [
+  {
+    key: "totalPublicDebt",
+    fredId: "GFDEBTN",
+    label: "联邦总债务",
+    unit: "万亿美元",
+    source: "FRED GFDEBTN / U.S. Treasury Fiscal Service",
+    sourceUrl: "https://fred.stlouisfed.org/series/GFDEBTN",
+    scale: 1 / 1_000_000,
+    color: "#0f766e",
+    description: "美国联邦总债务，包含公众持有债务与政府账户持有债务。"
+  },
+  {
+    key: "debtHeldByPublic",
+    fredId: "FYGFDPUN",
+    label: "公众持有债务",
+    unit: "万亿美元",
+    source: "FRED FYGFDPUN / U.S. Treasury Fiscal Service",
+    sourceUrl: "https://fred.stlouisfed.org/series/FYGFDPUN",
+    scale: 1 / 1_000_000,
+    color: "#2563eb",
+    description: "公众持有债务代表政府账户之外投资者持有的美国联邦债务。"
+  },
+  {
+    key: "debtToGdp",
+    fredId: "GFDEGDQ188S",
+    label: "债务/GDP",
+    unit: "%",
+    source: "FRED GFDEGDQ188S",
+    sourceUrl: "https://fred.stlouisfed.org/series/GFDEGDQ188S",
+    scale: 1,
+    color: "#dc2626",
+    description: "联邦总债务相对 GDP 的比例，用于观察财政杠杆的宏观压力。"
+  },
+  {
+    key: "interestPayments",
+    fredId: "A091RC1Q027SBEA",
+    label: "联邦利息支出",
+    unit: "万亿美元年化",
+    source: "FRED A091RC1Q027SBEA / BEA",
+    sourceUrl: "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
+    scale: 1 / 1_000,
+    color: "#7c3aed",
+    description: "联邦政府利息支付，按年化季度口径观察债务服务成本。"
+  },
+  {
+    key: "dgs3mo",
+    fredId: "DGS3MO",
+    label: "3M",
+    unit: "%",
+    source: "FRED DGS3MO / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS3MO",
+    scale: 1,
+    color: "#0f766e",
+    description: "3 个月美国国债收益率，代表现金和 T-bill 端的无风险收益。"
+  },
+  {
+    key: "dgs2",
+    fredId: "DGS2",
+    label: "2Y",
+    unit: "%",
+    source: "FRED DGS2 / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS2",
+    scale: 1,
+    color: "#2563eb",
+    description: "2 年期美国国债收益率，对政策利率预期最敏感。"
+  },
+  {
+    key: "dgs10",
+    fredId: "DGS10",
+    label: "10Y",
+    unit: "%",
+    source: "FRED DGS10 / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
+    scale: 1,
+    color: "#dc2626",
+    description: "10 年期美国国债收益率，是全球风险资产折现率的重要锚。"
+  },
+  {
+    key: "dgs30",
+    fredId: "DGS30",
+    label: "30Y",
+    unit: "%",
+    source: "FRED DGS30 / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS30",
+    scale: 1,
+    color: "#7c3aed",
+    description: "30 年期美国国债收益率，反映长期通胀、期限溢价和财政供给压力。"
+  },
+  {
+    key: "t10y2y",
+    fredId: "T10Y2Y",
+    label: "10Y-2Y",
+    unit: "pct",
+    source: "FRED T10Y2Y",
+    sourceUrl: "https://fred.stlouisfed.org/series/T10Y2Y",
+    scale: 1,
+    color: "#f59e0b",
+    description: "10 年期减 2 年期收益率利差，衡量收益率曲线倒挂和再陡峭化。"
+  },
+  {
+    key: "t10y3m",
+    fredId: "T10Y3M",
+    label: "10Y-3M",
+    unit: "pct",
+    source: "FRED T10Y3M",
+    sourceUrl: "https://fred.stlouisfed.org/series/T10Y3M",
+    scale: 1,
+    color: "#16a34a",
+    description: "10 年期减 3 个月收益率利差，是常见衰退风险观察指标。"
+  }
+];
+
+const treasuryHolderDefinitions = [
+  {
+    key: "fedHeldDebt",
+    fredId: "FDHBFRBN",
+    label: "Federal Reserve Banks",
+    unit: "万亿美元",
+    source: "FRED FDHBFRBN / U.S. Treasury Fiscal Service",
+    sourceUrl: "https://fred.stlouisfed.org/series/FDHBFRBN",
+    scale: 1 / 1_000,
+    color: "#7c3aed",
+    description: "Federal Reserve Banks 持有的联邦债务。"
+  },
+  {
+    key: "privateHeldDebt",
+    fredId: "FDHBPIN",
+    label: "Private Investors",
+    unit: "万亿美元",
+    source: "FRED FDHBPIN / U.S. Treasury Fiscal Service",
+    sourceUrl: "https://fred.stlouisfed.org/series/FDHBPIN",
+    scale: 1 / 1_000,
+    color: "#2563eb",
+    description: "私人投资者持有的联邦债务；后续会扣除海外/国际投资者，得到美国国内私人部门近似值。"
+  },
+  {
+    key: "foreignHeldDebt",
+    fredId: "FDHBFIN",
+    label: "Foreign and International Investors",
+    unit: "万亿美元",
+    source: "FRED FDHBFIN / U.S. Treasury Fiscal Service",
+    sourceUrl: "https://fred.stlouisfed.org/series/FDHBFIN",
+    scale: 1 / 1_000,
+    color: "#dc2626",
+    description: "海外和国际投资者持有的联邦债务。"
+  }
+];
+
 async function fetchFredSeries({ fredId, scale, start = startIso }) {
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${fredId}&cosd=${start}`;
   const response = await fetch(url, {
@@ -763,6 +912,7 @@ async function main() {
   await writeDataset("liquidity.json", await buildUsdDataset());
   await writeDataset("yen-liquidity.json", await buildJpyDataset());
   await writeDataset("risk-markets.json", await buildRiskDataset());
+  await writeDataset("treasury-markets.json", await buildTreasuryDataset());
 }
 
 async function fetchSeriesForDefinitions(definitionsForFetch) {
@@ -926,6 +1076,121 @@ function riskMarketCharts(seriesMap) {
   }));
 }
 
+function treasurySeries(definition, seriesMap) {
+  return {
+    key: definition.key,
+    label: definition.label,
+    color: definition.color,
+    unit: definition.unit,
+    source: definition.source,
+    sourceUrl: definition.sourceUrl,
+    description: definition.description,
+    points: [...(seriesMap.get(definition.key) ?? [])].sort((a, b) => a.date.localeCompare(b.date))
+  };
+}
+
+function treasuryDefinition(key) {
+  const definition = treasuryDefinitions.find((item) => item.key === key);
+  if (!definition) throw new Error(`Missing treasury definition: ${key}`);
+  return definition;
+}
+
+function treasuryMarketCharts(seriesMap) {
+  return [
+    {
+      title: "美国联邦债务规模",
+      description: "联邦总债务与公众持有债务都按万亿美元展示，用于观察财政供给压力和市场需要吸收的国债规模。",
+      series: [
+        treasurySeries(treasuryDefinition("totalPublicDebt"), seriesMap),
+        treasurySeries(treasuryDefinition("debtHeldByPublic"), seriesMap)
+      ]
+    },
+    {
+      title: "联邦债务/GDP",
+      description: "总债务相对 GDP 的比例越高，市场越容易关注财政可持续性、期限溢价和长期国债供给压力。",
+      series: [treasurySeries(treasuryDefinition("debtToGdp"), seriesMap)]
+    },
+    {
+      title: "联邦政府利息支出",
+      description: "利息支出上行代表高利率逐步传导到财政现金流，影响赤字、发债需求和长期期限溢价。",
+      series: [treasurySeries(treasuryDefinition("interestPayments"), seriesMap)]
+    },
+    {
+      title: "美债长短端收益率",
+      description: "3M、2Y、10Y、30Y 同图观察政策利率、增长预期、通胀预期和期限溢价的相对变化。",
+      series: [
+        treasurySeries(treasuryDefinition("dgs3mo"), seriesMap),
+        treasurySeries(treasuryDefinition("dgs2"), seriesMap),
+        treasurySeries(treasuryDefinition("dgs10"), seriesMap),
+        treasurySeries(treasuryDefinition("dgs30"), seriesMap)
+      ]
+    },
+    {
+      title: "收益率曲线利差",
+      description: "10Y-2Y 与 10Y-3M 利差用于观察倒挂、再陡峭化和衰退定价节奏。",
+      series: [
+        treasurySeries(treasuryDefinition("t10y2y"), seriesMap),
+        treasurySeries(treasuryDefinition("t10y3m"), seriesMap)
+      ]
+    }
+  ];
+}
+
+function latestPoint(series) {
+  return [...series].sort((a, b) => a.date.localeCompare(b.date)).at(-1) ?? null;
+}
+
+function treasuryHolderShares(seriesMap) {
+  const fed = seriesMap.get("fedHeldDebt") ?? [];
+  const privateInvestors = seriesMap.get("privateHeldDebt") ?? [];
+  const foreignInvestors = seriesMap.get("foreignHeldDebt") ?? [];
+  const latestDates = [latestPoint(fed), latestPoint(privateInvestors), latestPoint(foreignInvestors)]
+    .map((point) => point?.date)
+    .filter(Boolean)
+    .sort();
+  const date = latestDates[0];
+  if (!date) return [];
+
+  const fedValue = latestBeforeOrOn(byDate(fed), date);
+  const privateValue = latestBeforeOrOn(byDate(privateInvestors), date);
+  const foreignValue = latestBeforeOrOn(byDate(foreignInvestors), date);
+  if (fedValue === undefined || privateValue === undefined || foreignValue === undefined) return [];
+
+  const domesticPrivateValue = Math.max(privateValue - foreignValue, 0);
+  return [
+    {
+      key: "domesticPrivate",
+      label: "美国国内私人部门",
+      value: round(domesticPrivateValue, 3),
+      unit: "万亿美元",
+      color: "#2563eb",
+      source: "FRED FDHBPIN - FDHBFIN",
+      sourceUrl: "https://fredblog.stlouisfed.org/2025/03/who-holds-us-national-debt/",
+      date
+    },
+    {
+      key: "foreignInvestors",
+      label: "海外与国际投资者",
+      value: round(foreignValue, 3),
+      unit: "万亿美元",
+      color: "#dc2626",
+      source: "FRED FDHBFIN",
+      sourceUrl: "https://fred.stlouisfed.org/series/FDHBFIN",
+      date
+    },
+    {
+      key: "fedBanks",
+      label: "Federal Reserve Banks",
+      value: round(fedValue, 3),
+      unit: "万亿美元",
+      color: "#7c3aed",
+      source: "FRED FDHBFRBN",
+      sourceUrl: "https://fred.stlouisfed.org/series/FDHBFRBN",
+      date
+    }
+  ];
+}
+
 async function buildUsdDataset() {
   const seriesMap = await fetchSeriesForDefinitions(usdDefinitions);
   const rateSeriesMap = await fetchSeriesForDefinitions(usdRateDefinitions);
@@ -1039,6 +1304,37 @@ async function buildRiskDataset() {
     notes: [
       "风险市场页使用归一化价格曲线，不参与美元或日元流动性评分。",
       "BTC 和纳斯达克综合指数来自 FRED；恒生科技指数使用可自动更新的 3033.HK ETF 作为跟踪代理。"
+    ]
+  };
+}
+
+async function buildTreasuryDataset() {
+  const seriesMap = await fetchSeriesForDefinitions(treasuryDefinitions);
+  const holderSeriesMap = await fetchSeriesForDefinitions(treasuryHolderDefinitions);
+  const charts = treasuryMarketCharts(seriesMap);
+  const holderShares = treasuryHolderShares(holderSeriesMap);
+  const latestDebt = latestPoint(seriesMap.get("totalPublicDebt") ?? []);
+  return {
+    generatedAt: new Date().toISOString(),
+    lookbackYears,
+    dateRange: {
+      start: startIso,
+      end: endIso
+    },
+    indicators: [],
+    snapshots: [],
+    treasuryCharts: charts,
+    holderShares,
+    composite: {
+      score: null,
+      label: "美债市场",
+      date: latestDebt?.date ?? endIso,
+      series: []
+    },
+    notes: [
+      "美债页使用 FRED 无密钥 CSV 抓取，总债务、公众持有债务和持有人结构的原始来源为 U.S. Treasury Fiscal Service。",
+      "持有人饼图采用公众持有债务近似拆分：美国国内私人部门 = Private Investors - Foreign and International Investors；另列海外/国际投资者与 Federal Reserve Banks。",
+      "收益率曲线使用 Federal Reserve H.15 的 3M、2Y、10Y、30Y 常数期限美债收益率；利差使用 FRED T10Y2Y 与 T10Y3M。"
     ]
   };
 }

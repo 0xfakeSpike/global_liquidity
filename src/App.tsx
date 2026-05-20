@@ -6,6 +6,7 @@ import { loadLiquidityDataset, type LiquidityMarket } from "./lib/data";
 import { formatChange, formatNumber } from "./lib/format";
 import type {
   DataPoint,
+  HolderShare,
   IndicatorDefinition,
   IndicatorSnapshot,
   InterestRateChart,
@@ -50,6 +51,14 @@ const markets: Record<
     sourceLabel: "FRED / Yahoo",
     updateLabel: "Normalized prices"
   },
+  treasury: {
+    label: "美债市场",
+    eyebrow: "美国国债市场监控",
+    title: "把债务规模、持有人结构、收益率曲线和财政利息成本放到一页里。",
+    description: "跟踪美债供给、谁在吸收美债、长短端利率和曲线形态，观察美元资产定价的底层锚。",
+    sourceLabel: "FRED / Treasury",
+    updateLabel: "Build-time JSON"
+  },
   combined: {
     label: "美元+日元叠加",
     eyebrow: "美元与日元流动性叠加监控",
@@ -62,6 +71,7 @@ const markets: Record<
 
 function initialMarket(): ViewMode {
   if (window.location.hash.includes("combined")) return "combined";
+  if (window.location.hash.includes("treasury")) return "treasury";
   if (window.location.hash.includes("risk")) return "risk";
   return window.location.hash.includes("jpy") ? "jpy" : "usd";
 }
@@ -116,6 +126,7 @@ function App() {
         ? []
         : (activeDataset.inflationCharts ?? []);
   const riskCharts = activeDataset.riskCharts ?? [];
+  const treasuryCharts = activeDataset.treasuryCharts ?? [];
 
   return (
     <main>
@@ -149,6 +160,12 @@ function App() {
                 <span>BTC</span>
                 <span>Nasdaq</span>
                 <span>HSTECH</span>
+              </>
+            ) : market === "treasury" ? (
+              <>
+                <span>Debt</span>
+                <span>Holders</span>
+                <span>Yield Curve</span>
               </>
             ) : market === "usd" ? (
               <>
@@ -215,6 +232,13 @@ function App() {
         </>
       ) : market === "risk" ? (
         <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} notes={activeDataset.notes} />
+      ) : market === "treasury" ? (
+        <TreasuryMarketTerminal
+          charts={treasuryCharts}
+          dateRange={activeDataset.dateRange}
+          holderShares={activeDataset.holderShares ?? []}
+          notes={activeDataset.notes}
+        />
       ) : dataset ? (
         <>
           <section className="terminal" id="terminal">
@@ -496,6 +520,140 @@ function RiskMarketTerminal({
         ))}
       </div>
     </section>
+  );
+}
+
+function TreasuryMarketTerminal({
+  charts,
+  dateRange,
+  holderShares,
+  notes
+}: {
+  charts: InterestRateChart[];
+  dateRange: LiquidityDataset["dateRange"];
+  holderShares: HolderShare[];
+  notes: string[];
+}) {
+  return (
+    <section className="terminal" id="terminal">
+      <div className="section-heading">
+        <p>Treasury Market Terminal</p>
+        <h2>美债市场核心指标</h2>
+      </div>
+      <div className="overlay-note">
+        美债页分成三条主线：财政供给压力、投资者吸收结构、收益率曲线定价。规模类指标看供给，持有人结构看需求，长短端利率看资产定价锚。
+      </div>
+      {holderShares.length > 0 ? <HolderSharePanel shares={holderShares} /> : null}
+      <div className="charts-stack treasury-stack">
+        {charts.map((chart) => (
+          <section className="chart-panel" key={chart.title}>
+            <div className="chart-header">
+              <div>
+                <span>Treasury Monitor</span>
+                <h3>{chart.title}</h3>
+              </div>
+            </div>
+            <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
+            <div className="interpretation">
+              <strong>当前解读</strong>
+              <p>{chart.description}</p>
+            </div>
+            <div className="rate-sources">
+              {chart.series.map((item) => {
+                const latest = item.points.at(-1);
+                return (
+                  <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
+                    <strong>{item.label}</strong>
+                    <span>
+                      {latest ? `${latest.date} ${formatNumber(latest.value, 3)}${item.unit}` : "n/a"} · {item.source}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+      <div className="notes risk-notes">
+        {notes.map((note) => (
+          <p key={note}>{note}</p>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HolderSharePanel({ shares }: { shares: HolderShare[] }) {
+  const total = shares.reduce((sum, item) => sum + item.value, 0);
+  return (
+    <section className="holder-panel">
+      <div className="holder-copy">
+        <span>Ownership Structure</span>
+        <h3>美债持有人份额</h3>
+        <p>
+          这里把公众持有美债拆成美国国内私人部门、海外与国际投资者、Federal Reserve Banks。
+          若海外份额下降而发行继续上升，市场需要更多国内资金或更高收益率来吸收供给。
+        </p>
+      </div>
+      <PieChart shares={shares} />
+      <div className="holder-list">
+        {shares.map((share) => {
+          const percent = total > 0 ? (share.value / total) * 100 : 0;
+          return (
+            <a href={share.sourceUrl} key={share.key} target="_blank" rel="noreferrer">
+              <i style={{ background: share.color }} />
+              <span>{share.label}</span>
+              <strong>{formatNumber(percent, 1)}%</strong>
+              <small>
+                {share.date} {formatNumber(share.value, 2)}
+                {share.unit} · {share.source}
+              </small>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function PieChart({ shares }: { shares: HolderShare[] }) {
+  const total = shares.reduce((sum, item) => sum + item.value, 0);
+  let offset = 25;
+  const segments = shares.map((share) => {
+    const percent = total > 0 ? (share.value / total) * 100 : 0;
+    const segment = {
+      ...share,
+      dashArray: `${percent} ${100 - percent}`,
+      dashOffset: offset
+    };
+    offset -= percent;
+    return segment;
+  });
+
+  return (
+    <div className="pie-wrap" aria-label="美债持有人份额饼图">
+      <svg viewBox="0 0 42 42" role="img">
+        <circle className="pie-bg" cx="21" cy="21" r="15.9155" />
+        {segments.map((segment) => (
+          <circle
+            className="pie-segment"
+            cx="21"
+            cy="21"
+            key={segment.key}
+            r="15.9155"
+            stroke={segment.color}
+            strokeDasharray={segment.dashArray}
+            strokeDashoffset={segment.dashOffset}
+          />
+        ))}
+        <text x="21" y="19.5" textAnchor="middle">
+          {shares[0]?.date.slice(0, 7)}
+        </text>
+        <text x="21" y="24" textAnchor="middle">
+          {formatNumber(total, 1)}T
+        </text>
+      </svg>
+    </div>
   );
 }
 

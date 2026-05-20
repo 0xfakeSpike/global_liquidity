@@ -9,6 +9,7 @@ The app does not fetch macro data from the browser. `scripts/fetch-data.mjs` pul
 - `public/data/liquidity.json` for USD liquidity
 - `public/data/yen-liquidity.json` for JPY liquidity
 - `public/data/risk-markets.json` for normalized risk-market prices
+- `public/data/treasury-markets.json` for U.S. Treasury debt, ownership, yield curve, and fiscal interest cost charts
 
 USD primary series:
 
@@ -52,6 +53,16 @@ Risk market series:
 - Yahoo Finance `3033.HK`: CSOP Hang Seng TECH Index ETF, used as a Hang Seng TECH tracking proxy
 
 Risk market charts use one independent y-axis per asset and a shared 10-year x-axis.
+
+U.S. Treasury market series:
+
+- FRED `GFDEBTN`: federal total public debt
+- FRED `FYGFDPUN`: federal debt held by the public
+- FRED `GFDEGDQ188S`: federal debt as percent of GDP
+- FRED `A091RC1Q027SBEA`: federal government interest payments
+- FRED `DGS3MO`, `DGS2`, `DGS10`, `DGS30`: Treasury constant maturity yields
+- FRED `T10Y2Y`, `T10Y3M`: yield curve spreads
+- FRED `FDHBFRBN`, `FDHBPIN`, `FDHBFIN`: Treasury holder structure. The holder pie approximates domestic private ownership as `FDHBPIN - FDHBFIN`, then separately shows foreign/international investors and Federal Reserve Banks.
 
 ## Local Development
 
