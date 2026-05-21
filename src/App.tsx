@@ -1287,11 +1287,6 @@ function assetImplications(globalScore: number, modules: { label: string; score:
       label: "BTC",
       call: globalScore >= 1 && riskScore >= 0 ? "顺风" : globalScore <= -1 ? "防守" : "震荡",
       detail: "更依赖净流动性动量和实际利率方向。"
-    },
-    {
-      label: "腾讯",
-      call: globalScore <= -1 ? "不因便宜补仓" : "基本面优先",
-      detail: "估值修复需要港科风险偏好和美元价格共同配合。"
     }
   ];
 }
