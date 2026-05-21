@@ -401,6 +401,135 @@ footer {
   margin: 0;
 }
 
+.global-dashboard {
+  display: grid;
+  gap: 18px;
+}
+
+.dashboard-hero {
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 280px minmax(0, 1fr);
+  padding: 22px;
+}
+
+.dashboard-hero > div:first-child {
+  border-right: 1px solid #e2e8f0;
+  display: grid;
+  gap: 8px;
+  padding-right: 20px;
+}
+
+.dashboard-hero span,
+.module-light span,
+.impact-strip span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.dashboard-hero strong {
+  color: #0f172a;
+  font-size: 72px;
+  letter-spacing: 0;
+  line-height: 0.95;
+}
+
+.dashboard-hero p,
+.dashboard-rule p,
+.module-light p,
+.impact-strip p {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dashboard-rule {
+  align-content: center;
+  display: grid;
+  gap: 8px;
+}
+
+.dashboard-rule b {
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.module-lights,
+.impact-strip {
+  display: grid;
+  gap: 12px;
+}
+
+.module-lights {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.impact-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.module-light,
+.impact-strip > div {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.module-light strong,
+.impact-strip strong {
+  color: #0f172a;
+  font-size: 24px;
+}
+
+.tone-green {
+  border-color: rgba(22, 163, 74, 0.45);
+}
+
+.tone-green strong {
+  color: #15803d;
+}
+
+.tone-light {
+  border-color: rgba(15, 118, 110, 0.42);
+}
+
+.tone-light strong {
+  color: #0f766e;
+}
+
+.tone-neutral {
+  border-color: rgba(100, 116, 139, 0.32);
+}
+
+.tone-yellow {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.tone-yellow strong {
+  color: #b45309;
+}
+
+.tone-red {
+  border-color: rgba(220, 38, 38, 0.48);
+}
+
+.tone-red strong {
+  color: #dc2626;
+}
+
 .holder-panel {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e2e8f0;
@@ -838,9 +967,18 @@ footer {
   .metric-strip,
   .chart-stats,
   .momentum-summary,
+  .module-lights,
+  .impact-strip,
+  .dashboard-hero,
   .real-rate-cards,
   .real-rate-signals {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-hero > div:first-child {
+    border-right: 0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 0 18px;
   }
 
   .hero {

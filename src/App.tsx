@@ -60,12 +60,12 @@ const markets: Record<
     updateLabel: "Build-time JSON"
   },
   combined: {
-    label: "美元+日元叠加",
-    eyebrow: "美元与日元流动性叠加监控",
-    title: "把美元和日元对应指标标准化到同一坐标系，观察全球资金主轴的相对变化。",
-    description: "每组曲线以首个共同日期为 100，避免美元、日元单位和频率不同导致误读。",
+    label: "全球流动性驾驶舱",
+    eyebrow: "全球风险流动性仪表盘",
+    title: "全球风险流动性驾驶舱",
+    description: "核心看流动性变化量、变化率和市场确认，用红黄绿灯回答风险资产现在是顺风还是逆风。",
     sourceLabel: "FRED / NY Fed / BOJ / Treasury",
-    updateLabel: "Normalized overlay"
+    updateLabel: "Layered dashboard"
   }
 };
 
@@ -79,6 +79,7 @@ function initialMarket(): ViewMode {
 function App() {
   const [dataset, setDataset] = useState<LiquidityDataset | null>(null);
   const [pairedDatasets, setPairedDatasets] = useState<{
+    risk: LiquidityDataset;
     usd: LiquidityDataset;
     jpy: LiquidityDataset;
     treasury: LiquidityDataset;
@@ -90,9 +91,12 @@ function App() {
     setDataset(null);
     setPairedDatasets(null);
     if (market === "combined") {
-      Promise.all([loadLiquidityDataset("usd"), loadLiquidityDataset("jpy"), loadLiquidityDataset("treasury")]).then(
-        ([usd, jpy, treasury]) => setPairedDatasets({ usd, jpy, treasury })
-      );
+      Promise.all([
+        loadLiquidityDataset("usd"),
+        loadLiquidityDataset("jpy"),
+        loadLiquidityDataset("treasury"),
+        loadLiquidityDataset("risk")
+      ]).then(([usd, jpy, treasury, risk]) => setPairedDatasets({ risk, usd, jpy, treasury }));
     } else {
       loadLiquidityDataset(market).then(setDataset);
     }
@@ -222,6 +226,12 @@ function App() {
 
       {market === "combined" && pairedDatasets ? (
         <>
+          <GlobalLiquidityDashboard
+            jpy={pairedDatasets.jpy}
+            risk={pairedDatasets.risk}
+            treasury={pairedDatasets.treasury}
+            usd={pairedDatasets.usd}
+          />
           <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
           <LiquidityMomentumTerminal
             jpy={pairedDatasets.jpy}
@@ -965,6 +975,325 @@ function carrySignal(label: string, rawValue: number | undefined, unit: string, 
   const stressText = rawValue > 0 ? "压力上升。" : rawValue < 0 ? "压力下降。" : "压力中性。";
   const tailwindText = rawValue > 0 ? "carry 顺风。" : rawValue < 0 ? "carry 逆风。" : "carry 中性。";
   return { label, value, text: higherIsStress ? stressText : tailwindText };
+}
+
+function GlobalLiquidityDashboard({
+  jpy,
+  risk,
+  treasury,
+  usd
+}: {
+  jpy: LiquidityDataset;
+  risk: LiquidityDataset;
+  treasury: LiquidityDataset;
+  usd: LiquidityDataset;
+}) {
+  const usdMap = new Map(usd.snapshots.map((item) => [item.key, item]));
+  const jpyMap = new Map(jpy.snapshots.map((item) => [item.key, item]));
+  const usdEffr = findSeries(usd.rateCharts, "effr");
+  const fedSofr = findSeries(usd.rateCharts, "fedSofr");
+  const jpyCallAverage = findSeries(jpy.rateCharts, "jpyCallAverage");
+  const usCpi = findSeries(usd.inflationCharts, "usCpiYoy");
+  const dgs2 = findSeries(treasury.treasuryCharts, "dgs2");
+  const dgs10 = findSeries(treasury.treasuryCharts, "dgs10");
+  const dgs30 = findSeries(treasury.treasuryCharts, "dgs30");
+  const totalPublicDebt = findSeries(treasury.treasuryCharts, "totalPublicDebt");
+  const debtHeldByPublic = findSeries(treasury.treasuryCharts, "debtHeldByPublic");
+  const interestPayments = findSeries(treasury.treasuryCharts, "interestPayments");
+  const btc = findSeries(risk.riskCharts, "btc");
+  const nasdaq = findSeries(risk.riskCharts, "nasdaq");
+  const hangSengTech = findSeries(risk.riskCharts, "hangSengTech");
+
+  const netLiquidity = usdMap.get("netLiquidity")?.series ?? [];
+  const fedAssets = usdMap.get("fedBalanceSheet")?.series ?? [];
+  const tga = usdMap.get("tga")?.series ?? [];
+  const usM2 = usdMap.get("m2")?.series ?? [];
+  const realYield10y = usdMap.get("realYield10y")?.series ?? [];
+  const usdJpy = jpyMap.get("usdJpy")?.series ?? [];
+  const jgb10y = jpyMap.get("jgb10y")?.series ?? [];
+  const bojAssets = jpyMap.get("bojAssets")?.series ?? [];
+  const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
+
+  const modules = [
+    dashboardModule("美元数量", "Fed Net Liquidity / M2 / SOFR", [
+      absoluteChangeSeries(netLiquidity, 91),
+      percentChangeSeries(usM2, 91),
+      percentChangeSeries(fedAssets, 91),
+      invertSeries(absoluteChangeSeries(fedSofr?.points ?? [], 91))
+    ]),
+    dashboardModule("美元价格", "2Y / 10Y / 30Y / 实际利率", [
+      invertSeries(absoluteChangeSeries(usdEffr?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(dgs2?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(realYield10y, 91))
+    ]),
+    dashboardModule("财政压力", "长债供给 / TGA / 利息成本", [
+      invertSeries(percentChangeSeries(totalPublicDebt?.points ?? [], 91)),
+      invertSeries(percentChangeSeries(debtHeldByPublic?.points ?? [], 91)),
+      invertSeries(percentChangeSeries(interestPayments?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(tga, 91)),
+      invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91))
+    ]),
+    dashboardModule("日元融资", "EFFR-BOJ / USDJPY / JGB", [
+      absoluteChangeSeries(rateSpread, 91),
+      percentChangeSeries(usdJpy, 91),
+      percentChangeSeries(bojAssets, 91),
+      invertSeries(absoluteChangeSeries(jpyCallAverage?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(jgb10y, 91))
+    ]),
+    dashboardModule("通胀压力", "CPI / 实际利率 / 长端", [
+      invertSeries(absoluteChangeSeries(usCpi?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(realYield10y, 91)),
+      invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)),
+      invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91))
+    ]),
+    dashboardModule("风险确认", "Nasdaq / HSTECH / BTC", [
+      percentChangeSeries(nasdaq?.points ?? [], 91),
+      percentChangeSeries(hangSengTech?.points ?? [], 91),
+      percentChangeSeries(btc?.points ?? [], 91)
+    ])
+  ];
+
+  const macroModules = modules.slice(0, 5);
+  const globalScore = clampScore(
+    Math.round(macroModules.reduce((sum, item) => sum + item.score, 0) / Math.max(macroModules.length, 1))
+  );
+  const globalTone = toneForScore(globalScore);
+  const globalScoreSeries = scoreSeriesFromModuleIndexes(macroModules);
+  const treasuryPressure = standardizeSeries([
+    { label: "10Y下行", color: "#2563eb", points: invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)) },
+    { label: "30Y下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)) },
+    { label: "实际10Y下行", color: "#0f766e", points: invertSeries(absoluteChangeSeries(realYield10y, 91)) }
+  ]);
+  const yenCarry = standardizeSeries([
+    { label: "美日利差扩大", color: "#2563eb", points: absoluteChangeSeries(rateSpread, 91) },
+    { label: "USDJPY上行", color: "#16a34a", points: percentChangeSeries(usdJpy, 91) },
+    { label: "JGB10Y下行", color: "#dc2626", points: invertSeries(absoluteChangeSeries(jgb10y, 91)) }
+  ]);
+  const inflationConstraint = standardizeSeries([
+    { label: "美国CPI下行", color: "#dc2626", points: invertSeries(absoluteChangeSeries(usCpi?.points ?? [], 91)) },
+    { label: "实际10Y下行", color: "#2563eb", points: invertSeries(absoluteChangeSeries(realYield10y, 91)) },
+    { label: "30Y下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)) }
+  ]);
+  const riskConfirmation = [
+    { label: "Nasdaq", color: "#2563eb", points: nasdaq?.points ?? [] },
+    { label: "HSTECH代理", color: "#16a34a", points: hangSengTech?.points ?? [] },
+    { label: "BTC", color: "#f59e0b", points: btc?.points ?? [] }
+  ];
+
+  return (
+    <section className="terminal global-dashboard" id="terminal">
+      <div className="section-heading">
+        <p>Global Risk Liquidity Cockpit</p>
+        <h2>全球风险流动性驾驶舱</h2>
+      </div>
+      <div className={`dashboard-hero tone-${globalTone}`}>
+        <div>
+          <span>总评分</span>
+          <strong>{globalScore > 0 ? `+${globalScore}` : globalScore}</strong>
+          <p>{globalScoreText(globalScore)}</p>
+        </div>
+        <div className="dashboard-rule">
+          <b>硬规则</b>
+          <p>
+            美元净流动性改善、日元融资稳定、长端美债不再上行、通胀不重新抬头，就是风险资产顺风；其中两项以上反向，进入黄灯或红灯。
+          </p>
+        </div>
+      </div>
+      <div className="module-lights">
+        {modules.map((item) => (
+          <div className={`module-light tone-${item.tone}`} key={item.label}>
+            <span>{item.label}</span>
+            <strong>{item.score > 0 ? `+${item.score}` : item.score}</strong>
+            <p>{item.detail}</p>
+          </div>
+        ))}
+      </div>
+      <div className="impact-strip">
+        {assetImplications(globalScore, modules).map((item) => (
+          <div key={item.label}>
+            <span>{item.label}</span>
+            <strong>{item.call}</strong>
+            <p>{item.detail}</p>
+          </div>
+        ))}
+      </div>
+      <div className="charts-stack">
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Layer 1 / Composite Score</span>
+              <h3>全球风险流动性总分</h3>
+            </div>
+            <div className="latest-value">
+              <strong>{globalScore > 0 ? `+${globalScore}` : globalScore}</strong>
+              <small>{globalScoreText(globalScore).slice(0, 2)}</small>
+            </div>
+          </div>
+          <LineChart series={globalScoreSeries} color="#0f766e" dateRange={usd.dateRange} valueLabel="全球风险流动性总分" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>总分由美元数量、美元价格、财政压力、日元融资和通胀压力五个模块等权合成；风险确认单独展示，用来验证宏观判断是否被价格承认。</p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Chart 2 / USD Quantity</span>
+              <h3>Fed Net Liquidity</h3>
+            </div>
+            <div className="latest-value">
+              <strong>{formatNumber(netLiquidity.at(-1)?.value, 2)}</strong>
+              <small>万亿美元</small>
+            </div>
+          </div>
+          <MultiLineChart
+            series={[
+              { label: "净流动性", color: "#2563eb", points: netLiquidity },
+              { label: "Δ13W", color: "#16a34a", points: absoluteChangeSeries(netLiquidity, 91) },
+              { label: "Δ26W", color: "#7c3aed", points: absoluteChangeSeries(netLiquidity, 182) }
+            ]}
+            dateRange={usd.dateRange}
+            valueLabel="Fed Net Liquidity"
+          />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>这张图把水位和动量放在一起看。净流动性绝对值高但 13 周变化转负，风险资产应按黄灯处理。</p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Chart 3 / Treasury Pressure</span>
+              <h3>美债长端压力</h3>
+            </div>
+          </div>
+          <MultiLineChart series={treasuryPressure} dateRange={usd.dateRange} valueLabel="美债长端压力" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>所有分项已方向化：向上代表长端压力缓和，向下代表 10Y、30Y 或实际收益率重新压制高估值资产。</p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Chart 4 / Yen Carry</span>
+              <h3>日元 Carry 压力</h3>
+            </div>
+          </div>
+          <MultiLineChart series={yenCarry} dateRange={usd.dateRange} valueLabel="日元 Carry 压力" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>向上代表 carry 条件改善：美日利差扩大、USDJPY 上行、JGB 下行。利差收窄叠加日元升值时，风险资产容易出现被动去杠杆。</p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Chart 5 / Inflation Constraint</span>
+              <h3>通胀约束</h3>
+            </div>
+          </div>
+          <MultiLineChart series={inflationConstraint} dateRange={usd.dateRange} valueLabel="通胀约束" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>当前版本用美国 CPI、10Y 实际收益率和 30Y 作为通胀约束代理；后续可直接加入 Brent、5Y5Y 通胀预期和黄金。</p>
+          </div>
+        </section>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Chart 6 / Risk Confirmation</span>
+              <h3>风险资产确认</h3>
+            </div>
+          </div>
+          <MultiLineChart series={riskConfirmation} dateRange={risk.dateRange} valueLabel="风险资产确认" />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>风险确认不直接决定宏观总分。它回答另一个问题：流动性判断是否已经被 Nasdaq、港科和 BTC 的价格行为确认。</p>
+          </div>
+        </section>
+      </div>
+    </section>
+  );
+}
+
+function findSeries(charts: InterestRateChart[] | undefined, key: string) {
+  return charts?.flatMap((chart) => chart.series).find((item) => item.key === key);
+}
+
+function dashboardModule(label: string, detail: string, components: DataPoint[][]) {
+  const validComponents = components.filter((series) => series.length > 0);
+  const index = averageAlignedSeries(
+    standardizeSeries(validComponents.map((points, index) => ({ label: `${label}-${index}`, color: "#0f766e", points })))
+  );
+  const latest = index.at(-1)?.value ?? 0;
+  const score = scoreFromZ(latest);
+  return { detail, index, label, score, tone: toneForScore(score) };
+}
+
+function scoreSeriesFromModuleIndexes(modules: { index: DataPoint[] }[]) {
+  const series = averageAlignedSeries(
+    modules.map((module, index) => ({ label: `module-${index}`, color: "#0f766e", points: module.index }))
+  );
+  return series.map((point) => ({ date: point.date, value: scoreFromZ(point.value) }));
+}
+
+function scoreFromZ(value: number) {
+  if (value >= 0.65) return 2;
+  if (value >= 0.2) return 1;
+  if (value <= -0.65) return -2;
+  if (value <= -0.2) return -1;
+  return 0;
+}
+
+function clampScore(value: number) {
+  return Math.max(-2, Math.min(2, value));
+}
+
+function toneForScore(score: number) {
+  if (score >= 2) return "green";
+  if (score === 1) return "light";
+  if (score === 0) return "neutral";
+  if (score === -1) return "yellow";
+  return "red";
+}
+
+function globalScoreText(score: number) {
+  if (score >= 2) return "强顺风";
+  if (score === 1) return "温和顺风";
+  if (score === 0) return "中性震荡";
+  if (score === -1) return "黄灯偏紧";
+  return "红灯防守";
+}
+
+function assetImplications(globalScore: number, modules: { label: string; score: number }[]) {
+  const yenScore = modules.find((item) => item.label === "日元融资")?.score ?? 0;
+  const treasuryScore = modules.find((item) => item.label === "美元价格")?.score ?? 0;
+  const riskScore = modules.find((item) => item.label === "风险确认")?.score ?? 0;
+  return [
+    {
+      label: "美股 AI",
+      call: globalScore >= 1 && treasuryScore >= 0 ? "可进攻" : globalScore <= -1 ? "不追高" : "等确认",
+      detail: treasuryScore < 0 ? "长端利率仍是主要约束。" : "需要风险确认继续走强。"
+    },
+    {
+      label: "港科",
+      call: globalScore >= 1 && yenScore >= 0 ? "顺风改善" : "流动性敏感",
+      detail: "美元价格和日元 carry 同时恶化时弹性会被压住。"
+    },
+    {
+      label: "BTC",
+      call: globalScore >= 1 && riskScore >= 0 ? "顺风" : globalScore <= -1 ? "防守" : "震荡",
+      detail: "更依赖净流动性动量和实际利率方向。"
+    },
+    {
+      label: "腾讯",
+      call: globalScore <= -1 ? "不因便宜补仓" : "基本面优先",
+      detail: "估值修复需要港科风险偏好和美元价格共同配合。"
+    }
+  ];
 }
 
 function IndicatorChart({
