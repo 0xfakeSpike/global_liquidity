@@ -188,6 +188,7 @@ footer {
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  scroll-margin-top: 18px;
 }
 
 .metric {
@@ -207,6 +208,118 @@ footer {
 .metric strong {
   color: #0f172a;
   margin-left: auto;
+}
+
+.market-composition {
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: 14px clamp(18px, 4vw, 56px) 26px;
+}
+
+.composition-heading {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.composition-heading > span {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.composition-heading h2 {
+  color: #0f172a;
+  font-size: 24px;
+  margin: 0 0 5px;
+}
+
+.composition-heading p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+}
+
+.composition-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.composition-grid a {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.composition-grid a:hover {
+  border-color: #0f766e;
+  transform: translateY(-2px);
+}
+
+.composition-grid span {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.composition-grid p {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.composition-grid b {
+  color: #0f766e;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.constituent-section {
+  border-top: 1px solid #dbe3ec;
+  margin-top: 34px;
+  padding-top: 34px;
+  scroll-margin-top: 18px;
+}
+
+.constituent-heading {
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: 0 clamp(18px, 4vw, 56px) 8px;
+}
+
+.constituent-heading span {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.constituent-heading h2 {
+  color: #0f172a;
+  font-size: 36px;
+  margin: 8px 0;
+}
+
+.constituent-heading p {
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 760px;
+}
+
+.constituent-terminal {
+  padding-top: 12px;
 }
 
 .section-heading {
@@ -822,6 +935,76 @@ footer {
   padding: 14px 16px;
 }
 
+.analysis-disclosure {
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: 0 clamp(18px, 4vw, 56px);
+}
+
+.analysis-disclosure > summary {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+  padding: 18px 20px;
+}
+
+.analysis-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.analysis-disclosure > summary span {
+  display: grid;
+  gap: 5px;
+}
+
+.analysis-disclosure > summary strong {
+  color: #0f172a;
+  font-size: 17px;
+}
+
+.analysis-disclosure > summary small {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.analysis-disclosure > summary b {
+  color: #0f766e;
+  flex: 0 0 auto;
+  font-size: 13px;
+  margin-left: 18px;
+}
+
+.analysis-disclosure[open] > summary b {
+  font-size: 0;
+}
+
+.analysis-disclosure[open] > summary b::after {
+  content: "收起";
+  font-size: 13px;
+}
+
+.analysis-disclosure-content {
+  padding-top: 18px;
+}
+
+.analysis-disclosure-content > .terminal,
+.analysis-disclosure-content > .rate-section {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.charts-stack > .analysis-disclosure {
+  padding: 0;
+  width: 100%;
+}
+
 .line-chart text {
   fill: #64748b;
   font-size: 12px;
@@ -965,6 +1148,7 @@ footer {
   }
 
   .metric-strip,
+  .composition-grid,
   .chart-stats,
   .momentum-summary,
   .module-lights,
@@ -975,10 +1159,20 @@ footer {
     grid-template-columns: 1fr;
   }
 
+  .composition-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .dashboard-hero > div:first-child {
     border-right: 0;
     border-bottom: 1px solid #e2e8f0;
     padding: 0 0 18px;
+  }
+
+  .analysis-disclosure > summary {
+    align-items: flex-start;
   }
 
   .hero {

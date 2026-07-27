@@ -27,8 +27,16 @@ const markets: Record<
     updateLabel: string;
   }
 > = {
+  combined: {
+    label: "全球驾驶舱",
+    eyebrow: "全球风险流动性仪表盘",
+    title: "全球风险流动性驾驶舱",
+    description: "汇总美元、日元、美债与风险市场，用红黄绿灯回答全球流动性现在是顺风还是逆风。",
+    sourceLabel: "FRED / NY Fed / BOJ / Treasury",
+    updateLabel: "Layered dashboard"
+  },
   usd: {
-    label: "美元流动性",
+    label: "美元明细",
     eyebrow: "美元全球流动性监控",
     title: "把 Fed 资产、TGA、ON RRP、融资压力和风险价格放到一张表里。",
     description: "每张图表按指标依次展开，构建阶段自动更新公开数据，页面端读取最新发布快照。",
@@ -36,11 +44,19 @@ const markets: Record<
     updateLabel: "Build-time JSON"
   },
   jpy: {
-    label: "日元流动性",
+    label: "日元明细",
     eyebrow: "日元全球流动性监控",
     title: "把 BOJ 资产、基础货币、当座存款、广义流动性和日元融资压力放到一张表里。",
     description: "数据来自 BOJ 官方统计 API 与 FRED 镜像序列，构建阶段生成日元流动性快照。",
     sourceLabel: "BOJ / FRED",
+    updateLabel: "Build-time JSON"
+  },
+  treasury: {
+    label: "美债明细",
+    eyebrow: "美国国债市场监控",
+    title: "把债务规模、持有人结构、收益率曲线和财政利息成本放到一页里。",
+    description: "跟踪美债供给、谁在吸收美债、长短端利率和曲线形态，观察美元资产定价的底层锚。",
+    sourceLabel: "FRED / Treasury",
     updateLabel: "Build-time JSON"
   },
   risk: {
@@ -50,30 +66,12 @@ const markets: Record<
     description: "三条价格曲线按首个可用日期归一为 100，用来观察风险资产之间的相对强弱和节奏。",
     sourceLabel: "FRED / Yahoo",
     updateLabel: "Normalized prices"
-  },
-  treasury: {
-    label: "美债市场",
-    eyebrow: "美国国债市场监控",
-    title: "把债务规模、持有人结构、收益率曲线和财政利息成本放到一页里。",
-    description: "跟踪美债供给、谁在吸收美债、长短端利率和曲线形态，观察美元资产定价的底层锚。",
-    sourceLabel: "FRED / Treasury",
-    updateLabel: "Build-time JSON"
-  },
-  combined: {
-    label: "全球流动性驾驶舱",
-    eyebrow: "全球风险流动性仪表盘",
-    title: "全球风险流动性驾驶舱",
-    description: "核心看流动性变化量、变化率和市场确认，用红黄绿灯回答风险资产现在是顺风还是逆风。",
-    sourceLabel: "FRED / NY Fed / BOJ / Treasury",
-    updateLabel: "Layered dashboard"
   }
 };
 
 function initialMarket(): ViewMode {
-  if (window.location.hash.includes("combined")) return "combined";
-  if (window.location.hash.includes("treasury")) return "treasury";
   if (window.location.hash.includes("risk")) return "risk";
-  return window.location.hash.includes("jpy") ? "jpy" : "usd";
+  return "combined";
 }
 
 function App() {
@@ -145,7 +143,9 @@ function App() {
             <span>Global Liquidity Monitor</span>
           </div>
           <div className="market-tabs" aria-label="liquidity market">
-            {Object.entries(markets).map(([key, item]) => (
+            {Object.entries(markets)
+              .filter(([key]) => key === "combined" || key === "risk")
+              .map(([key, item]) => (
               <button
                 className={key === market ? "active" : ""}
                 key={key}
@@ -154,7 +154,7 @@ function App() {
               >
                 {item.label}
               </button>
-            ))}
+              ))}
           </div>
           <div className="nav-meta">
             {market === "combined" ? (
@@ -197,18 +197,20 @@ function App() {
             <h1>{marketConfig.title}</h1>
             <p className="hero-text">{marketConfig.description}</p>
             <div className="hero-actions">
-              <a href="#terminal">查看图表</a>
-              <a href="#terminal">图表数据来源</a>
+              <a href="#terminal">查看当前结论</a>
+              <a href="#data-methodology">数据与口径</a>
             </div>
           </div>
         </section>
       </header>
 
-      <section className="metric-strip">
+      <section className="metric-strip" id="data-methodology">
         <Metric icon={<Database size={20} />} label="公开数据源" value={marketConfig.sourceLabel} />
         <Metric icon={<RefreshCw size={20} />} label="更新方式" value={marketConfig.updateLabel} />
         <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${activeDataset.lookbackYears}Y Z-score`} />
       </section>
+
+      {market === "combined" ? <GlobalCompositionNav /> : null}
 
       {market !== "combined" && rateCharts.length > 0 ? (
         <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
@@ -232,27 +234,65 @@ function App() {
             treasury={pairedDatasets.treasury}
             usd={pairedDatasets.usd}
           />
-          <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
-          <LiquidityMomentumTerminal
-            jpy={pairedDatasets.jpy}
-            treasury={pairedDatasets.treasury}
-            usd={pairedDatasets.usd}
-          />
-          <YenCarryStressTerminal
-            jpy={pairedDatasets.jpy}
-            treasury={pairedDatasets.treasury}
-            usd={pairedDatasets.usd}
-          />
-          {rateCharts.length > 0 ? <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} /> : null}
-          {inflationCharts.length > 0 ? (
-            <ChartGroupSection
-              charts={inflationCharts}
-              dateRange={activeDataset.dateRange}
-              eyebrow="Inflation / Real Rate"
-              title="通胀与实际政策利率"
-              showRealRateImpact
+          <LiquidityDetailSection dataset={pairedDatasets.usd} id="usd-details" marketLabel="美元流动性" />
+          <LiquidityDetailSection dataset={pairedDatasets.jpy} id="jpy-details" marketLabel="日元流动性" />
+          <section className="constituent-section" id="treasury-details">
+            <div className="constituent-heading">
+              <span>03 / Treasury Liquidity</span>
+              <h2>美债市场</h2>
+              <p>查看债务供给、持有人结构、收益率曲线与财政利息成本对全球美元流动性的约束。</p>
+            </div>
+            <TreasuryMarketTerminal
+              charts={pairedDatasets.treasury.treasuryCharts ?? []}
+              dateRange={pairedDatasets.treasury.dateRange}
+              foreignHolderShares={pairedDatasets.treasury.foreignHolderShares ?? []}
+              holderShares={pairedDatasets.treasury.holderShares ?? []}
+              notes={pairedDatasets.treasury.notes}
             />
-          ) : null}
+          </section>
+          <AnalysisDisclosure
+            title="美元与日元横向比较"
+            description="央行资产、M2、DLI、长端利率与汇率的归一化叠加图。"
+          >
+            <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
+          </AnalysisDisclosure>
+          <AnalysisDisclosure
+            title="流动性动量明细"
+            description="展开查看 4周、13周、26周变化量及融资条件分项。"
+          >
+            <LiquidityMomentumTerminal
+              jpy={pairedDatasets.jpy}
+              treasury={pairedDatasets.treasury}
+              usd={pairedDatasets.usd}
+            />
+          </AnalysisDisclosure>
+          <AnalysisDisclosure
+            title="日元 Carry 压力专题"
+            description="展开查看利差、汇率、JGB 和美债长端构成的 unwind 压力。"
+          >
+            <YenCarryStressTerminal
+              jpy={pairedDatasets.jpy}
+              treasury={pairedDatasets.treasury}
+              usd={pairedDatasets.usd}
+            />
+          </AnalysisDisclosure>
+          <AnalysisDisclosure
+            title="利率、通胀与实际利率底表"
+            description="用于追溯驾驶舱评分的政策利率和通胀原始曲线。"
+          >
+            {rateCharts.length > 0 ? (
+              <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
+            ) : null}
+            {inflationCharts.length > 0 ? (
+              <ChartGroupSection
+                charts={inflationCharts}
+                dateRange={activeDataset.dateRange}
+                eyebrow="Inflation / Real Rate"
+                title="通胀与实际政策利率"
+                showRealRateImpact
+              />
+            ) : null}
+          </AnalysisDisclosure>
         </>
       ) : market === "risk" ? (
         <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} notes={activeDataset.notes} />
@@ -327,6 +367,131 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
+  );
+}
+
+function GlobalCompositionNav() {
+  return (
+    <section className="market-composition" aria-label="全球流动性页面目录">
+      <div className="composition-heading">
+        <span>Dashboard Components</span>
+        <div>
+          <h2>全球流动性的三个组成部分</h2>
+          <p>总览之后依次展示美元、日元与美债底层数据；风险市场作为独立一级页面。</p>
+        </div>
+      </div>
+      <div className="composition-grid">
+        <a href="#usd-details">
+          <span>美元流动性</span>
+          <p>Fed、TGA、ON RRP、M2 与美元融资条件</p>
+          <b>页内查看 ↓</b>
+        </a>
+        <a href="#jpy-details">
+          <span>日元流动性</span>
+          <p>BOJ、日元货币供应与 Carry 融资压力</p>
+          <b>页内查看 ↓</b>
+        </a>
+        <a href="#treasury-details">
+          <span>美债市场</span>
+          <p>债务供给、持有人、收益率曲线与利息成本</p>
+          <b>页内查看 ↓</b>
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function LiquidityDetailSection({
+  dataset,
+  id,
+  marketLabel
+}: {
+  dataset: LiquidityDataset;
+  id: string;
+  marketLabel: string;
+}) {
+  const snapshots = new Map(dataset.snapshots.map((snapshot) => [snapshot.key, snapshot]));
+  const sectionNumber = id === "usd-details" ? "01" : "02";
+
+  return (
+    <section className="constituent-section" id={id}>
+      <div className="constituent-heading">
+        <span>{sectionNumber} / {marketLabel}</span>
+        <h2>{marketLabel}</h2>
+        <p>该部分直接构成全球驾驶舱，不是独立一级页面。以下保留政策利率、实际利率、流动性指标和综合评分。</p>
+      </div>
+      {(dataset.rateCharts ?? []).length > 0 ? (
+        <InterestRateSection charts={dataset.rateCharts ?? []} dateRange={dataset.dateRange} />
+      ) : null}
+      {(dataset.inflationCharts ?? []).length > 0 ? (
+        <ChartGroupSection
+          charts={dataset.inflationCharts ?? []}
+          dateRange={dataset.dateRange}
+          eyebrow="Inflation / Real Rate"
+          title="通胀与实际政策利率"
+          showRealRateImpact
+        />
+      ) : null}
+      <div className="terminal constituent-terminal">
+        <div className="section-heading">
+          <p>Liquidity Indicators</p>
+          <h2>流动性底层指标</h2>
+        </div>
+        <div className="charts-stack">
+          {dataset.indicators.map((definition) => {
+            const snapshot = snapshots.get(definition.key);
+            return snapshot ? (
+              <IndicatorChart
+                key={definition.key}
+                definition={definition}
+                snapshot={snapshot}
+                dateRange={dataset.dateRange}
+              />
+            ) : null;
+          })}
+        </div>
+      </div>
+      <div className="composite-section constituent-terminal">
+        <div className="section-heading">
+          <p>Composite DLI</p>
+          <h2>{marketLabel}综合评分</h2>
+        </div>
+        <div className="composite-grid">
+          <LineChart
+            series={dataset.composite.series}
+            color="#0f766e"
+            dateRange={dataset.dateRange}
+            valueLabel={`${marketLabel}综合评分`}
+          />
+          <div className="notes">
+            {dataset.notes.map((note) => <p key={note}>{note}</p>)}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AnalysisDisclosure({
+  children,
+  description,
+  title
+}: {
+  children: React.ReactNode;
+  description: string;
+  title: string;
+}) {
+  return (
+    <details className="analysis-disclosure">
+      <summary>
+        <span>
+          <strong>{title}</strong>
+          <small>{description}</small>
+        </span>
+        <b aria-hidden="true">展开</b>
+      </summary>
+      <div className="analysis-disclosure-content">{children}</div>
+    </details>
   );
 }
 
@@ -1162,58 +1327,65 @@ function GlobalLiquidityDashboard({
             <p>这张图把水位和动量放在一起看。净流动性绝对值高但 13 周变化转负，风险资产应按黄灯处理。</p>
           </div>
         </section>
-        <section className="chart-panel">
-          <div className="chart-header">
-            <div>
-              <span>Chart 3 / Treasury Pressure</span>
-              <h3>美债长端压力</h3>
-            </div>
+        <AnalysisDisclosure
+          title="查看四项分项证据"
+          description="美债长端、日元 Carry、通胀约束和风险资产确认已体现在上方模块灯中，此处保留完整曲线供追溯。"
+        >
+          <div className="charts-stack">
+            <section className="chart-panel">
+              <div className="chart-header">
+                <div>
+                  <span>Chart 3 / Treasury Pressure</span>
+                  <h3>美债长端压力</h3>
+                </div>
+              </div>
+              <MultiLineChart series={treasuryPressure} dateRange={usd.dateRange} valueLabel="美债长端压力" />
+              <div className="interpretation">
+                <strong>当前解读</strong>
+                <p>所有分项已方向化：向上代表长端压力缓和，向下代表 10Y、30Y 或实际收益率重新压制高估值资产。</p>
+              </div>
+            </section>
+            <section className="chart-panel">
+              <div className="chart-header">
+                <div>
+                  <span>Chart 4 / Yen Carry</span>
+                  <h3>日元 Carry 压力</h3>
+                </div>
+              </div>
+              <MultiLineChart series={yenCarry} dateRange={usd.dateRange} valueLabel="日元 Carry 压力" />
+              <div className="interpretation">
+                <strong>当前解读</strong>
+                <p>向上代表 carry 条件改善：美日利差扩大、USDJPY 上行、JGB 下行。利差收窄叠加日元升值时，风险资产容易出现被动去杠杆。</p>
+              </div>
+            </section>
+            <section className="chart-panel">
+              <div className="chart-header">
+                <div>
+                  <span>Chart 5 / Inflation Constraint</span>
+                  <h3>通胀约束</h3>
+                </div>
+              </div>
+              <MultiLineChart series={inflationConstraint} dateRange={usd.dateRange} valueLabel="通胀约束" />
+              <div className="interpretation">
+                <strong>当前解读</strong>
+                <p>当前版本用美国 CPI、10Y 实际收益率和 30Y 作为通胀约束代理；后续可直接加入 Brent、5Y5Y 通胀预期和黄金。</p>
+              </div>
+            </section>
+            <section className="chart-panel">
+              <div className="chart-header">
+                <div>
+                  <span>Chart 6 / Risk Confirmation</span>
+                  <h3>风险资产确认</h3>
+                </div>
+              </div>
+              <MultiLineChart series={riskConfirmation} dateRange={risk.dateRange} valueLabel="风险资产确认" />
+              <div className="interpretation">
+                <strong>当前解读</strong>
+                <p>风险确认不直接决定宏观总分。它回答另一个问题：流动性判断是否已经被 Nasdaq、港科和 BTC 的价格行为确认。</p>
+              </div>
+            </section>
           </div>
-          <MultiLineChart series={treasuryPressure} dateRange={usd.dateRange} valueLabel="美债长端压力" />
-          <div className="interpretation">
-            <strong>当前解读</strong>
-            <p>所有分项已方向化：向上代表长端压力缓和，向下代表 10Y、30Y 或实际收益率重新压制高估值资产。</p>
-          </div>
-        </section>
-        <section className="chart-panel">
-          <div className="chart-header">
-            <div>
-              <span>Chart 4 / Yen Carry</span>
-              <h3>日元 Carry 压力</h3>
-            </div>
-          </div>
-          <MultiLineChart series={yenCarry} dateRange={usd.dateRange} valueLabel="日元 Carry 压力" />
-          <div className="interpretation">
-            <strong>当前解读</strong>
-            <p>向上代表 carry 条件改善：美日利差扩大、USDJPY 上行、JGB 下行。利差收窄叠加日元升值时，风险资产容易出现被动去杠杆。</p>
-          </div>
-        </section>
-        <section className="chart-panel">
-          <div className="chart-header">
-            <div>
-              <span>Chart 5 / Inflation Constraint</span>
-              <h3>通胀约束</h3>
-            </div>
-          </div>
-          <MultiLineChart series={inflationConstraint} dateRange={usd.dateRange} valueLabel="通胀约束" />
-          <div className="interpretation">
-            <strong>当前解读</strong>
-            <p>当前版本用美国 CPI、10Y 实际收益率和 30Y 作为通胀约束代理；后续可直接加入 Brent、5Y5Y 通胀预期和黄金。</p>
-          </div>
-        </section>
-        <section className="chart-panel">
-          <div className="chart-header">
-            <div>
-              <span>Chart 6 / Risk Confirmation</span>
-              <h3>风险资产确认</h3>
-            </div>
-          </div>
-          <MultiLineChart series={riskConfirmation} dateRange={risk.dateRange} valueLabel="风险资产确认" />
-          <div className="interpretation">
-            <strong>当前解读</strong>
-            <p>风险确认不直接决定宏观总分。它回答另一个问题：流动性判断是否已经被 Nasdaq、港科和 BTC 的价格行为确认。</p>
-          </div>
-        </section>
+        </AnalysisDisclosure>
       </div>
     </section>
   );
