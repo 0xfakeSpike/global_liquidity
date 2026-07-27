@@ -49,6 +49,31 @@ main {
   padding: 24px clamp(18px, 4vw, 56px) 36px;
 }
 
+.hero-compact {
+  padding-bottom: 10px;
+}
+
+.hero-compact nav {
+  margin-bottom: 22px;
+}
+
+.hero-compact h1 {
+  font-size: clamp(36px, 4.2vw, 56px);
+}
+
+.hero-compact .hero-text {
+  margin: 14px 0 0;
+  max-width: 820px;
+}
+
+.hero-compact .secondary-actions {
+  display: none;
+}
+
+.hero-compact .nav-meta {
+  display: none;
+}
+
 nav {
   align-items: center;
   display: flex;
@@ -188,12 +213,19 @@ footer {
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+  padding-top: 8px;
   scroll-margin-top: 18px;
 }
 
 .metric {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   gap: 12px;
-  padding: 18px;
+  padding: 8px 0;
 }
 
 .metric svg {
@@ -213,13 +245,12 @@ footer {
 .market-composition {
   margin: 0 auto;
   max-width: 1240px;
-  padding: 14px clamp(18px, 4vw, 56px) 26px;
+  padding: 18px clamp(18px, 4vw, 56px) 22px;
 }
 
 .composition-heading {
-  align-items: end;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  gap: 4px;
   margin-bottom: 16px;
 }
 
@@ -232,8 +263,8 @@ footer {
 
 .composition-heading h2 {
   color: #0f172a;
-  font-size: 24px;
-  margin: 0 0 5px;
+  font-size: 22px;
+  margin: 0;
 }
 
 .composition-heading p {
@@ -255,7 +286,7 @@ footer {
   display: grid;
   gap: 8px;
   min-width: 0;
-  padding: 16px;
+  padding: 13px 14px;
   text-align: left;
   transition:
     border-color 0.15s ease,
@@ -1005,6 +1036,60 @@ footer {
   width: 100%;
 }
 
+.curated-detail {
+  display: grid;
+  gap: 16px;
+}
+
+.curated-snapshot-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.curated-snapshot-grid > div {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+}
+
+.curated-snapshot-grid span,
+.curated-snapshot-grid small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.curated-snapshot-grid strong {
+  color: #0f172a;
+  font-size: 24px;
+}
+
+.curated-chart-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.curated-chart-grid .chart-header h3 {
+  font-size: 22px;
+}
+
+.curated-chart-grid .chart-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.curated-chart-grid .chart-stats .stat:nth-child(n + 4) {
+  display: none;
+}
+
+.curated-chart-grid .interpretation,
+.curated-chart-grid .data-source p {
+  display: none;
+}
+
 .line-chart text {
   fill: #64748b;
   font-size: 12px;
@@ -1149,6 +1234,8 @@ footer {
 
   .metric-strip,
   .composition-grid,
+  .curated-snapshot-grid,
+  .curated-chart-grid,
   .chart-stats,
   .momentum-summary,
   .module-lights,
@@ -1181,6 +1268,11 @@ footer {
 
   h1 {
     font-size: 38px;
+  }
+
+  .hero-compact h1 {
+    font-size: 34px;
+    line-height: 1.05;
   }
 
   .latest-value {

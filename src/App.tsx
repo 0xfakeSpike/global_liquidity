@@ -32,8 +32,8 @@ const markets: Record<
     eyebrow: "全球风险流动性仪表盘",
     title: "全球风险流动性驾驶舱",
     description: "汇总美元、日元、美债与风险市场，用红黄绿灯回答全球流动性现在是顺风还是逆风。",
-    sourceLabel: "FRED / NY Fed / BOJ / Treasury",
-    updateLabel: "Layered dashboard"
+    sourceLabel: "Fed / BOJ / 美国财政部",
+    updateLabel: "工作日自动更新"
   },
   usd: {
     label: "美元明细",
@@ -136,7 +136,7 @@ function App() {
 
   return (
     <main>
-      <header className="hero">
+      <header className={`hero ${market === "combined" ? "hero-compact" : ""}`}>
         <nav>
           <div className="brand">
             <Activity size={21} />
@@ -196,7 +196,7 @@ function App() {
             <p className="eyebrow">{marketConfig.eyebrow}</p>
             <h1>{marketConfig.title}</h1>
             <p className="hero-text">{marketConfig.description}</p>
-            <div className="hero-actions">
+            <div className={`hero-actions ${market === "combined" ? "secondary-actions" : ""}`}>
               <a href="#terminal">查看当前结论</a>
               <a href="#data-methodology">数据与口径</a>
             </div>
@@ -207,7 +207,11 @@ function App() {
       <section className="metric-strip" id="data-methodology">
         <Metric icon={<Database size={20} />} label="公开数据源" value={marketConfig.sourceLabel} />
         <Metric icon={<RefreshCw size={20} />} label="更新方式" value={marketConfig.updateLabel} />
-        <Metric icon={<ShieldCheck size={20} />} label="口径" value={`${activeDataset.lookbackYears}Y Z-score`} />
+        <Metric
+          icon={<ShieldCheck size={20} />}
+          label={market === "combined" ? "观察窗口" : "口径"}
+          value={market === "combined" ? `近 ${activeDataset.lookbackYears} 年` : `${activeDataset.lookbackYears}Y Z-score`}
+        />
       </section>
 
       {market === "combined" ? <GlobalCompositionNav /> : null}
@@ -234,64 +238,31 @@ function App() {
             treasury={pairedDatasets.treasury}
             usd={pairedDatasets.usd}
           />
-          <LiquidityDetailSection dataset={pairedDatasets.usd} id="usd-details" marketLabel="美元流动性" />
-          <LiquidityDetailSection dataset={pairedDatasets.jpy} id="jpy-details" marketLabel="日元流动性" />
-          <section className="constituent-section" id="treasury-details">
-            <div className="constituent-heading">
-              <span>03 / Treasury Liquidity</span>
-              <h2>美债市场</h2>
-              <p>查看债务供给、持有人结构、收益率曲线与财政利息成本对全球美元流动性的约束。</p>
-            </div>
-            <TreasuryMarketTerminal
-              charts={pairedDatasets.treasury.treasuryCharts ?? []}
-              dateRange={pairedDatasets.treasury.dateRange}
-              foreignHolderShares={pairedDatasets.treasury.foreignHolderShares ?? []}
-              holderShares={pairedDatasets.treasury.holderShares ?? []}
-              notes={pairedDatasets.treasury.notes}
-            />
-          </section>
           <AnalysisDisclosure
-            title="美元与日元横向比较"
-            description="央行资产、M2、DLI、长端利率与汇率的归一化叠加图。"
+            title="01 · 美元流动性底表"
+            description="保留净流动性、TGA、M2 与融资压力四项核心证据。"
           >
-            <CombinedTerminal usd={pairedDatasets.usd} jpy={pairedDatasets.jpy} />
-          </AnalysisDisclosure>
-          <AnalysisDisclosure
-            title="流动性动量明细"
-            description="展开查看 4周、13周、26周变化量及融资条件分项。"
-          >
-            <LiquidityMomentumTerminal
-              jpy={pairedDatasets.jpy}
-              treasury={pairedDatasets.treasury}
-              usd={pairedDatasets.usd}
+            <CuratedLiquidityDetail
+              dataset={pairedDatasets.usd}
+              keys={["netLiquidity", "tga", "m2", "sofrIorb"]}
+              id="usd-details"
             />
           </AnalysisDisclosure>
           <AnalysisDisclosure
-            title="日元 Carry 压力专题"
-            description="展开查看利差、汇率、JGB 和美债长端构成的 unwind 压力。"
+            title="02 · 日元流动性底表"
+            description="保留 BOJ 资产、日本 M2、USD/JPY 与 JGB 10Y 四项核心证据。"
           >
-            <YenCarryStressTerminal
-              jpy={pairedDatasets.jpy}
-              treasury={pairedDatasets.treasury}
-              usd={pairedDatasets.usd}
+            <CuratedLiquidityDetail
+              dataset={pairedDatasets.jpy}
+              keys={["bojAssets", "m2Japan", "usdJpy", "jgb10y"]}
+              id="jpy-details"
             />
           </AnalysisDisclosure>
           <AnalysisDisclosure
-            title="利率、通胀与实际利率底表"
-            description="用于追溯驾驶舱评分的政策利率和通胀原始曲线。"
+            title="03 · 美债市场底表"
+            description="保留债务规模、利息成本、收益率曲线与持有人结构。"
           >
-            {rateCharts.length > 0 ? (
-              <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
-            ) : null}
-            {inflationCharts.length > 0 ? (
-              <ChartGroupSection
-                charts={inflationCharts}
-                dateRange={activeDataset.dateRange}
-                eyebrow="Inflation / Real Rate"
-                title="通胀与实际政策利率"
-                showRealRateImpact
-              />
-            ) : null}
+            <CuratedTreasuryDetail dataset={pairedDatasets.treasury} />
           </AnalysisDisclosure>
         </>
       ) : market === "risk" ? (
@@ -376,8 +347,8 @@ function GlobalCompositionNav() {
       <div className="composition-heading">
         <span>Dashboard Components</span>
         <div>
-          <h2>全球流动性的三个组成部分</h2>
-          <p>总览之后依次展示美元、日元与美债底层数据；风险市场作为独立一级页面。</p>
+          <h2>先看结论，需要时再查底表</h2>
+          <p>默认只展示总评分和关键驱动；美元、日元与美债原始指标按需展开。</p>
         </div>
       </div>
       <div className="composition-grid">
@@ -401,74 +372,64 @@ function GlobalCompositionNav() {
   );
 }
 
-function LiquidityDetailSection({
+function CuratedLiquidityDetail({
   dataset,
   id,
-  marketLabel
+  keys
 }: {
   dataset: LiquidityDataset;
   id: string;
-  marketLabel: string;
+  keys: string[];
 }) {
   const snapshots = new Map(dataset.snapshots.map((snapshot) => [snapshot.key, snapshot]));
-  const sectionNumber = id === "usd-details" ? "01" : "02";
+  const definitions = keys
+    .map((key) => dataset.indicators.find((definition) => definition.key === key))
+    .filter((definition): definition is IndicatorDefinition => Boolean(definition));
 
   return (
-    <section className="constituent-section" id={id}>
-      <div className="constituent-heading">
-        <span>{sectionNumber} / {marketLabel}</span>
-        <h2>{marketLabel}</h2>
-        <p>该部分直接构成全球驾驶舱，不是独立一级页面。以下保留政策利率、实际利率、流动性指标和综合评分。</p>
+    <section className="curated-detail" id={id}>
+      <div className="curated-snapshot-grid">
+        {definitions.map((definition) => {
+          const snapshot = snapshots.get(definition.key);
+          return snapshot ? (
+            <div key={definition.key}>
+              <span>{definition.shortName}</span>
+              <strong>{formatNumber(snapshot.latestValue, 2)}</strong>
+              <small>{definition.unit}</small>
+            </div>
+          ) : null;
+        })}
       </div>
-      {(dataset.rateCharts ?? []).length > 0 ? (
-        <InterestRateSection charts={dataset.rateCharts ?? []} dateRange={dataset.dateRange} />
-      ) : null}
-      {(dataset.inflationCharts ?? []).length > 0 ? (
-        <ChartGroupSection
-          charts={dataset.inflationCharts ?? []}
-          dateRange={dataset.dateRange}
-          eyebrow="Inflation / Real Rate"
-          title="通胀与实际政策利率"
-          showRealRateImpact
-        />
-      ) : null}
-      <div className="terminal constituent-terminal">
-        <div className="section-heading">
-          <p>Liquidity Indicators</p>
-          <h2>流动性底层指标</h2>
-        </div>
-        <div className="charts-stack">
-          {dataset.indicators.map((definition) => {
-            const snapshot = snapshots.get(definition.key);
-            return snapshot ? (
-              <IndicatorChart
-                key={definition.key}
-                definition={definition}
-                snapshot={snapshot}
-                dateRange={dataset.dateRange}
-              />
-            ) : null;
-          })}
-        </div>
-      </div>
-      <div className="composite-section constituent-terminal">
-        <div className="section-heading">
-          <p>Composite DLI</p>
-          <h2>{marketLabel}综合评分</h2>
-        </div>
-        <div className="composite-grid">
-          <LineChart
-            series={dataset.composite.series}
-            color="#0f766e"
-            dateRange={dataset.dateRange}
-            valueLabel={`${marketLabel}综合评分`}
-          />
-          <div className="notes">
-            {dataset.notes.map((note) => <p key={note}>{note}</p>)}
-          </div>
-        </div>
+      <div className="curated-chart-grid">
+        {definitions.map((definition) => {
+          const snapshot = snapshots.get(definition.key);
+          return snapshot ? (
+            <IndicatorChart
+              key={definition.key}
+              definition={definition}
+              snapshot={snapshot}
+              dateRange={dataset.dateRange}
+            />
+          ) : null;
+        })}
       </div>
     </section>
+  );
+}
+
+function CuratedTreasuryDetail({ dataset }: { dataset: LiquidityDataset }) {
+  const selectedTitles = new Set(["美国联邦债务规模", "联邦政府利息支出", "美债长短端收益率"]);
+  const charts = (dataset.treasuryCharts ?? []).filter((chart) => selectedTitles.has(chart.title));
+  return (
+    <div id="treasury-details">
+      <TreasuryMarketTerminal
+        charts={charts}
+        dateRange={dataset.dateRange}
+        foreignHolderShares={[]}
+        holderShares={dataset.holderShares ?? []}
+        notes={[]}
+      />
+    </div>
   );
 }
 
