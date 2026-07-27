@@ -1135,6 +1135,18 @@ footer {
   display: none;
 }
 
+#treasury-details .treasury-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#treasury-details .treasury-stack .chart-panel:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+#treasury-details .treasury-stack .chart-header h3 {
+  font-size: 22px;
+}
+
 .line-chart text {
   fill: #64748b;
   font-size: 12px;
@@ -1282,6 +1294,7 @@ footer {
   .curated-snapshot-grid,
   .curated-chart-grid,
   .charts-stack > .analysis-disclosure .analysis-disclosure-content > .charts-stack,
+  #treasury-details .treasury-stack,
   .chart-stats,
   .momentum-summary,
   .module-lights,
