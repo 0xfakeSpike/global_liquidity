@@ -1036,6 +1036,14 @@ footer {
   width: 100%;
 }
 
+.charts-stack > .analysis-disclosure .analysis-disclosure-content > .charts-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.charts-stack > .analysis-disclosure .chart-header h3 {
+  font-size: 22px;
+}
+
 .curated-detail {
   display: grid;
   gap: 16px;
@@ -1236,6 +1244,7 @@ footer {
   .composition-grid,
   .curated-snapshot-grid,
   .curated-chart-grid,
+  .charts-stack > .analysis-disclosure .analysis-disclosure-content > .charts-stack,
   .chart-stats,
   .momentum-summary,
   .module-lights,
