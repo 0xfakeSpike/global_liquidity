@@ -3,6 +3,7 @@ import { formatNumber } from "../lib/format";
 import { dateTicks, type DateRange } from "../lib/chartAxis";
 import { gridTicks } from "../lib/chartGrid";
 import type { DataPoint } from "../types/liquidity";
+import { ChartRangeControl, recentRange, type ChartRangeYears } from "./ChartRangeControl";
 
 interface MultiLineSeries {
   label: string;
@@ -18,6 +19,7 @@ interface MultiLineChartProps {
 }
 
 export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: MultiLineChartProps) {
+  const [rangeYears, setRangeYears] = useState<ChartRangeYears>(5);
   const [hovered, setHovered] = useState<{
     date: string;
     items: { label: string; color: string; point: DataPoint }[];
@@ -35,14 +37,22 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
     return <div className="chart-empty">暂无数据</div>;
   }
 
-  const values = points.map((point) => point.value);
+  const lastDate = points.reduce((last, point) => (point.date > last ? point.date : last), points[0].date);
+  const endDate = dateRange?.end ?? lastDate;
+  const visibleRange = recentRange(endDate, rangeYears);
+  const visibleSeries = series.map((item) => ({
+    ...item,
+    points: item.points.filter((point) => point.date >= visibleRange.start && point.date <= visibleRange.end)
+  }));
+  const visiblePoints = visibleSeries.flatMap((item) => item.points);
+  const plottedSeries = visiblePoints.length > 0 ? visibleSeries : series;
+  const plottedPoints = visiblePoints.length > 0 ? visiblePoints : points;
+  const values = plottedPoints.map((point) => point.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1;
-  const firstDate = points.reduce((first, point) => (point.date < first ? point.date : first), points[0].date);
-  const lastDate = points.reduce((last, point) => (point.date > last ? point.date : last), points[0].date);
-  const domainStartLabel = dateRange?.start ?? firstDate;
-  const domainEndLabel = dateRange?.end ?? lastDate;
+  const domainStartLabel = visibleRange.start;
+  const domainEndLabel = visibleRange.end;
   const domainStart = Date.parse(`${domainStartLabel}T00:00:00Z`);
   const domainEnd = Date.parse(`${domainEndLabel}T00:00:00Z`);
   const domainRange = domainEnd - domainStart || 1;
@@ -67,8 +77,8 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
     const rawX = ((event.clientX - rect.left) / rect.width) * width;
     const x = Math.max(padding.left, Math.min(width - padding.right, rawX));
     const timestamp = domainStart + ((x - padding.left) / usableWidth) * domainRange;
-    const anchor = nearestPoint(points, timestamp);
-    const items = series
+    const anchor = nearestPoint(plottedPoints, timestamp);
+    const items = plottedSeries
       .map((item) => {
         if (item.points.length === 0) return null;
         return { label: item.label, color: item.color, point: nearestPoint(item.points, timestamp) };
@@ -95,6 +105,7 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
 
   return (
     <div className="multi-chart-wrap">
+      <ChartRangeControl onChange={setRangeYears} value={rangeYears} />
       <div className="chart-interactive-wrap" onPointerLeave={() => setHovered(null)} onPointerMove={handlePointerMove}>
       <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={valueLabel ?? "叠加走势图"}>
         {yTicks.map((tick) => {
@@ -108,7 +119,7 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
             </g>
           );
         })}
-        {series.map((item) => {
+        {plottedSeries.map((item) => {
           const latest = item.points.at(-1);
           return (
             <g key={item.label}>
@@ -166,7 +177,7 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
       ) : null}
       </div>
       <div className="multi-chart-legend">
-        {series.map((item) => (
+        {plottedSeries.map((item) => (
           <span key={item.label}>
             <i style={{ background: item.color }} />
             {item.label}

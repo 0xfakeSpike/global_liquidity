@@ -3,6 +3,7 @@ import type { DataPoint } from "../types/liquidity";
 import { formatNumber } from "../lib/format";
 import { dateTicks, type DateRange } from "../lib/chartAxis";
 import { gridTicks } from "../lib/chartGrid";
+import { ChartRangeControl, recentRange, type ChartRangeYears } from "./ChartRangeControl";
 
 interface LineChartProps {
   series: DataPoint[];
@@ -13,6 +14,7 @@ interface LineChartProps {
 }
 
 export function LineChart({ series, color = "#2563eb", dateRange, height = 240, valueLabel }: LineChartProps) {
+  const [rangeYears, setRangeYears] = useState<ChartRangeYears>(5);
   const [hovered, setHovered] = useState<{ point: DataPoint; x: number; y: number; tooltipX: number; tooltipY: number } | null>(
     null
   );
@@ -24,16 +26,20 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
     return <div className="chart-empty">暂无数据</div>;
   }
 
-  const values = series.map((point) => point.value);
+  const endDate = dateRange?.end ?? series.at(-1)?.date ?? series[0].date;
+  const visibleRange = recentRange(endDate, rangeYears);
+  const visibleSeries = series.filter((point) => point.date >= visibleRange.start && point.date <= visibleRange.end);
+  const plottedSeries = visibleSeries.length > 0 ? visibleSeries : series;
+  const values = plottedSeries.map((point) => point.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1;
-  const domainStart = Date.parse(`${dateRange?.start ?? series[0]?.date}T00:00:00Z`);
-  const domainEnd = Date.parse(`${dateRange?.end ?? series.at(-1)?.date}T00:00:00Z`);
+  const domainStart = Date.parse(`${visibleRange.start}T00:00:00Z`);
+  const domainEnd = Date.parse(`${visibleRange.end}T00:00:00Z`);
   const domainRange = domainEnd - domainStart || 1;
   const domainLabels = {
-    start: dateRange?.start ?? series[0]?.date,
-    end: dateRange?.end ?? series.at(-1)?.date ?? series[0]?.date
+    start: visibleRange.start,
+    end: visibleRange.end
   };
   const ticks = dateTicks(domainLabels);
   const yTicks = gridTicks(min, max);
@@ -46,11 +52,11 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
 
   const nearestPoint = (x: number) => {
     const timestamp = domainStart + ((x - padding.left) / usableWidth) * domainRange;
-    return series.reduce((nearest, point) => {
+    return plottedSeries.reduce((nearest, point) => {
       const distance = Math.abs(Date.parse(`${point.date}T00:00:00Z`) - timestamp);
       const nearestDistance = Math.abs(Date.parse(`${nearest.date}T00:00:00Z`) - timestamp);
       return distance < nearestDistance ? point : nearest;
-    }, series[0]);
+    }, plottedSeries[0]);
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -69,7 +75,7 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
     });
   };
 
-  const path = series
+  const path = plottedSeries
     .map((point, index) => {
       const x = xForDate(point.date);
       const y = padding.top + (1 - (point.value - min) / range) * usableHeight;
@@ -77,10 +83,12 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
     })
     .join(" ");
 
-  const latest = series[series.length - 1];
+  const latest = plottedSeries[plottedSeries.length - 1];
 
   return (
-    <div className="chart-interactive-wrap" onPointerLeave={() => setHovered(null)} onPointerMove={handlePointerMove}>
+    <div className="chart-shell">
+      <ChartRangeControl onChange={setRangeYears} value={rangeYears} />
+      <div className="chart-interactive-wrap" onPointerLeave={() => setHovered(null)} onPointerMove={handlePointerMove}>
       <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={valueLabel ?? "指标走势图"}>
       {yTicks.map((tick) => {
         const y = yForValue(tick);
@@ -128,6 +136,7 @@ export function LineChart({ series, color = "#2563eb", dateRange, height = 240, 
           <span>{formatNumber(hovered.point.value, 3)}</span>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }
