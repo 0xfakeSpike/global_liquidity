@@ -1147,12 +1147,12 @@ footer {
 }
 
 .treasury-core-grid .holder-panel {
-  grid-template-columns: minmax(0, 1fr) 190px;
-  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
 }
 
 .treasury-core-grid .holder-copy {
-  grid-column: 1 / -1;
+  grid-column: auto;
 }
 
 .treasury-core-grid .pie-wrap {
@@ -1161,9 +1161,11 @@ footer {
 
 .treasury-core-grid .holder-list {
   align-content: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .treasury-core-grid .holder-list a {
+  align-content: start;
   padding: 9px 10px;
 }
 
@@ -1292,6 +1294,10 @@ footer {
   .hero-grid,
   .composite-grid,
   .holder-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .treasury-core-grid .holder-list {
     grid-template-columns: 1fr;
   }
 }
