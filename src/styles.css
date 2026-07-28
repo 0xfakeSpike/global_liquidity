@@ -1141,6 +1141,36 @@ footer {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.treasury-core-grid > * {
+  height: 100%;
+  margin: 0;
+}
+
+.treasury-core-grid .holder-panel {
+  grid-template-columns: minmax(0, 1fr) 190px;
+  grid-template-rows: auto 1fr;
+}
+
+.treasury-core-grid .holder-copy {
+  grid-column: 1 / -1;
+}
+
+.treasury-core-grid .pie-wrap {
+  align-self: center;
+}
+
+.treasury-core-grid .holder-list {
+  align-content: center;
+}
+
+.treasury-core-grid .holder-list a {
+  padding: 9px 10px;
+}
+
+.treasury-core-grid .holder-list small {
+  display: none;
+}
+
 .treasury-core-grid .chart-header h3 {
   font-size: 22px;
 }
@@ -1339,5 +1369,13 @@ footer {
 @media (max-width: 520px) {
   .treasury-core-grid {
     grid-template-columns: 1fr;
+  }
+
+  .treasury-core-grid .holder-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .treasury-core-grid .holder-copy {
+    grid-column: auto;
   }
 }

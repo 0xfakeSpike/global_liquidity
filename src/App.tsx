@@ -696,23 +696,23 @@ function TreasuryMarketTerminal({
       <div className="overlay-note">
         美债页分成三条主线：财政供给压力、投资者吸收结构、收益率曲线定价。规模类指标看供给，持有人结构看需求，长短端利率看资产定价锚。
       </div>
-      {holderShares.length > 0 ? (
-        <HolderSharePanel
-          description="这里把公众持有美债拆成美国国内私人部门、海外与国际投资者、Federal Reserve Banks。若海外份额下降而发行继续上升，市场需要更多国内资金或更高收益率来吸收供给。"
-          eyebrow="Ownership Structure"
-          shares={holderShares}
-          title="美债持有人份额"
-        />
-      ) : null}
-      {foreignHolderShares.length > 0 ? (
-        <HolderSharePanel
-          description="这里继续拆分海外与国际投资者，展示 TIC Table 5 中最新一期主要国家/地区持有的美国国债。注意 TIC 按托管/报告地统计，不一定等于最终受益所有人。"
-          eyebrow="Foreign Holders"
-          shares={foreignHolderShares}
-          title="海外主要持有人细分"
-        />
-      ) : null}
       <div className="treasury-core-grid">
+        {holderShares.length > 0 ? (
+          <HolderSharePanel
+            description="把公众持有美债拆成美国国内私人部门、海外与国际投资者和 Federal Reserve Banks，用于观察新增供给由谁吸收。"
+            eyebrow="Ownership Structure"
+            shares={holderShares}
+            title="美债持有人份额"
+          />
+        ) : null}
+        {foreignHolderShares.length > 0 ? (
+          <HolderSharePanel
+            description="拆分海外主要国家和地区持仓；TIC 按托管或报告地统计，不一定等于最终受益所有人。"
+            eyebrow="Foreign Holders"
+            shares={foreignHolderShares}
+            title="海外主要持有人细分"
+          />
+        ) : null}
         {charts.map((chart) => (
           <section className="chart-panel" key={chart.title}>
             <div className="chart-header">
