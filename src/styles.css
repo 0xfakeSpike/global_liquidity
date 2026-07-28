@@ -1292,7 +1292,6 @@ footer {
   .curated-snapshot-grid,
   .curated-chart-grid,
   .charts-stack > .analysis-disclosure .analysis-disclosure-content > .charts-stack,
-  .treasury-core-grid,
   .chart-stats,
   .momentum-summary,
   .module-lights,
@@ -1334,5 +1333,11 @@ footer {
 
   .latest-value {
     text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .treasury-core-grid {
+    grid-template-columns: 1fr;
   }
 }
