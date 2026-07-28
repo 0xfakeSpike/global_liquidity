@@ -629,6 +629,14 @@ footer {
   gap: 18px;
 }
 
+.global-dashboard > .charts-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.global-dashboard > .charts-stack > .analysis-disclosure {
+  grid-column: 1 / -1;
+}
+
 .dashboard-hero {
   align-items: stretch;
   background: #fff;
@@ -1411,6 +1419,7 @@ footer {
   .event-grid,
   .curated-snapshot-grid,
   .curated-chart-grid,
+  .global-dashboard > .charts-stack,
   .charts-stack > .analysis-disclosure .analysis-disclosure-content > .charts-stack,
   .chart-stats,
   .momentum-summary,
