@@ -698,6 +698,60 @@ footer {
   font-size: 20px;
 }
 
+.capex-dashboard {
+  display: grid;
+  gap: 18px;
+}
+
+.capex-dashboard-hero strong {
+  font-size: 52px;
+}
+
+.capex-component-grid,
+.capex-chart-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.capex-component-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.capex-chart-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.capex-component-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+}
+
+.capex-component-card span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.capex-component-card strong {
+  color: #0f172a;
+  font-size: 28px;
+}
+
+.capex-component-card b {
+  color: #0f766e;
+  font-size: 13px;
+}
+
+.capex-component-card p {
+  color: #64748b;
+  font-size: 12px;
+  margin: 0;
+}
+
 .dashboard-hero {
   align-items: stretch;
   background: #fff;
@@ -1454,6 +1508,10 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .capex-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
   .treasury-core-grid .holder-list {
     grid-template-columns: 1fr;
   }
@@ -1484,6 +1542,7 @@ footer {
   .event-grid,
   .risk-detail-grid,
   .risk-momentum-grid,
+  .capex-component-grid,
   .curated-snapshot-grid,
   .curated-chart-grid,
   .global-dashboard > .charts-stack,

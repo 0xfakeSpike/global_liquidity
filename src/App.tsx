@@ -29,7 +29,7 @@ const markets: Record<
   }
 > = {
   combined: {
-    label: "全球驾驶舱",
+    label: "宏观流动性",
     eyebrow: "全球风险流动性仪表盘",
     title: "全球风险流动性驾驶舱",
     description: "汇总美元、日元、美债与风险市场，用红黄绿灯回答全球流动性现在是顺风还是逆风。",
@@ -37,7 +37,7 @@ const markets: Record<
     updateLabel: "工作日自动更新"
   },
   usd: {
-    label: "美元明细",
+    label: "美元流动性",
     eyebrow: "美元全球流动性监控",
     title: "把 Fed 资产、TGA、ON RRP、融资压力和风险价格放到一张表里。",
     description: "每张图表按指标依次展开，构建阶段自动更新公开数据，页面端读取最新发布快照。",
@@ -45,7 +45,7 @@ const markets: Record<
     updateLabel: "Build-time JSON"
   },
   jpy: {
-    label: "日元明细",
+    label: "日元流动性",
     eyebrow: "日元全球流动性监控",
     title: "把 BOJ 资产、基础货币、当座存款、广义流动性和日元融资压力放到一张表里。",
     description: "数据来自 BOJ 官方统计 API 与 FRED 镜像序列，构建阶段生成日元流动性快照。",
@@ -53,7 +53,7 @@ const markets: Record<
     updateLabel: "Build-time JSON"
   },
   treasury: {
-    label: "美债明细",
+    label: "美债市场",
     eyebrow: "美国国债市场监控",
     title: "把债务规模、持有人结构、收益率曲线和财政利息成本放到一页里。",
     description: "跟踪美债供给、谁在吸收美债、长短端利率和曲线形态，观察美元资产定价的底层锚。",
@@ -67,11 +67,20 @@ const markets: Record<
     description: "三条价格曲线按首个可用日期归一为 100，用来观察风险资产之间的相对强弱和节奏。",
     sourceLabel: "FRED / Yahoo",
     updateLabel: "Normalized prices"
+  },
+  capex: {
+    label: "资本开支",
+    eyebrow: "美国企业资本开支",
+    title: "观察美国非住宅固定投资的总量、增速与结构。",
+    description: "使用 BEA 季度数据拆分建筑、设备和知识产权投资。",
+    sourceLabel: "BEA / FRED",
+    updateLabel: "Quarterly"
   }
 };
 
 function initialMarket(): ViewMode {
-  if (window.location.hash.includes("risk")) return "risk";
+  const hash = window.location.hash.replace("#", "") as ViewMode;
+  if (hash in markets) return hash;
   return "combined";
 }
 
@@ -112,8 +121,6 @@ function App() {
     return new Map(dataset?.snapshots.map((snapshot) => [snapshot.key, snapshot]) ?? []);
   }, [dataset]);
 
-  const marketConfig = markets[market];
-
   if (market !== "combined" && !dataset) {
     return <div className="loading">Loading liquidity monitor...</div>;
   }
@@ -144,16 +151,14 @@ function App() {
 
   return (
     <main>
-      <header className={`hero ${market === "combined" || market === "risk" ? "hero-compact" : ""}`}>
+      <header className="hero hero-compact">
         <nav>
           <div className="brand">
             <Activity size={21} />
             <span>Global Liquidity Monitor</span>
           </div>
           <div className="market-tabs" aria-label="liquidity market">
-            {Object.entries(markets)
-              .filter(([key]) => key === "combined" || key === "risk")
-              .map(([key, item]) => (
+            {Object.entries(markets).map(([key, item]) => (
               <button
                 className={key === market ? "active" : ""}
                 key={key}
@@ -162,7 +167,7 @@ function App() {
               >
                 {item.label}
               </button>
-              ))}
+            ))}
           </div>
           <div className="nav-meta">
             {market === "combined" ? (
@@ -199,21 +204,7 @@ function App() {
           </div>
         </nav>
 
-        {market !== "combined" && market !== "risk" ? (
-          <section className="hero-grid">
-            <div className="hero-copy">
-              <p className="eyebrow">{marketConfig.eyebrow}</p>
-              <h1>{marketConfig.title}</h1>
-              <p className="hero-text">{marketConfig.description}</p>
-              <div className="hero-actions">
-                <a href="#terminal">查看图表</a>
-              </div>
-            </div>
-          </section>
-        ) : null}
       </header>
-
-      {market === "combined" ? <GlobalCompositionNav /> : null}
 
       {market !== "combined" && rateCharts.length > 0 ? (
         <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
@@ -238,35 +229,11 @@ function App() {
             usd={pairedDatasets.usd}
             upcomingEvents={upcomingEvents}
           />
-          <AnalysisDisclosure
-            title="01 · 美元流动性底表"
-            description="保留净流动性、TGA、M2 与融资压力四项核心证据。"
-          >
-            <CuratedLiquidityDetail
-              dataset={pairedDatasets.usd}
-              keys={["netLiquidity", "tga", "m2", "sofrIorb"]}
-              id="usd-details"
-            />
-          </AnalysisDisclosure>
-          <AnalysisDisclosure
-            title="02 · 日元流动性底表"
-            description="保留 BOJ 资产、日本 M2、USD/JPY 与 JGB 10Y 四项核心证据。"
-          >
-            <CuratedLiquidityDetail
-              dataset={pairedDatasets.jpy}
-              keys={["bojAssets", "m2Japan", "usdJpy", "jgb10y"]}
-              id="jpy-details"
-            />
-          </AnalysisDisclosure>
-          <AnalysisDisclosure
-            title="03 · 美债市场底表"
-            description="保留债务规模、利息成本、收益率曲线与持有人结构。"
-          >
-            <CuratedTreasuryDetail dataset={pairedDatasets.treasury} />
-          </AnalysisDisclosure>
         </>
       ) : market === "risk" ? (
         <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} />
+      ) : market === "capex" ? (
+        <CapexTerminal charts={activeDataset.capexCharts ?? []} dateRange={activeDataset.dateRange} />
       ) : market === "treasury" ? (
         <TreasuryMarketTerminal
           charts={treasuryCharts}
@@ -328,30 +295,6 @@ function App() {
         <span>仅供研究与教育用途，不构成投资建议。</span>
       </footer>
     </main>
-  );
-}
-
-function GlobalCompositionNav() {
-  return (
-    <section className="market-composition" aria-label="全球流动性页面目录">
-      <div className="composition-grid">
-        <a href="#usd-details">
-          <span>美元流动性</span>
-          <p>Fed、TGA、ON RRP、M2 与美元融资条件</p>
-          <b>页内查看 ↓</b>
-        </a>
-        <a href="#jpy-details">
-          <span>日元流动性</span>
-          <p>BOJ、日元货币供应与 Carry 融资压力</p>
-          <b>页内查看 ↓</b>
-        </a>
-        <a href="#treasury-details">
-          <span>美债市场</span>
-          <p>债务供给、持有人、收益率曲线与利息成本</p>
-          <b>页内查看 ↓</b>
-        </a>
-      </div>
-    </section>
   );
 }
 
@@ -771,6 +714,76 @@ function riskBreadthText(positive: number, total: number) {
   if (positive >= 2) return "风险偏好有一定广度";
   if (positive === 1) return "局部上涨，尚未形成共振";
   return "风险偏好同步收缩";
+}
+
+function CapexTerminal({
+  charts,
+  dateRange
+}: {
+  charts: InterestRateChart[];
+  dateRange: LiquidityDataset["dateRange"];
+}) {
+  const total = charts.flatMap((chart) => chart.series).find((series) => series.key === "capexTotal");
+  const components = charts
+    .flatMap((chart) => chart.series)
+    .filter((series) => ["capexStructures", "capexEquipment", "capexIntellectualProperty"].includes(series.key));
+  const latestTotal = total?.points.at(-1);
+  const totalYoy = total ? percentChangeSeries(total.points, 365).at(-1)?.value ?? null : null;
+
+  return (
+    <section className="terminal capex-dashboard" id="terminal">
+      <div className="dashboard-hero capex-dashboard-hero">
+        <div>
+          <span>资本开支总量</span>
+          <strong>{formatNumber(latestTotal?.value, 2)}</strong>
+          <p>万亿美元 · 季调年化</p>
+        </div>
+        <div className="dashboard-rule">
+          <b>同比 {formatSignedPercent(totalYoy)}</b>
+          <p>总量回答企业投入是否扩张，建筑、设备和知识产权结构回答资本正在流向实体产能、生产工具还是软件与研发。</p>
+        </div>
+      </div>
+      <div className="capex-component-grid">
+        {components.map((series) => {
+          const latest = series.points.at(-1);
+          const share = latestTotal?.value && latest ? (latest.value / latestTotal.value) * 100 : null;
+          const yoy = percentChangeSeries(series.points, 365).at(-1)?.value ?? null;
+          return (
+            <div className="capex-component-card" key={series.key}>
+              <span>{series.label}</span>
+              <strong>{formatNumber(latest?.value, 2)}</strong>
+              <b>占比 {share === null ? "n/a" : `${formatNumber(share, 1)}%`}</b>
+              <p>同比 {formatSignedPercent(yoy)}</p>
+            </div>
+          );
+        })}
+      </div>
+      <div className="capex-chart-grid">
+        {charts.map((chart) => (
+          <section className="chart-panel" key={chart.title}>
+            <div className="chart-header">
+              <div>
+                <span>BEA / Quarterly SAAR</span>
+                <h3>{chart.title}</h3>
+              </div>
+            </div>
+            <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
+            <div className="rate-sources">
+              {chart.series.map((series) => {
+                const latest = series.points.at(-1);
+                return (
+                  <a href={series.sourceUrl} key={series.key} rel="noreferrer" target="_blank">
+                    <strong>{series.label}</strong>
+                    <span>{latest ? `${latest.date} ${formatNumber(latest.value, 3)}` : "n/a"} · {series.source}</span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function TreasuryMarketTerminal({

@@ -479,6 +479,53 @@ const riskDefinitions = [
   }
 ];
 
+const capexDefinitions = [
+  {
+    key: "capexTotal",
+    fredId: "PNFI",
+    label: "非住宅固定投资",
+    unit: "万亿美元年化",
+    source: "FRED PNFI / U.S. Bureau of Economic Analysis",
+    sourceUrl: "https://fred.stlouisfed.org/series/PNFI",
+    scale: 1 / 1_000,
+    color: "#0f766e",
+    description: "美国私人非住宅固定投资总额，季度频率、季调年化。"
+  },
+  {
+    key: "capexStructures",
+    fredId: "B009RC1Q027SBEA",
+    label: "建筑",
+    unit: "万亿美元年化",
+    source: "FRED B009RC1Q027SBEA / U.S. BEA",
+    sourceUrl: "https://fred.stlouisfed.org/series/B009RC1Q027SBEA",
+    scale: 1 / 1_000,
+    color: "#dc2626",
+    description: "厂房、商业建筑和其他非住宅建筑投资。"
+  },
+  {
+    key: "capexEquipment",
+    fredId: "Y033RC1Q027SBEA",
+    label: "设备",
+    unit: "万亿美元年化",
+    source: "FRED Y033RC1Q027SBEA / U.S. BEA",
+    sourceUrl: "https://fred.stlouisfed.org/series/Y033RC1Q027SBEA",
+    scale: 1 / 1_000,
+    color: "#2563eb",
+    description: "企业生产设备、信息处理设备和运输设备等投资。"
+  },
+  {
+    key: "capexIntellectualProperty",
+    fredId: "Y001RC1Q027SBEA",
+    label: "知识产权",
+    unit: "万亿美元年化",
+    source: "FRED Y001RC1Q027SBEA / U.S. BEA",
+    sourceUrl: "https://fred.stlouisfed.org/series/Y001RC1Q027SBEA",
+    scale: 1 / 1_000,
+    color: "#7c3aed",
+    description: "软件、研发以及娱乐、文学和艺术原作等知识产权投资。"
+  }
+];
+
 const treasuryDefinitions = [
   {
     key: "totalPublicDebt",
@@ -913,6 +960,7 @@ async function main() {
   await writeDataset("yen-liquidity.json", await buildJpyDataset());
   await writeDataset("risk-markets.json", await buildRiskDataset());
   await writeDataset("treasury-markets.json", await buildTreasuryDataset());
+  await writeDataset("capex.json", await buildCapexDataset());
 }
 
 async function fetchSeriesForDefinitions(definitionsForFetch) {
@@ -1074,6 +1122,34 @@ function riskMarketCharts(seriesMap) {
       }
     ]
   }));
+}
+
+function capexSeries(definition, seriesMap) {
+  return {
+    key: definition.key,
+    label: definition.label,
+    color: definition.color,
+    unit: definition.unit,
+    source: definition.source,
+    sourceUrl: definition.sourceUrl,
+    description: definition.description,
+    points: [...(seriesMap.get(definition.key) ?? [])].sort((a, b) => a.date.localeCompare(b.date))
+  };
+}
+
+function capexMarketCharts(seriesMap) {
+  return [
+    {
+      title: "美国企业资本开支总量",
+      description: "私人非住宅固定投资总额，按季度季调年化展示。",
+      series: [capexSeries(capexDefinitions[0], seriesMap)]
+    },
+    {
+      title: "资本开支构成",
+      description: "将资本开支拆分为建筑、设备和知识产权，观察增长由实体扩产还是数字与研发投资驱动。",
+      series: capexDefinitions.slice(1).map((definition) => capexSeries(definition, seriesMap))
+    }
+  ];
 }
 
 function treasurySeries(definition, seriesMap) {
@@ -1345,6 +1421,32 @@ async function buildRiskDataset() {
     notes: [
       "风险市场页使用归一化价格曲线，不参与美元或日元流动性评分。",
       "BTC 和纳斯达克综合指数来自 FRED；恒生科技指数使用可自动更新的 3033.HK ETF 作为跟踪代理。"
+    ]
+  };
+}
+
+async function buildCapexDataset() {
+  const seriesMap = await fetchSeriesForDefinitions(capexDefinitions);
+  const total = seriesMap.get("capexTotal") ?? [];
+  return {
+    generatedAt: new Date().toISOString(),
+    lookbackYears,
+    dateRange: {
+      start: startIso,
+      end: endIso
+    },
+    indicators: [],
+    snapshots: [],
+    capexCharts: capexMarketCharts(seriesMap),
+    composite: {
+      score: null,
+      label: "资本开支",
+      date: total.at(-1)?.date ?? endIso,
+      series: []
+    },
+    notes: [
+      "资本开支采用美国 BEA 私人非住宅固定投资口径，数据为季度、季节调整年化值。",
+      "总量由建筑、设备和知识产权产品构成；名义金额适合观察投入规模，不能直接等同于实际产能增长。"
     ]
   };
 }

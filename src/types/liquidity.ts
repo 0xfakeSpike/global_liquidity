@@ -91,6 +91,7 @@ export interface LiquidityDataset {
   inflationCharts?: InterestRateChart[];
   riskCharts?: InterestRateChart[];
   treasuryCharts?: InterestRateChart[];
+  capexCharts?: InterestRateChart[];
   holderShares?: HolderShare[];
   foreignHolderShares?: HolderShare[];
   composite: {
