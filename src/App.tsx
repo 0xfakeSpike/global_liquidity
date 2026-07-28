@@ -1253,9 +1253,9 @@ function GlobalLiquidityDashboard({
     { label: "30Y下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)) }
   ]);
   const riskConfirmation = [
-    { label: "Nasdaq", color: "#2563eb", points: nasdaq?.points ?? [] },
-    { label: "HSTECH代理", color: "#16a34a", points: hangSengTech?.points ?? [] },
-    { label: "BTC", color: "#f59e0b", points: btc?.points ?? [] }
+    { label: "Nasdaq", color: "#2563eb", points: cumulativeLogReturn(nasdaq?.points ?? []) },
+    { label: "HSTECH代理", color: "#16a34a", points: cumulativeLogReturn(hangSengTech?.points ?? []) },
+    { label: "BTC", color: "#f59e0b", points: cumulativeLogReturn(btc?.points ?? []) }
   ];
 
   return (
@@ -1385,10 +1385,10 @@ function GlobalLiquidityDashboard({
                   <h3>风险资产确认</h3>
                 </div>
               </div>
-              <MultiLineChart series={riskConfirmation} dateRange={risk.dateRange} valueLabel="风险资产确认" />
+              <MultiLineChart series={riskConfirmation} dateRange={risk.dateRange} valueLabel="累计对数收益率（%）" />
               <div className="interpretation">
                 <strong>当前解读</strong>
-                <p>风险确认不直接决定宏观总分。它回答另一个问题：流动性判断是否已经被 Nasdaq、港科和 BTC 的价格行为确认。</p>
+                <p>三项资产统一转换为累计对数收益率，压缩 BTC 极端涨幅的视觉影响，同时保持三者方向与相对强弱可比。</p>
               </div>
             </section>
           </div>
@@ -1707,6 +1707,14 @@ function percentChangeSeries(series: DataPoint[], days: number) {
       return { date: point.date, value: ((point.value / base) - 1) * 100 };
     })
     .filter(Boolean) as DataPoint[];
+}
+
+function cumulativeLogReturn(series: DataPoint[]) {
+  const base = series.find((point) => point.value > 0)?.value;
+  if (!base) return [];
+  return series
+    .filter((point) => point.value > 0)
+    .map((point) => ({ date: point.date, value: Math.log(point.value / base) * 100 }));
 }
 
 function invertSeries(series: DataPoint[]) {
