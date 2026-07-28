@@ -710,7 +710,7 @@ function RiskMarketTerminal({
           />
           <div className="interpretation">
             <strong>当前解读</strong>
-            <p>三项统一使用累计对数收益率，既压缩 BTC 的极端涨幅，也保留跨资产方向、拐点和相对强弱的可比性。</p>
+            <p>三项从所选窗口内的共同首个交易日统一归零，再计算累计对数收益率，比较方向、拐点和相对强弱。</p>
           </div>
         </section>
         <AnalysisDisclosure title="查看单资产原始曲线" description="按各自纵轴查看价格路径、最新值与官方数据源。">
@@ -1441,7 +1441,7 @@ function GlobalLiquidityDashboard({
               />
               <div className="interpretation">
                 <strong>当前解读</strong>
-                <p>三项资产统一转换为累计对数收益率，压缩 BTC 极端涨幅的视觉影响，同时保持三者方向与相对强弱可比。</p>
+                <p>三项资产从共同首个交易日统一归零，再转换为累计对数收益率，避免不同数据起点扭曲相对表现。</p>
               </div>
             </section>
           </div>

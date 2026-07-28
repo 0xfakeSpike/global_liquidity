@@ -45,16 +45,25 @@ export function MultiLineChart({ series, dateRange, height = 260, transform, val
     ...item,
     points: item.points.filter((point) => point.date >= visibleRange.start && point.date <= visibleRange.end)
   }));
+  const commonStart =
+    transform === "log-return"
+      ? filteredSeries
+          .map((item) => item.points.find((point) => point.value > 0)?.date)
+          .filter((date): date is string => Boolean(date))
+          .sort()
+          .at(-1)
+      : undefined;
   const visibleSeries =
     transform === "log-return"
       ? filteredSeries.map((item) => {
-          const base = item.points.find((point) => point.value > 0)?.value;
+          const comparablePoints = commonStart
+            ? item.points.filter((point) => point.date >= commonStart && point.value > 0)
+            : [];
+          const base = comparablePoints[0]?.value;
           return {
             ...item,
             points: base
-              ? item.points
-                  .filter((point) => point.value > 0)
-                  .map((point) => ({ date: point.date, value: Math.log(point.value / base) * 100 }))
+              ? comparablePoints.map((point) => ({ date: point.date, value: Math.log(point.value / base) * 100 }))
               : []
           };
         })
@@ -66,7 +75,7 @@ export function MultiLineChart({ series, dateRange, height = 260, transform, val
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = max - min || 1;
-  const domainStartLabel = visibleRange.start;
+  const domainStartLabel = transform === "log-return" && commonStart ? commonStart : visibleRange.start;
   const domainEndLabel = visibleRange.end;
   const domainStart = Date.parse(`${domainStartLabel}T00:00:00Z`);
   const domainEnd = Date.parse(`${domainEndLabel}T00:00:00Z`);
