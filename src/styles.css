@@ -50,11 +50,11 @@ main {
 }
 
 .hero-compact {
-  padding-bottom: 10px;
+  padding-bottom: 0;
 }
 
 .hero-compact nav {
-  margin-bottom: 22px;
+  margin-bottom: 8px;
 }
 
 .hero-compact h1 {
@@ -245,7 +245,7 @@ footer {
 .market-composition {
   margin: 0 auto;
   max-width: 1240px;
-  padding: 18px clamp(18px, 4vw, 56px) 22px;
+  padding: 12px clamp(18px, 4vw, 56px) 18px;
 }
 
 .composition-heading {

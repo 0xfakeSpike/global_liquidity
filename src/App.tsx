@@ -191,17 +191,19 @@ function App() {
           </div>
         </nav>
 
-        <section className="hero-grid">
-          <div className="hero-copy">
-            <p className="eyebrow">{marketConfig.eyebrow}</p>
-            <h1>{marketConfig.title}</h1>
-            <p className="hero-text">{marketConfig.description}</p>
-            <div className={`hero-actions ${market === "combined" ? "secondary-actions" : ""}`}>
-              <a href="#terminal">查看当前结论</a>
-              <a href="#data-methodology">数据与口径</a>
+        {market !== "combined" ? (
+          <section className="hero-grid">
+            <div className="hero-copy">
+              <p className="eyebrow">{marketConfig.eyebrow}</p>
+              <h1>{marketConfig.title}</h1>
+              <p className="hero-text">{marketConfig.description}</p>
+              <div className="hero-actions">
+                <a href="#terminal">查看图表</a>
+                <a href="#data-methodology">数据与口径</a>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : null}
       </header>
 
       <section className="metric-strip" id="data-methodology">
@@ -344,13 +346,6 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 function GlobalCompositionNav() {
   return (
     <section className="market-composition" aria-label="全球流动性页面目录">
-      <div className="composition-heading">
-        <span>Dashboard Components</span>
-        <div>
-          <h2>先看结论，需要时再查底表</h2>
-          <p>默认只展示总评分和关键驱动；美元、日元与美债原始指标按需展开。</p>
-        </div>
-      </div>
       <div className="composition-grid">
         <a href="#usd-details">
           <span>美元流动性</span>
@@ -690,11 +685,7 @@ function TreasuryMarketTerminal({
   return (
     <section className="terminal" id="terminal">
       <div className="section-heading">
-        <p>Treasury Market Terminal</p>
         <h2>美债市场核心指标</h2>
-      </div>
-      <div className="overlay-note">
-        美债页分成三条主线：财政供给压力、投资者吸收结构、收益率曲线定价。规模类指标看供给，持有人结构看需求，长短端利率看资产定价锚。
       </div>
       <div className="treasury-core-grid">
         {holderShares.length > 0 ? (
@@ -1210,10 +1201,6 @@ function GlobalLiquidityDashboard({
 
   return (
     <section className="terminal global-dashboard" id="terminal">
-      <div className="section-heading">
-        <p>Global Risk Liquidity Cockpit</p>
-        <h2>全球风险流动性驾驶舱</h2>
-      </div>
       <div className={`dashboard-hero tone-${globalTone}`}>
         <div>
           <span>总评分</span>
