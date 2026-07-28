@@ -714,7 +714,7 @@ footer {
 }
 
 .capex-component-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .capex-chart-grid {
@@ -750,6 +750,62 @@ footer {
   color: #64748b;
   font-size: 12px;
   margin: 0;
+}
+
+.capex-commitments {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.commitment-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.commitment-list a {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 11px;
+}
+
+.commitment-list a div {
+  display: grid;
+  gap: 4px;
+}
+
+.commitment-list span,
+.commitment-list p,
+.commitment-warning {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.commitment-list strong {
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.commitment-list b {
+  color: #0f766e;
+  font-size: 14px;
+}
+
+.commitment-list p {
+  grid-column: 1 / -1;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.commitment-warning {
+  border-top: 1px solid #e2e8f0;
+  margin: 12px 0 0;
+  padding-top: 10px;
 }
 
 .dashboard-hero {
@@ -1510,6 +1566,10 @@ footer {
 
   .capex-chart-grid {
     grid-template-columns: 1fr;
+  }
+
+  .capex-component-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .treasury-core-grid .holder-list {

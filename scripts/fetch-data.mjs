@@ -479,50 +479,49 @@ const riskDefinitions = [
   }
 ];
 
-const capexDefinitions = [
+const aiCapexCompanies = [
+  { key: "alphabet", label: "Alphabet", cik: "0001652044", tag: "PaymentsToAcquirePropertyPlantAndEquipment", color: "#2563eb" },
+  { key: "microsoft", label: "Microsoft", cik: "0000789019", tag: "PaymentsToAcquirePropertyPlantAndEquipment", color: "#16a34a" },
+  { key: "amazon", label: "Amazon", cik: "0001018724", tag: "PaymentsToAcquireProductiveAssets", color: "#f59e0b" },
+  { key: "meta", label: "Meta", cik: "0001326801", tag: "PaymentsToAcquirePropertyPlantAndEquipment", color: "#7c3aed" }
+];
+
+const aiInvestmentCommitments = [
   {
-    key: "capexTotal",
-    fredId: "PNFI",
-    label: "非住宅固定投资",
-    unit: "万亿美元年化",
-    source: "FRED PNFI / U.S. Bureau of Economic Analysis",
-    sourceUrl: "https://fred.stlouisfed.org/series/PNFI",
-    scale: 1 / 1_000,
-    color: "#0f766e",
-    description: "美国私人非住宅固定投资总额，季度频率、季调年化。"
+    name: "Alphabet 2026 CapEx 指引",
+    amount: "1,750–1,850 亿美元",
+    horizon: "2026",
+    type: "公司指引",
+    announcedDate: "2026-02-04",
+    sourceUrl: "https://abc.xyz/investor/events/event-details/2026/2025-Q4-Earnings-Call-2026-Dr_C033hS6/default.aspx",
+    detail: "主要投向服务器、数据中心和网络设备；属于公司总 CapEx，并非全部为 AI。"
   },
   {
-    key: "capexStructures",
-    fredId: "B009RC1Q027SBEA",
-    label: "建筑",
-    unit: "万亿美元年化",
-    source: "FRED B009RC1Q027SBEA / U.S. BEA",
-    sourceUrl: "https://fred.stlouisfed.org/series/B009RC1Q027SBEA",
-    scale: 1 / 1_000,
-    color: "#dc2626",
-    description: "厂房、商业建筑和其他非住宅建筑投资。"
+    name: "Microsoft 2026 CapEx 指引",
+    amount: "约 1,900 亿美元",
+    horizon: "2026",
+    type: "公司指引",
+    announcedDate: "2026-04-29",
+    sourceUrl: "https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q3",
+    detail: "公司口径包含融资租赁，用于持续扩充云与 AI 容量。"
   },
   {
-    key: "capexEquipment",
-    fredId: "Y033RC1Q027SBEA",
-    label: "设备",
-    unit: "万亿美元年化",
-    source: "FRED Y033RC1Q027SBEA / U.S. BEA",
-    sourceUrl: "https://fred.stlouisfed.org/series/Y033RC1Q027SBEA",
-    scale: 1 / 1_000,
-    color: "#2563eb",
-    description: "企业生产设备、信息处理设备和运输设备等投资。"
+    name: "Stargate",
+    amount: "5,000 亿美元",
+    horizon: "2025–2028",
+    type: "产业项目",
+    announcedDate: "2025-01-21",
+    sourceUrl: "https://openai.com/index/announcing-the-stargate-project/",
+    detail: "OpenAI、SoftBank、Oracle、MGX 发起的美国 AI 基础设施多年投资意向。"
   },
   {
-    key: "capexIntellectualProperty",
-    fredId: "Y001RC1Q027SBEA",
-    label: "知识产权",
-    unit: "万亿美元年化",
-    source: "FRED Y001RC1Q027SBEA / U.S. BEA",
-    sourceUrl: "https://fred.stlouisfed.org/series/Y001RC1Q027SBEA",
-    scale: 1 / 1_000,
-    color: "#7c3aed",
-    description: "软件、研发以及娱乐、文学和艺术原作等知识产权投资。"
+    name: "欧盟 InvestAI",
+    amount: "2,000 亿欧元",
+    horizon: "多年计划",
+    type: "公共与私人动员",
+    announcedDate: "2025-02-11",
+    sourceUrl: "https://digital-strategy.ec.europa.eu/en/news/eu-launches-investai-initiative-mobilise-eu200-billion-investment-artificial-intelligence",
+    detail: "欧盟计划动员的公共与私人投资，其中包含 200 亿欧元 AI Gigafactories 基金。"
   }
 ];
 
@@ -1124,32 +1123,73 @@ function riskMarketCharts(seriesMap) {
   }));
 }
 
-function capexSeries(definition, seriesMap) {
-  return {
-    key: definition.key,
-    label: definition.label,
-    color: definition.color,
-    unit: definition.unit,
-    source: definition.source,
-    sourceUrl: definition.sourceUrl,
-    description: definition.description,
-    points: [...(seriesMap.get(definition.key) ?? [])].sort((a, b) => a.date.localeCompare(b.date))
-  };
-}
-
-function capexMarketCharts(seriesMap) {
-  return [
-    {
-      title: "美国企业资本开支总量",
-      description: "私人非住宅固定投资总额，按季度季调年化展示。",
-      series: [capexSeries(capexDefinitions[0], seriesMap)]
-    },
-    {
-      title: "资本开支构成",
-      description: "将资本开支拆分为建筑、设备和知识产权，观察增长由实体扩产还是数字与研发投资驱动。",
-      series: capexDefinitions.slice(1).map((definition) => capexSeries(definition, seriesMap))
+async function fetchSecCompanyCapex(company) {
+  const url = `https://data.sec.gov/api/xbrl/companyfacts/CIK${company.cik}.json`;
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": "global-liquidity-monitor/1.0 public-research-dashboard"
     }
-  ];
+  });
+  if (!response.ok) throw new Error(`SEC ${company.label} failed: ${response.status}`);
+  const payload = await response.json();
+  const facts = payload.facts?.["us-gaap"]?.[company.tag]?.units?.USD ?? [];
+  const unique = new Map();
+  for (const fact of facts) {
+    if (!fact.start || !fact.end || !["10-Q", "10-K"].includes(fact.form)) continue;
+    const key = `${fact.start}:${fact.end}`;
+    const existing = unique.get(key);
+    if (!existing || (fact.filed ?? "") > (existing.filed ?? "")) unique.set(key, fact);
+  }
+  const entries = [...unique.values()];
+  const quarters = entries.filter((fact) => {
+    const days = (Date.parse(fact.end) - Date.parse(fact.start)) / 86_400_000;
+    return days >= 70 && days <= 120;
+  });
+  const cumulativeGroups = new Map();
+  for (const fact of entries) {
+    const days = (Date.parse(fact.end) - Date.parse(fact.start)) / 86_400_000;
+    if (fact.form !== "10-Q" || days <= 120 || days >= 300) continue;
+    const group = cumulativeGroups.get(fact.start) ?? [];
+    group.push(fact);
+    cumulativeGroups.set(fact.start, group);
+  }
+  for (const [start, cumulativeFacts] of cumulativeGroups) {
+    const firstQuarter = quarters
+      .filter((fact) => fact.start === start)
+      .sort((a, b) => a.end.localeCompare(b.end))[0];
+    let previousValue = firstQuarter?.val ?? 0;
+    let previousEnd = firstQuarter?.end ?? start;
+    for (const fact of cumulativeFacts.sort((a, b) => a.end.localeCompare(b.end))) {
+      const derived = fact.val - previousValue;
+      if (derived > 0) quarters.push({ start: previousEnd, end: fact.end, val: derived });
+      previousValue = fact.val;
+      previousEnd = fact.end;
+    }
+  }
+  const uniqueQuarters = [...new Map(quarters.map((fact) => [fact.end, fact])).values()];
+  const annuals = entries.filter((fact) => {
+    const days = (Date.parse(fact.end) - Date.parse(fact.start)) / 86_400_000;
+    return fact.form === "10-K" && days >= 300 && days <= 380;
+  });
+  for (const annual of annuals) {
+    const contained = uniqueQuarters.filter((quarter) => quarter.start >= annual.start && quarter.end < annual.end);
+    if (contained.length !== 3) continue;
+    const derived = annual.val - contained.reduce((sum, quarter) => sum + quarter.val, 0);
+    if (derived > 0) uniqueQuarters.push({ start: contained.map((item) => item.end).sort().at(-1), end: annual.end, val: derived });
+  }
+  const points = [...new Map(uniqueQuarters.map((fact) => [fact.end, { date: fact.end, value: round(fact.val / 1_000_000_000, 3) }])).values()]
+    .filter((point) => point.date >= startIso)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  return {
+    key: company.key,
+    label: company.label,
+    color: company.color,
+    unit: "十亿美元",
+    source: `SEC Company Facts / ${company.label}`,
+    sourceUrl: url,
+    description: "公司现金流量表中的物业及设备购置现金支出；不等同于公司单独披露的纯 AI 投资。",
+    points
+  };
 }
 
 function treasurySeries(definition, seriesMap) {
@@ -1426,8 +1466,8 @@ async function buildRiskDataset() {
 }
 
 async function buildCapexDataset() {
-  const seriesMap = await fetchSeriesForDefinitions(capexDefinitions);
-  const total = seriesMap.get("capexTotal") ?? [];
+  const companySeries = await Promise.all(aiCapexCompanies.map(fetchSecCompanyCapex));
+  const latestCommonDate = companySeries.map((series) => series.points.at(-1)?.date).filter(Boolean).sort().at(0) ?? endIso;
   return {
     generatedAt: new Date().toISOString(),
     lookbackYears,
@@ -1437,16 +1477,24 @@ async function buildCapexDataset() {
     },
     indicators: [],
     snapshots: [],
-    capexCharts: capexMarketCharts(seriesMap),
+    capexCharts: [
+      {
+        title: "Hyperscaler 季度现金资本开支",
+        description: "四家公司现金流量表中的物业及设备购置现金支出，统一按十亿美元展示。",
+        series: companySeries
+      }
+    ],
+    capexCommitments: aiInvestmentCommitments,
     composite: {
       score: null,
-      label: "资本开支",
-      date: total.at(-1)?.date ?? endIso,
+      label: "AI 资本开支",
+      date: latestCommonDate,
       series: []
     },
     notes: [
-      "资本开支采用美国 BEA 私人非住宅固定投资口径，数据为季度、季节调整年化值。",
-      "总量由建筑、设备和知识产权产品构成；名义金额适合观察投入规模，不能直接等同于实际产能增长。"
+      "季度实际值来自 SEC Company Facts，统一采用物业及设备购置现金支出，以提高跨公司可比性。",
+      "公司未普遍单独披露纯 AI CapEx，因此实际值包含云、数据中心、服务器、网络及其他物业设备投资。",
+      "公司指引、产业项目与政府动员资金属于不同口径的承诺值，不计入季度实际支出合计。"
     ]
   };
 }

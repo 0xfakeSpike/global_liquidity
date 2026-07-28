@@ -78,6 +78,16 @@ export interface UpcomingEventsDataset {
   failures?: string[];
 }
 
+export interface AiCapexCommitment {
+  name: string;
+  amount: string;
+  horizon: string;
+  type: string;
+  announcedDate: string;
+  sourceUrl: string;
+  detail: string;
+}
+
 export interface LiquidityDataset {
   generatedAt: string;
   lookbackYears: number;
@@ -92,6 +102,7 @@ export interface LiquidityDataset {
   riskCharts?: InterestRateChart[];
   treasuryCharts?: InterestRateChart[];
   capexCharts?: InterestRateChart[];
+  capexCommitments?: AiCapexCommitment[];
   holderShares?: HolderShare[];
   foreignHolderShares?: HolderShare[];
   composite: {

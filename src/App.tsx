@@ -5,6 +5,7 @@ import { MultiLineChart } from "./components/MultiLineChart";
 import { loadLiquidityDataset, loadUpcomingEvents, type LiquidityMarket } from "./lib/data";
 import { formatChange, formatNumber } from "./lib/format";
 import type {
+  AiCapexCommitment,
   DataPoint,
   HolderShare,
   IndicatorDefinition,
@@ -70,10 +71,10 @@ const markets: Record<
   },
   capex: {
     label: "资本开支",
-    eyebrow: "美国企业资本开支",
-    title: "观察美国非住宅固定投资的总量、增速与结构。",
-    description: "使用 BEA 季度数据拆分建筑、设备和知识产权投资。",
-    sourceLabel: "BEA / FRED",
+    eyebrow: "AI 产业资本开支",
+    title: "跟踪头部云厂商的实际资本开支与全球 AI 投资承诺。",
+    description: "实际支出与多年承诺分开展示，避免重复计算。",
+    sourceLabel: "SEC / Company IR",
     updateLabel: "Quarterly"
   }
 };
@@ -233,7 +234,7 @@ function App() {
       ) : market === "risk" ? (
         <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} />
       ) : market === "capex" ? (
-        <CapexTerminal charts={activeDataset.capexCharts ?? []} dateRange={activeDataset.dateRange} />
+        <CapexTerminal dataset={activeDataset} />
       ) : market === "treasury" ? (
         <TreasuryMarketTerminal
           charts={treasuryCharts}
@@ -716,58 +717,56 @@ function riskBreadthText(positive: number, total: number) {
   return "风险偏好同步收缩";
 }
 
-function CapexTerminal({
-  charts,
-  dateRange
-}: {
-  charts: InterestRateChart[];
-  dateRange: LiquidityDataset["dateRange"];
-}) {
-  const total = charts.flatMap((chart) => chart.series).find((series) => series.key === "capexTotal");
-  const components = charts
-    .flatMap((chart) => chart.series)
-    .filter((series) => ["capexStructures", "capexEquipment", "capexIntellectualProperty"].includes(series.key));
-  const latestTotal = total?.points.at(-1);
-  const totalYoy = total ? percentChangeSeries(total.points, 365).at(-1)?.value ?? null : null;
+function CapexTerminal({ dataset }: { dataset: LiquidityDataset }) {
+  const chart = dataset.capexCharts?.[0];
+  const companies = chart?.series ?? [];
+  const commonDate = companies.map((series) => series.points.at(-1)?.date).filter((date): date is string => Boolean(date)).sort().at(0);
+  const commonQuarterValues = companies.map((series) => ({
+    series,
+    point: commonDate ? [...series.points].reverse().find((point) => point.date <= commonDate) : undefined
+  }));
+  const commonTotal = commonQuarterValues.reduce((sum, item) => sum + (item.point?.value ?? 0), 0);
+  const commitments = dataset.capexCommitments ?? [];
 
   return (
     <section className="terminal capex-dashboard" id="terminal">
       <div className="dashboard-hero capex-dashboard-hero">
         <div>
-          <span>资本开支总量</span>
-          <strong>{formatNumber(latestTotal?.value, 2)}</strong>
-          <p>万亿美元 · 季调年化</p>
+          <span>四大厂商现金 CapEx</span>
+          <strong>{formatNumber(commonTotal, 1)}</strong>
+          <p>十亿美元 · {commonDate ? commonDate.slice(0, 7) : "数据不足"}</p>
         </div>
         <div className="dashboard-rule">
-          <b>同比 {formatSignedPercent(totalYoy)}</b>
-          <p>总量回答企业投入是否扩张，建筑、设备和知识产权结构回答资本正在流向实体产能、生产工具还是软件与研发。</p>
+          <b>可比口径</b>
+          <p>统一采用 SEC 现金流量表中的物业及设备购置现金支出。它覆盖 AI 与云基础设施，但公司没有普遍拆出纯 AI 占比。</p>
         </div>
       </div>
       <div className="capex-component-grid">
-        {components.map((series) => {
-          const latest = series.points.at(-1);
-          const share = latestTotal?.value && latest ? (latest.value / latestTotal.value) * 100 : null;
-          const yoy = percentChangeSeries(series.points, 365).at(-1)?.value ?? null;
+        {commonQuarterValues.map(({ series, point }) => {
+          const yoy =
+            (commonDate
+              ? [...percentChangeSeries(series.points, 365)].reverse().find((item) => item.date <= commonDate)?.value
+              : null) ?? null;
           return (
             <div className="capex-component-card" key={series.key}>
               <span>{series.label}</span>
-              <strong>{formatNumber(latest?.value, 2)}</strong>
-              <b>占比 {share === null ? "n/a" : `${formatNumber(share, 1)}%`}</b>
-              <p>同比 {formatSignedPercent(yoy)}</p>
+              <strong>{formatNumber(point?.value, 1)}</strong>
+              <b>十亿美元</b>
+              <p>最新同比 {formatSignedPercent(yoy)}</p>
             </div>
           );
         })}
       </div>
-      <div className="capex-chart-grid">
-        {charts.map((chart) => (
+      {chart ? (
+        <div className="capex-chart-grid">
           <section className="chart-panel" key={chart.title}>
             <div className="chart-header">
               <div>
-                <span>BEA / Quarterly SAAR</span>
-                <h3>{chart.title}</h3>
+                <span>SEC Company Facts</span>
+                <h3>Hyperscaler 季度现金资本开支</h3>
               </div>
             </div>
-            <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
+            <MultiLineChart series={chart.series} dateRange={dataset.dateRange} valueLabel={chart.title} />
             <div className="rate-sources">
               {chart.series.map((series) => {
                 const latest = series.points.at(-1);
@@ -780,8 +779,35 @@ function CapexTerminal({
               })}
             </div>
           </section>
+          <CapexCommitments commitments={commitments} />
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function CapexCommitments({ commitments }: { commitments: AiCapexCommitment[] }) {
+  return (
+    <section className="capex-commitments">
+      <div className="chart-header">
+        <div>
+          <span>Guidance / Announced Commitments</span>
+          <h3>已宣布 AI 投资</h3>
+        </div>
+      </div>
+      <div className="commitment-list">
+        {commitments.map((item) => (
+          <a href={item.sourceUrl} key={item.name} rel="noreferrer" target="_blank">
+            <div>
+              <span>{item.type} · {item.horizon}</span>
+              <strong>{item.name}</strong>
+            </div>
+            <b>{item.amount}</b>
+            <p>{item.detail}</p>
+          </a>
         ))}
       </div>
+      <p className="commitment-warning">承诺金额具有不同币种、周期和执行条件，不与季度实际 CapEx 相加。</p>
     </section>
   );
 }
