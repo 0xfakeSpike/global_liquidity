@@ -58,6 +58,26 @@ export interface HolderShare {
   date: string;
 }
 
+export interface UpcomingEvent {
+  id: string;
+  date: string;
+  endDate?: string;
+  region: "美国" | "日本";
+  category: "议息会议" | "官员讲话" | "美债供给";
+  importance: "high" | "medium";
+  title: string;
+  detail: string;
+  source: string;
+  sourceUrl: string;
+}
+
+export interface UpcomingEventsDataset {
+  generatedAt: string;
+  timezone: string;
+  events: UpcomingEvent[];
+  failures?: string[];
+}
+
 export interface LiquidityDataset {
   generatedAt: string;
   lookbackYears: number;

@@ -1,5 +1,5 @@
 import { fallbackDataset } from "../data/fallbackDataset";
-import type { LiquidityDataset } from "../types/liquidity";
+import type { LiquidityDataset, UpcomingEventsDataset } from "../types/liquidity";
 
 export type LiquidityMarket = "usd" | "jpy" | "risk" | "treasury";
 
@@ -19,4 +19,10 @@ export async function loadLiquidityDataset(market: LiquidityMarket = "usd"): Pro
     console.warn("Using fallback liquidity dataset", error);
     return fallbackDataset;
   }
+}
+
+export async function loadUpcomingEvents(): Promise<UpcomingEventsDataset> {
+  const response = await fetch(`${import.meta.env.BASE_URL}data/upcoming-events.json`, { cache: "no-store" });
+  if (!response.ok) throw new Error(`event data request failed: ${response.status}`);
+  return response.json() as Promise<UpcomingEventsDataset>;
 }

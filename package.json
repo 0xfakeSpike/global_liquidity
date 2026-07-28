@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "npm run update:data && tsc -b && vite build",
     "preview": "vite preview",
-    "update:data": "node scripts/fetch-data.mjs",
+    "update:data": "node scripts/fetch-data.mjs && node scripts/fetch-events.mjs",
     "typecheck": "tsc -b"
   },
   "dependencies": {

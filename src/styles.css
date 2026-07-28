@@ -248,6 +248,107 @@ footer {
   padding: 12px clamp(18px, 4vw, 56px) 18px;
 }
 
+.upcoming-events {
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: 18px clamp(18px, 4vw, 56px) 28px;
+}
+
+.events-heading {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.events-heading > div > span {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.events-heading h2 {
+  font-size: clamp(24px, 2.4vw, 32px);
+  margin: 4px 0 0;
+}
+
+.events-heading svg {
+  color: #0f766e;
+}
+
+.event-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.event-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #dbe3ec;
+  border-left: 3px solid #94a3b8;
+  border-radius: 10px;
+  min-width: 0;
+  padding: 16px;
+}
+
+.event-card.importance-high {
+  border-left-color: #dc2626;
+}
+
+.event-date {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.event-date strong {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.event-date span {
+  color: #b45309;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.event-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.event-tags span {
+  background: #eef2f6;
+  border-radius: 999px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 7px;
+}
+
+.event-card h3 {
+  font-size: 17px;
+  margin: 12px 0 6px;
+}
+
+.event-card p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0 0 14px;
+}
+
+.event-card a {
+  align-items: center;
+  color: #0f766e;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 750;
+  gap: 5px;
+}
+
 .composition-heading {
   display: grid;
   gap: 4px;
@@ -1293,8 +1394,13 @@ footer {
 @media (max-width: 980px) {
   .hero-grid,
   .composite-grid,
-  .holder-panel {
+  .holder-panel,
+  .event-grid {
     grid-template-columns: 1fr;
+  }
+
+  .event-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .treasury-core-grid .holder-list {
@@ -1325,6 +1431,7 @@ footer {
 
   .metric-strip,
   .composition-grid,
+  .event-grid,
   .curated-snapshot-grid,
   .curated-chart-grid,
   .charts-stack > .analysis-disclosure .analysis-disclosure-content > .charts-stack,

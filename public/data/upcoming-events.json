@@ -1,0 +1,148 @@
+{
+  "generatedAt": "2026-07-28T09:21:46.904Z",
+  "timezone": "Asia/Shanghai",
+  "events": [
+    {
+      "id": "fomc-2026-07-28",
+      "date": "2026-07-28",
+      "endDate": "2026-07-29",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定与政策声明",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "boj-mpm-2026-07-30",
+      "date": "2026-07-30",
+      "endDate": "2026-07-31",
+      "region": "日本",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "BOJ 金融政策决议",
+      "detail": "会议结束后公布政策决定；行长通常举行记者会",
+      "source": "Bank of Japan",
+      "sourceUrl": "https://www.boj.or.jp/en/mopo/mpmsche_minu/"
+    },
+    {
+      "id": "treasury-refunding-0-2026-08-03",
+      "date": "2026-08-03",
+      "region": "美国",
+      "category": "美债供给",
+      "importance": "high",
+      "title": "财政部季度融资预估",
+      "detail": "更新未来一个季度的市场化借款需求",
+      "source": "U.S. Treasury",
+      "sourceUrl": "https://home.treasury.gov/policy-issues/financing-the-government/quarterly-refunding/most-recent-quarterly-refunding-documents"
+    },
+    {
+      "id": "treasury-refunding-1-2026-08-05",
+      "date": "2026-08-05",
+      "region": "美国",
+      "category": "美债供给",
+      "importance": "high",
+      "title": "美债季度再融资声明",
+      "detail": "公布券种、期限与发行规模安排",
+      "source": "U.S. Treasury",
+      "sourceUrl": "https://home.treasury.gov/policy-issues/financing-the-government/quarterly-refunding/most-recent-quarterly-refunding-documents"
+    },
+    {
+      "id": "boj-speech-2026-08-27-himino-ryozo-deputy-governor",
+      "date": "2026-08-27",
+      "region": "日本",
+      "category": "官员讲话",
+      "importance": "medium",
+      "title": "HIMINO Ryozo, Deputy Governor",
+      "detail": "At a meeting with local leaders in Saitama",
+      "source": "Bank of Japan",
+      "sourceUrl": "https://www.boj.or.jp/en/about/press/index.htm"
+    },
+    {
+      "id": "fomc-2026-09-15",
+      "date": "2026-09-15",
+      "endDate": "2026-09-16",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定、声明及经济预测",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "boj-mpm-2026-09-17",
+      "date": "2026-09-17",
+      "endDate": "2026-09-18",
+      "region": "日本",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "BOJ 金融政策决议",
+      "detail": "会议结束后公布政策决定；行长通常举行记者会",
+      "source": "Bank of Japan",
+      "sourceUrl": "https://www.boj.or.jp/en/mopo/mpmsche_minu/"
+    },
+    {
+      "id": "fomc-2026-10-27",
+      "date": "2026-10-27",
+      "endDate": "2026-10-28",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定与政策声明",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "boj-mpm-2026-10-29",
+      "date": "2026-10-29",
+      "endDate": "2026-10-30",
+      "region": "日本",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "BOJ 金融政策决议",
+      "detail": "会议结束后公布政策决定；行长通常举行记者会",
+      "source": "Bank of Japan",
+      "sourceUrl": "https://www.boj.or.jp/en/mopo/mpmsche_minu/"
+    },
+    {
+      "id": "fomc-2026-12-08",
+      "date": "2026-12-08",
+      "endDate": "2026-12-09",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定、声明及经济预测",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "boj-mpm-2026-12-17",
+      "date": "2026-12-17",
+      "endDate": "2026-12-18",
+      "region": "日本",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "BOJ 金融政策决议",
+      "detail": "会议结束后公布政策决定；行长通常举行记者会",
+      "source": "Bank of Japan",
+      "sourceUrl": "https://www.boj.or.jp/en/mopo/mpmsche_minu/"
+    },
+    {
+      "id": "fomc-2027-01-26",
+      "date": "2027-01-26",
+      "endDate": "2027-01-27",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定与政策声明",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    }
+  ],
+  "failures": []
+}

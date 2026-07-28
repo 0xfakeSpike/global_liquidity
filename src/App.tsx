@@ -1,8 +1,8 @@
-import { Activity, Database, RefreshCw, ShieldCheck } from "lucide-react";
+import { Activity, CalendarClock, Database, ExternalLink, RefreshCw, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { LineChart } from "./components/LineChart";
 import { MultiLineChart } from "./components/MultiLineChart";
-import { loadLiquidityDataset, type LiquidityMarket } from "./lib/data";
+import { loadLiquidityDataset, loadUpcomingEvents, type LiquidityMarket } from "./lib/data";
 import { formatChange, formatNumber } from "./lib/format";
 import type {
   DataPoint,
@@ -10,7 +10,8 @@ import type {
   IndicatorDefinition,
   IndicatorSnapshot,
   InterestRateChart,
-  LiquidityDataset
+  LiquidityDataset,
+  UpcomingEvent
 } from "./types/liquidity";
 import "./styles.css";
 
@@ -83,6 +84,13 @@ function App() {
     treasury: LiquidityDataset;
   } | null>(null);
   const [market, setMarket] = useState<ViewMode>(initialMarket);
+  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
+
+  useEffect(() => {
+    loadUpcomingEvents()
+      .then((result) => setUpcomingEvents(result.events))
+      .catch((error) => console.warn("Upcoming event calendar unavailable", error));
+  }, []);
 
   useEffect(() => {
     window.location.hash = market;
@@ -217,6 +225,7 @@ function App() {
       </section>
 
       {market === "combined" ? <GlobalCompositionNav /> : null}
+      {market === "combined" && upcomingEvents.length > 0 ? <UpcomingEvents events={upcomingEvents} /> : null}
 
       {market !== "combined" && rateCharts.length > 0 ? (
         <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
@@ -362,6 +371,56 @@ function GlobalCompositionNav() {
           <p>债务供给、持有人、收益率曲线与利息成本</p>
           <b>页内查看 ↓</b>
         </a>
+      </div>
+    </section>
+  );
+}
+
+function UpcomingEvents({ events }: { events: UpcomingEvent[] }) {
+  const formatEventDate = (event: UpcomingEvent) => {
+    const start = new Date(`${event.date}T00:00:00+08:00`);
+    const startText = new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric", weekday: "short" }).format(start);
+    if (!event.endDate || event.endDate === event.date) return startText;
+    const end = new Date(`${event.endDate}T00:00:00+08:00`);
+    return `${startText}–${new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(end)}`;
+  };
+
+  const daysUntil = (date: string) => {
+    const target = new Date(`${date}T00:00:00+08:00`).getTime();
+    const current = new Date();
+    const todayStart = new Date(current.getFullYear(), current.getMonth(), current.getDate()).getTime();
+    const days = Math.max(0, Math.ceil((target - todayStart) / 86_400_000));
+    return days === 0 ? "今天" : `${days}天后`;
+  };
+
+  return (
+    <section className="upcoming-events" aria-labelledby="upcoming-events-title">
+      <div className="events-heading">
+        <div>
+          <span>官方日历 · 自动更新</span>
+          <h2 id="upcoming-events-title">未来关键事件</h2>
+        </div>
+        <CalendarClock size={24} />
+      </div>
+      <div className="event-grid">
+        {events.slice(0, 6).map((event) => (
+          <article className={`event-card importance-${event.importance}`} key={event.id}>
+            <div className="event-date">
+              <strong>{formatEventDate(event)}</strong>
+              <span>{daysUntil(event.date)}</span>
+            </div>
+            <div className="event-tags">
+              <span>{event.region}</span>
+              <span>{event.category}</span>
+            </div>
+            <h3>{event.title}</h3>
+            <p>{event.detail}</p>
+            <a href={event.sourceUrl} rel="noreferrer" target="_blank">
+              {event.source}
+              <ExternalLink size={14} />
+            </a>
+          </article>
+        ))}
       </div>
     </section>
   );
