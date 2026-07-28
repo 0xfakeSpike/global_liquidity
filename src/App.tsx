@@ -1,4 +1,4 @@
-import { Activity, CalendarClock, Database, ExternalLink, RefreshCw, ShieldCheck } from "lucide-react";
+import { Activity, CalendarClock, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { LineChart } from "./components/LineChart";
 import { MultiLineChart } from "./components/MultiLineChart";
@@ -207,22 +207,11 @@ function App() {
               <p className="hero-text">{marketConfig.description}</p>
               <div className="hero-actions">
                 <a href="#terminal">查看图表</a>
-                <a href="#data-methodology">数据与口径</a>
               </div>
             </div>
           </section>
         ) : null}
       </header>
-
-      <section className="metric-strip" id="data-methodology">
-        <Metric icon={<Database size={20} />} label="公开数据源" value={marketConfig.sourceLabel} />
-        <Metric icon={<RefreshCw size={20} />} label="更新方式" value={marketConfig.updateLabel} />
-        <Metric
-          icon={<ShieldCheck size={20} />}
-          label={market === "combined" ? "观察窗口" : "口径"}
-          value={market === "combined" ? `近 ${activeDataset.lookbackYears} 年` : `${activeDataset.lookbackYears}Y Z-score`}
-        />
-      </section>
 
       {market === "combined" ? <GlobalCompositionNav /> : null}
       {market === "combined" && upcomingEvents.length > 0 ? <UpcomingEvents events={upcomingEvents} /> : null}
@@ -339,16 +328,6 @@ function App() {
         <span>仅供研究与教育用途，不构成投资建议。</span>
       </footer>
     </main>
-  );
-}
-
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="metric">
-      {icon}
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
   );
 }
 

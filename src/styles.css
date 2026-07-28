@@ -85,7 +85,6 @@ nav {
 .brand,
 .nav-meta,
 .market-tabs,
-.metric,
 .hero-actions,
 .chart-header,
 .chart-stats,
@@ -185,8 +184,7 @@ h1 {
 }
 
 .chart-panel,
-.notes,
-.metric {
+.notes {
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -200,32 +198,12 @@ footer {
   font-size: 13px;
 }
 
-.metric-strip,
 .rate-section,
 .terminal,
 .composite-section {
   margin: 0 auto;
   max-width: 1240px;
   padding: 26px clamp(18px, 4vw, 56px);
-}
-
-.metric-strip {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-bottom: 1px solid #e2e8f0;
-  border-top: 1px solid #e2e8f0;
-  padding-bottom: 8px;
-  padding-top: 8px;
-  scroll-margin-top: 18px;
-}
-
-.metric {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  gap: 12px;
-  padding: 8px 0;
 }
 
 .metric svg {
@@ -1429,7 +1407,6 @@ footer {
     flex: 1;
   }
 
-  .metric-strip,
   .composition-grid,
   .event-grid,
   .curated-snapshot-grid,
