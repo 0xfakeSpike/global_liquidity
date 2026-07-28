@@ -642,6 +642,62 @@ footer {
   grid-column: 1 / -1;
 }
 
+.risk-dashboard {
+  display: grid;
+  gap: 18px;
+}
+
+.risk-dashboard-hero strong {
+  font-size: 58px;
+}
+
+.risk-momentum-grid,
+.risk-detail-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.risk-momentum-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+}
+
+.risk-momentum-card > span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.risk-momentum-card > strong {
+  color: #0f172a;
+  font-size: 30px;
+}
+
+.risk-momentum-card > b {
+  color: #0f766e;
+  font-size: 14px;
+}
+
+.risk-momentum-card > p {
+  color: #64748b;
+  font-size: 12px;
+  margin: 0;
+}
+
+.risk-detail-grid .chart-panel {
+  min-width: 0;
+}
+
+.risk-detail-grid .chart-header h3 {
+  font-size: 20px;
+}
+
 .dashboard-hero {
   align-items: stretch;
   background: #fff;
@@ -1394,6 +1450,10 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .risk-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .treasury-core-grid .holder-list {
     grid-template-columns: 1fr;
   }
@@ -1422,6 +1482,8 @@ footer {
 
   .composition-grid,
   .event-grid,
+  .risk-detail-grid,
+  .risk-momentum-grid,
   .curated-snapshot-grid,
   .curated-chart-grid,
   .global-dashboard > .charts-stack,

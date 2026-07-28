@@ -15,10 +15,11 @@ interface MultiLineChartProps {
   series: MultiLineSeries[];
   dateRange?: DateRange;
   height?: number;
+  transform?: "log-return";
   valueLabel?: string;
 }
 
-export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: MultiLineChartProps) {
+export function MultiLineChart({ series, dateRange, height = 260, transform, valueLabel }: MultiLineChartProps) {
   const [rangeYears, setRangeYears] = useState<ChartRangeYears>(5);
   const [hovered, setHovered] = useState<{
     date: string;
@@ -40,10 +41,24 @@ export function MultiLineChart({ series, dateRange, height = 260, valueLabel }: 
   const lastDate = points.reduce((last, point) => (point.date > last ? point.date : last), points[0].date);
   const endDate = dateRange?.end ?? lastDate;
   const visibleRange = recentRange(endDate, rangeYears);
-  const visibleSeries = series.map((item) => ({
+  const filteredSeries = series.map((item) => ({
     ...item,
     points: item.points.filter((point) => point.date >= visibleRange.start && point.date <= visibleRange.end)
   }));
+  const visibleSeries =
+    transform === "log-return"
+      ? filteredSeries.map((item) => {
+          const base = item.points.find((point) => point.value > 0)?.value;
+          return {
+            ...item,
+            points: base
+              ? item.points
+                  .filter((point) => point.value > 0)
+                  .map((point) => ({ date: point.date, value: Math.log(point.value / base) * 100 }))
+              : []
+          };
+        })
+      : filteredSeries;
   const visiblePoints = visibleSeries.flatMap((item) => item.points);
   const plottedSeries = visiblePoints.length > 0 ? visibleSeries : series;
   const plottedPoints = visiblePoints.length > 0 ? visiblePoints : points;

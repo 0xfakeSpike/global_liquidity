@@ -144,7 +144,7 @@ function App() {
 
   return (
     <main>
-      <header className={`hero ${market === "combined" ? "hero-compact" : ""}`}>
+      <header className={`hero ${market === "combined" || market === "risk" ? "hero-compact" : ""}`}>
         <nav>
           <div className="brand">
             <Activity size={21} />
@@ -199,7 +199,7 @@ function App() {
           </div>
         </nav>
 
-        {market !== "combined" ? (
+        {market !== "combined" && market !== "risk" ? (
           <section className="hero-grid">
             <div className="hero-copy">
               <p className="eyebrow">{marketConfig.eyebrow}</p>
@@ -266,7 +266,7 @@ function App() {
           </AnalysisDisclosure>
         </>
       ) : market === "risk" ? (
-        <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} notes={activeDataset.notes} />
+        <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} />
       ) : market === "treasury" ? (
         <TreasuryMarketTerminal
           charts={treasuryCharts}
@@ -652,59 +652,125 @@ function realRatePressureText(value: number) {
 
 function RiskMarketTerminal({
   charts,
-  dateRange,
-  notes
+  dateRange
 }: {
   charts: InterestRateChart[];
   dateRange: LiquidityDataset["dateRange"];
-  notes: string[];
 }) {
+  const assets = charts.flatMap((chart) =>
+    chart.series.map((series) => {
+      const thirteenWeek = percentChangeSeries(series.points, 91).at(-1)?.value ?? null;
+      const oneYear = percentChangeSeries(series.points, 365).at(-1)?.value ?? null;
+      return { chart, series, thirteenWeek, oneYear };
+    })
+  );
+  const positiveBreadth = assets.filter((asset) => (asset.thirteenWeek ?? 0) > 0).length;
+  const comparisonSeries = assets.map(({ series }, index) => ({
+    label: riskAssetLabel(series.label),
+    color: ["#f59e0b", "#2563eb", "#16a34a"][index] ?? series.color,
+    points: series.points
+  }));
+
   return (
-    <section className="terminal" id="terminal">
-      <div className="section-heading">
-        <p>Risk Market Terminal</p>
-        <h2>风险市场价格变化</h2>
+    <section className="terminal risk-dashboard" id="terminal">
+      <div className="dashboard-hero risk-dashboard-hero">
+        <div>
+          <span>13周上涨</span>
+          <strong>{positiveBreadth}/{assets.length}</strong>
+          <p>{riskBreadthText(positiveBreadth, assets.length)}</p>
+        </div>
+        <div className="dashboard-rule">
+          <b>确认规则</b>
+          <p>三项同步上涨说明风险偏好具有广度；只有 BTC 单独走强或港科持续落后时，不能视为全球风险流动性全面改善。</p>
+        </div>
       </div>
-      <div className="overlay-note">
-        每个风险资产使用独立纵轴，横轴统一为全站时间区间；价格按该资产首个可用日期归一为 100。
+      <div className="risk-momentum-grid">
+        {assets.map(({ series, thirteenWeek, oneYear }) => (
+          <div className="risk-momentum-card" key={series.key}>
+            <span>{riskAssetLabel(series.label)}</span>
+            <strong>{formatSignedPercent(thirteenWeek)}</strong>
+            <b>{riskMomentumText(thirteenWeek)}</b>
+            <p>13周 · 1年 {formatSignedPercent(oneYear)}</p>
+          </div>
+        ))}
       </div>
       <div className="charts-stack">
-        {charts.map((chart) => (
-          <section className="chart-panel" key={chart.title}>
-            <div className="chart-header">
-              <div>
-                <span>Normalized Price / Independent Y Axis</span>
-                <h3>{chart.title}</h3>
-              </div>
+        <section className="chart-panel">
+          <div className="chart-header">
+            <div>
+              <span>Risk Breadth / Log Return</span>
+              <h3>风险资产相对强弱</h3>
             </div>
-            <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
-            <div className="interpretation">
-              <strong>当前解读</strong>
-              <p>{chart.description}</p>
-            </div>
-            <div className="rate-sources">
-              {chart.series.map((item) => {
-                const latest = item.points.at(-1);
-                return (
-                  <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
-                    <strong>{item.label}</strong>
-                    <span>
-                      {latest ? `${latest.date} ${formatNumber(latest.value, 2)}` : "n/a"} · {item.source}
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-        ))}
-      </div>
-      <div className="notes risk-notes">
-        {notes.map((note) => (
-          <p key={note}>{note}</p>
-        ))}
+          </div>
+          <MultiLineChart
+            series={comparisonSeries}
+            dateRange={dateRange}
+            transform="log-return"
+            valueLabel="累计对数收益率（%）"
+          />
+          <div className="interpretation">
+            <strong>当前解读</strong>
+            <p>三项统一使用累计对数收益率，既压缩 BTC 的极端涨幅，也保留跨资产方向、拐点和相对强弱的可比性。</p>
+          </div>
+        </section>
+        <AnalysisDisclosure title="查看单资产原始曲线" description="按各自纵轴查看价格路径、最新值与官方数据源。">
+          <div className="risk-detail-grid">
+            {charts.map((chart) => (
+              <section className="chart-panel" key={chart.title}>
+                <div className="chart-header">
+                  <div>
+                    <span>Normalized Price</span>
+                    <h3>{chart.title}</h3>
+                  </div>
+                </div>
+                <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
+                <div className="rate-sources">
+                  {chart.series.map((item) => {
+                    const latest = item.points.at(-1);
+                    return (
+                      <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
+                        <strong>{riskAssetLabel(item.label)}</strong>
+                        <span>
+                          {latest ? `${latest.date} ${formatNumber(latest.value, 2)}` : "n/a"} · {item.source}
+                        </span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
+        </AnalysisDisclosure>
       </div>
     </section>
   );
+}
+
+function riskAssetLabel(label: string) {
+  if (label.includes("纳斯达克")) return "Nasdaq";
+  if (label.includes("恒生科技")) return "HSTECH 代理";
+  return label;
+}
+
+function formatSignedPercent(value: number | null) {
+  if (value === null) return "n/a";
+  return `${value > 0 ? "+" : ""}${formatNumber(value, 1)}%`;
+}
+
+function riskMomentumText(value: number | null) {
+  if (value === null) return "数据不足";
+  if (value >= 10) return "强势";
+  if (value > 0) return "上涨";
+  if (value > -5) return "震荡";
+  return "走弱";
+}
+
+function riskBreadthText(positive: number, total: number) {
+  if (total === 0) return "数据不足";
+  if (positive === total) return "风险偏好同步扩张";
+  if (positive >= 2) return "风险偏好有一定广度";
+  if (positive === 1) return "局部上涨，尚未形成共振";
+  return "风险偏好同步收缩";
 }
 
 function TreasuryMarketTerminal({
@@ -1234,9 +1300,9 @@ function GlobalLiquidityDashboard({
     { label: "30Y下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)) }
   ]);
   const riskConfirmation = [
-    { label: "Nasdaq", color: "#2563eb", points: cumulativeLogReturn(nasdaq?.points ?? []) },
-    { label: "HSTECH代理", color: "#16a34a", points: cumulativeLogReturn(hangSengTech?.points ?? []) },
-    { label: "BTC", color: "#f59e0b", points: cumulativeLogReturn(btc?.points ?? []) }
+    { label: "Nasdaq", color: "#2563eb", points: nasdaq?.points ?? [] },
+    { label: "HSTECH代理", color: "#16a34a", points: hangSengTech?.points ?? [] },
+    { label: "BTC", color: "#f59e0b", points: btc?.points ?? [] }
   ];
 
   return (
@@ -1367,7 +1433,12 @@ function GlobalLiquidityDashboard({
                   <h3>风险资产确认</h3>
                 </div>
               </div>
-              <MultiLineChart series={riskConfirmation} dateRange={risk.dateRange} valueLabel="累计对数收益率（%）" />
+              <MultiLineChart
+                series={riskConfirmation}
+                dateRange={risk.dateRange}
+                transform="log-return"
+                valueLabel="累计对数收益率（%）"
+              />
               <div className="interpretation">
                 <strong>当前解读</strong>
                 <p>三项资产统一转换为累计对数收益率，压缩 BTC 极端涨幅的视觉影响，同时保持三者方向与相对强弱可比。</p>
@@ -1689,14 +1760,6 @@ function percentChangeSeries(series: DataPoint[], days: number) {
       return { date: point.date, value: ((point.value / base) - 1) * 100 };
     })
     .filter(Boolean) as DataPoint[];
-}
-
-function cumulativeLogReturn(series: DataPoint[]) {
-  const base = series.find((point) => point.value > 0)?.value;
-  if (!base) return [];
-  return series
-    .filter((point) => point.value > 0)
-    .map((point) => ({ date: point.date, value: Math.log(point.value / base) * 100 }));
 }
 
 function invertSeries(series: DataPoint[]) {
