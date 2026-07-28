@@ -712,7 +712,7 @@ function TreasuryMarketTerminal({
           title="海外主要持有人细分"
         />
       ) : null}
-      <div className="charts-stack treasury-stack">
+      <div className="treasury-core-grid">
         {charts.map((chart) => (
           <section className="chart-panel" key={chart.title}>
             <div className="chart-header">
