@@ -214,7 +214,6 @@ function App() {
       </header>
 
       {market === "combined" ? <GlobalCompositionNav /> : null}
-      {market === "combined" && upcomingEvents.length > 0 ? <UpcomingEvents events={upcomingEvents} /> : null}
 
       {market !== "combined" && rateCharts.length > 0 ? (
         <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
@@ -237,6 +236,7 @@ function App() {
             risk={pairedDatasets.risk}
             treasury={pairedDatasets.treasury}
             usd={pairedDatasets.usd}
+            upcomingEvents={upcomingEvents}
           />
           <AnalysisDisclosure
             title="01 · 美元流动性底表"
@@ -1136,12 +1136,14 @@ function GlobalLiquidityDashboard({
   jpy,
   risk,
   treasury,
-  usd
+  usd,
+  upcomingEvents
 }: {
   jpy: LiquidityDataset;
   risk: LiquidityDataset;
   treasury: LiquidityDataset;
   usd: LiquidityDataset;
+  upcomingEvents: UpcomingEvent[];
 }) {
   const usdMap = new Map(usd.snapshots.map((item) => [item.key, item]));
   const jpyMap = new Map(jpy.snapshots.map((item) => [item.key, item]));
@@ -1270,6 +1272,7 @@ function GlobalLiquidityDashboard({
           </div>
         ))}
       </div>
+      {upcomingEvents.length > 0 ? <UpcomingEvents events={upcomingEvents} /> : null}
       <div className="charts-stack">
         <section className="chart-panel">
           <div className="chart-header">
