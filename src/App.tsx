@@ -1,5 +1,5 @@
 import { Activity, CalendarClock, ExternalLink } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { LineChart } from "./components/LineChart";
 import { MultiLineChart } from "./components/MultiLineChart";
 import { loadLiquidityDataset, loadUpcomingEvents, type LiquidityMarket } from "./lib/data";
@@ -918,6 +918,26 @@ const costCategoryLabels: Record<string, string> = {
   equity: "股票"
 };
 
+const costCategoryTitles: Record<string, string> = {
+  cash: "现金与货币市场",
+  ust: "美债收益率曲线",
+  credit: "信用债总收益",
+  fx: "海外债券（美元折算）",
+  equity: "股票"
+};
+
+const anchorBarShortLabels: Record<string, string> = {
+  sofr: "SOFR",
+  dgs3mo: "3M",
+  dgs2: "2Y",
+  dgs10: "10Y",
+  dgs30: "30Y",
+  dfii10: "10Y实际",
+  igTotal: "IG总",
+  hyTotal: "HY总",
+  spxEarningsYield: "标普盈利"
+};
+
 function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
   const cost = dataset.costOfCapital;
   if (!cost) {
@@ -935,17 +955,13 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
 
   const { anchor, yields, spreads, charts } = cost;
   const byKey = new Map(yields.map((item) => [item.key, item]));
-  const tenYear = byKey.get("dgs10") ?? null;
-  const earnings = byKey.get("spxEarningsYield") ?? null;
-  const hyTotal = byKey.get("hyTotal") ?? null;
-  const jgbUsd = byKey.get("jgbUsd") ?? null;
-
-  const heroStat = (item: CostOfCapitalYield | null) => {
-    if (!item || item.latestValue === null) return "n/a";
-    const anchorDelta =
-      item.vsAnchorBp === null ? "" : ` · 锚差 ${formatChange(item.vsAnchorBp, 0)}bp`;
-    return `${formatNumber(item.latestValue, 2)}%${anchorDelta}`;
-  };
+  const seriesByKey = new Map<string, DataPoint[]>();
+  charts.forEach((chart) =>
+    chart.series.forEach((series) => {
+      if (!seriesByKey.has(series.key)) seriesByKey.set(series.key, series.points);
+    })
+  );
+  const categoryOrder = ["cash", "ust", "credit", "fx", "equity"];
 
   return (
     <section className="terminal cost-dashboard" id="terminal">
@@ -958,32 +974,37 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
         <div className="cost-hero-anchor">
           <span>美元现金锚 · EFFR</span>
           <strong>{formatNumber(anchor.latestValue, 3)}%</strong>
-          <p>{anchor.latestDate} · 十年位置 {anchor.percentile === null ? "n/a" : `${Math.round(anchor.percentile)}%`}</p>
+          <p>{anchor.latestDate}</p>
+          <dl className="cost-anchor-stats">
+            <div>
+              <dt>SOFR</dt>
+              <dd>{formatNumber(byKey.get("sofr")?.latestValue ?? null, 2)}%</dd>
+            </div>
+            <div>
+              <dt>3M 美债</dt>
+              <dd>{formatNumber(byKey.get("dgs3mo")?.latestValue ?? null, 2)}%</dd>
+            </div>
+            <div>
+              <dt>十年位置</dt>
+              <dd>{anchor.percentile === null ? "n/a" : `${Math.round(anchor.percentile)}%`}</dd>
+            </div>
+            <div>
+              <dt>1M 变化</dt>
+              <dd>{formatChange(anchor.oneMonthChange, 2)}%</dd>
+            </div>
+          </dl>
         </div>
-        <div>
-          <span>10Y 美债</span>
-          <strong>{heroStat(tenYear)}</strong>
-          <p>长期美元无风险收益</p>
-        </div>
-        <div>
-          <span>标普盈利收益率</span>
-          <strong>{heroStat(earnings)}</strong>
-          <p>100 / Shiller PE（月度）</p>
-        </div>
-        <div>
-          <span>HY 总收益率</span>
-          <strong>{heroStat(hyTotal)}</strong>
-          <p>10Y + 高收益利差</p>
-        </div>
-        <div>
-          <span>JGB 美元近似</span>
-          <strong>{heroStat(jgbUsd)}</strong>
-          <p>JGB + 12M 汇率贡献</p>
+        <div className="cost-anchor-bars">
+          <div className="cost-bars-heading">
+            <span>各收益载体相对现金锚的利差（bp）</span>
+            <b>正值为跑赢现金锚</b>
+          </div>
+          <AnchorBars yields={yields} />
         </div>
         <div className="cost-rule">
           <b>怎么读</b>
           <p>{anchor.description}</p>
-          <p>收益率上行通常代表资金撤出该市场或供给压力，下行代表价格走强；结合相对变化判断股债之间资金的边际倾向。</p>
+          <p>条形图回答“谁跑赢了现金”：柱子在 0 线右侧表示收益高于 EFFR，左侧表示低于现金锚。收益率上行通常代表资金撤出该市场或供给压力，下行代表价格走强。</p>
         </div>
       </div>
 
@@ -992,9 +1013,17 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
         <h2>统一收益标尺（美元年化）</h2>
       </div>
       <div className="cost-ladder-grid">
-        {yields.map((item) => (
-          <CostYieldCard item={item} key={item.key} />
-        ))}
+        {categoryOrder.flatMap((category) => [
+          <div className="cost-group-heading" key={`group-${category}`}>
+            <span>{costCategoryTitles[category]}</span>
+            <small>{yields.filter((item) => item.category === category).length} 项</small>
+          </div>,
+          ...yields
+            .filter((item) => item.category === category)
+            .map((item) => (
+              <CostYieldCard item={item} key={item.key} points={seriesByKey.get(item.key) ?? []} />
+            ))
+        ])}
       </div>
 
       <div className="section-heading">
@@ -1051,28 +1080,38 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
   );
 }
 
-function CostYieldCard({ item }: { item: CostOfCapitalYield }) {
+function CostYieldCard({ item, points }: { item: CostOfCapitalYield; points: DataPoint[] }) {
   const change = (value: number | null) => (value === null ? "n/a" : `${formatChange(value, 2)}%`);
   return (
     <section className="cost-ladder-card">
-      <div className="cost-card-head">
-        <span>{costCategoryLabels[item.category] ?? item.category} · {item.basis}</span>
-        <strong>{item.latestValue === null ? "n/a" : `${formatNumber(item.latestValue, 2)}%`}</strong>
+      <div className="cost-card-top">
+        <div>
+          <span className="cost-card-category">{costCategoryLabels[item.category] ?? item.category}</span>
+          <h3>{item.label}</h3>
+        </div>
+        <div className="cost-card-value">
+          <strong>{item.latestValue === null ? "n/a" : `${formatNumber(item.latestValue, 2)}%`}</strong>
+          <span>{item.basis}</span>
+        </div>
       </div>
-      <h3>{item.label}</h3>
-      <p className={item.vsAnchorBp === null ? "" : item.vsAnchorBp >= 0 ? "cost-positive" : "cost-negative"}>
-        {item.key === "effr" ? "基准" : item.vsAnchorBp === null ? "—" : `vs 锚 ${formatChange(item.vsAnchorBp, 0)}bp`}
-      </p>
-      <p>1M {change(item.oneMonthChange)} · 3M {change(item.threeMonthChange)} · 6M {change(item.sixMonthChange)}</p>
+      <div className="cost-card-deltas">
+        <span className={item.vsAnchorBp === null ? "" : item.vsAnchorBp >= 0 ? "cost-positive" : "cost-negative"}>
+          {item.key === "effr" ? "基准" : item.vsAnchorBp === null ? "—" : `vs 锚 ${formatChange(item.vsAnchorBp, 0)}bp`}
+        </span>
+        <span>1M {change(item.oneMonthChange)}</span>
+        <span>3M {change(item.threeMonthChange)}</span>
+        <span>6M {change(item.sixMonthChange)}</span>
+      </div>
+      <Sparkline points={points} />
       {item.fxContribution !== undefined ? (
-        <p>
+        <p className="cost-card-extra">
           汇率 12M {item.fxMove === null ? "n/a" : `${formatChange(item.fxMove, 2)}%`}
           {" · "}折算贡献 {item.fxContribution === null ? "n/a" : `${formatChange(item.fxContribution, 2)}%`}
           {" · "}本币 {item.localYield === null ? "n/a" : `${formatNumber(item.localYield, 2)}%`}
         </p>
       ) : null}
       {item.peRatio !== undefined ? (
-        <p>Shiller PE {item.peRatio === null ? "n/a" : formatNumber(item.peRatio, 1)}</p>
+        <p className="cost-card-extra">Shiller PE {item.peRatio === null ? "n/a" : formatNumber(item.peRatio, 1)}</p>
       ) : null}
       <div className="cost-card-meta">
         <a href={item.sourceUrl} target="_blank" rel="noreferrer">
@@ -1081,6 +1120,79 @@ function CostYieldCard({ item }: { item: CostOfCapitalYield }) {
         <span>{item.latestDate}</span>
       </div>
     </section>
+  );
+}
+
+function AnchorBars({ yields }: { yields: CostOfCapitalYield[] }) {
+  const items = Object.keys(anchorBarShortLabels)
+    .map((key) => yields.find((item) => item.key === key))
+    .filter((item): item is CostOfCapitalYield => Boolean(item && item.vsAnchorBp !== null));
+  const maxAbs = Math.max(...items.map((item) => Math.abs(item.vsAnchorBp ?? 0)), 1);
+  const scale = Math.ceil(maxAbs / 100) * 100;
+  return (
+    <div className="cost-bars">
+      {items.map((item) => {
+        const bp = item.vsAnchorBp ?? 0;
+        const width = Math.min((Math.abs(bp) / scale) * 50, 50);
+        const style: CSSProperties = { width: `${width}%` };
+        if (bp >= 0) style.left = "50%";
+        else style.right = "50%";
+        return (
+          <div className="cost-bar-row" key={item.key}>
+            <span className="cost-bar-label">{anchorBarShortLabels[item.key]}</span>
+            <div className="cost-bar-track">
+              <span className="cost-bar-center" />
+              <span className={`cost-bar-fill ${bp >= 0 ? "positive" : "negative"}`} style={style} />
+            </div>
+            <span className="cost-bar-value">{bp >= 0 ? "+" : ""}{bp}</span>
+          </div>
+        );
+      })}
+      <div className="cost-bar-scale">
+        <span>-{scale}</span>
+        <span>0</span>
+        <span>+{scale}</span>
+      </div>
+    </div>
+  );
+}
+
+function Sparkline({ points, height = 46 }: { points: DataPoint[]; height?: number }) {
+  const width = 360;
+  const padding = 3;
+  const recent = points.slice(-780);
+  if (recent.length === 0) {
+    return <div className="sparkline-empty">暂无历史</div>;
+  }
+  const maxPoints = 150;
+  const sampled =
+    recent.length > maxPoints
+      ? recent.filter((_, index) => index % Math.ceil(recent.length / maxPoints) === 0)
+      : recent;
+  const values = sampled.map((point) => point.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const step = (width - padding * 2) / Math.max(sampled.length - 1, 1);
+  const path = sampled
+    .map((point, index) => {
+      const x = padding + index * step;
+      const y = padding + (1 - (point.value - min) / range) * (height - padding * 2);
+      return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const up = (sampled.at(-1)?.value ?? 0) >= (sampled[0]?.value ?? 0);
+  return (
+    <svg className="sparkline" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+      <path
+        d={path}
+        fill="none"
+        stroke={up ? "#0f766e" : "#dc2626"}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
+      />
+    </svg>
   );
 }
 
