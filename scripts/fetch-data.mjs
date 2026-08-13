@@ -506,6 +506,15 @@ const aiInvestmentCommitments = [
     detail: "公司口径包含融资租赁，用于持续扩充云与 AI 容量。"
   },
   {
+    name: "Meta 2026 CapEx 指引",
+    amount: "1,150–1,350 亿美元",
+    horizon: "2026",
+    type: "公司指引",
+    announcedDate: "2026-01-28",
+    sourceUrl: "https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-Fourth-Quarter-and-Full-Year-2025-Results/",
+    detail: "包含融资租赁本金支付，主要由 AI、超级智能实验室与核心业务基础设施推动。"
+  },
+  {
     name: "Stargate",
     amount: "5,000 亿美元",
     horizon: "2025–2028",
@@ -671,6 +680,213 @@ const treasuryHolderDefinitions = [
     scale: 1 / 1_000,
     color: "#dc2626",
     description: "海外和国际投资者持有的联邦债务。"
+  }
+];
+
+const costOfCapitalDefinitions = [
+  {
+    key: "effr",
+    fredId: "EFFR",
+    label: "EFFR 现金锚",
+    category: "cash",
+    unit: "%",
+    source: "FRED EFFR / Federal Reserve Bank of New York",
+    sourceUrl: "https://fred.stlouisfed.org/series/EFFR",
+    scale: 1,
+    color: "#2563eb",
+    description: "有效联邦基金利率，是美元隔夜资金的机会成本锚。"
+  },
+  {
+    key: "sofr",
+    fredId: "SOFR",
+    label: "SOFR",
+    category: "cash",
+    unit: "%",
+    source: "FRED SOFR / Federal Reserve Bank of New York",
+    sourceUrl: "https://fred.stlouisfed.org/series/SOFR",
+    scale: 1,
+    color: "#0ea5e9",
+    description: "以美国国债回购为抵押的隔夜融资成本，反映担保融资市场对现金的定价。"
+  },
+  {
+    key: "dgs3mo",
+    fredId: "DGS3MO",
+    label: "3M 美债",
+    category: "cash",
+    unit: "%",
+    source: "FRED DGS3MO / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS3MO",
+    scale: 1,
+    color: "#16a34a",
+    description: "3 个月国库券收益率，是现金类资产最常见的市场利率。"
+  },
+  {
+    key: "dgs2",
+    fredId: "DGS2",
+    label: "2Y 美债",
+    category: "ust",
+    unit: "%",
+    source: "FRED DGS2 / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS2",
+    scale: 1,
+    color: "#7c3aed",
+    description: "2 年期美债收益率，对政策利率预期最敏感。"
+  },
+  {
+    key: "dgs10",
+    fredId: "DGS10",
+    label: "10Y 美债",
+    category: "ust",
+    unit: "%",
+    source: "FRED DGS10 / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
+    scale: 1,
+    color: "#f59e0b",
+    description: "10 年期美债收益率，是全球风险资产折现率的核心锚。"
+  },
+  {
+    key: "dgs30",
+    fredId: "DGS30",
+    label: "30Y 美债",
+    category: "ust",
+    unit: "%",
+    source: "FRED DGS30 / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS30",
+    scale: 1,
+    color: "#dc2626",
+    description: "30 年期美债收益率，反映长期通胀、期限溢价和财政供给压力。"
+  },
+  {
+    key: "dfii10",
+    fredId: "DFII10",
+    label: "10Y 实际利率",
+    category: "ust",
+    unit: "%",
+    source: "FRED DFII10 / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/DFII10",
+    scale: 1,
+    color: "#0f766e",
+    description: "10 年期 TIPS 收益率，扣除通胀预期后的实际资金成本。"
+  },
+  {
+    key: "breakeven10y",
+    fredId: "T10YIE",
+    label: "盈亏平衡通胀",
+    category: "ust",
+    unit: "%",
+    source: "FRED T10YIE / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/T10YIE",
+    scale: 1,
+    color: "#94a3b8",
+    description: "10 年期美债与 TIPS 的收益率差，代表市场隐含的十年平均通胀预期。"
+  },
+  {
+    key: "igOas",
+    fredId: "BAMLC0A0CM",
+    label: "IG 信用利差",
+    category: "credit",
+    unit: "bp",
+    source: "FRED BAMLC0A0CM / ICE BofA",
+    sourceUrl: "https://fred.stlouisfed.org/series/BAMLC0A0CM",
+    scale: 100,
+    color: "#64748b",
+    description: "投资级公司债相对同期限国债的期权调整利差（OAS）。"
+  },
+  {
+    key: "hyOas",
+    fredId: "BAMLH0A0HYM2",
+    label: "HY 信用利差",
+    category: "credit",
+    unit: "bp",
+    source: "FRED BAMLH0A0HYM2 / ICE BofA",
+    sourceUrl: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
+    scale: 100,
+    color: "#9333ea",
+    description: "高收益债相对同期限国债的期权调整利差（OAS）。"
+  },
+  {
+    key: "jgb10y",
+    fredId: "IRLTLT01JPM156N",
+    label: "JGB 10Y 本币",
+    category: "fx",
+    unit: "%",
+    source: "FRED IRLTLT01JPM156N / OECD",
+    sourceUrl: "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
+    scale: 1,
+    color: "#0d9488",
+    description: "日本 10 年期国债收益率（日元口径），反映日元长端融资成本。"
+  },
+  {
+    key: "usdJpy",
+    fredId: "DEXJPUS",
+    label: "USD/JPY",
+    category: "fx",
+    unit: "日元/美元",
+    source: "FRED DEXJPUS / Federal Reserve H.10",
+    sourceUrl: "https://fred.stlouisfed.org/series/DEXJPUS",
+    scale: 1,
+    color: "#6366f1",
+    description: "美元兑日元汇率，用于把日元资产收益折算为美元收益。"
+  },
+  {
+    key: "bund10y",
+    fredId: "IRLTLT01EZM156N",
+    label: "Bund 10Y 本币",
+    category: "fx",
+    unit: "%",
+    source: "FRED IRLTLT01EZM156N / OECD",
+    sourceUrl: "https://fred.stlouisfed.org/series/IRLTLT01EZM156N",
+    scale: 1,
+    color: "#b45309",
+    description: "欧元区 10 年期国债收益率（欧元口径），以德国 Bund 为代表基准。"
+  },
+  {
+    key: "eurUsd",
+    fredId: "DEXUSEU",
+    label: "EUR/USD",
+    category: "fx",
+    unit: "美元/欧元",
+    source: "FRED DEXUSEU / Federal Reserve H.10",
+    sourceUrl: "https://fred.stlouisfed.org/series/DEXUSEU",
+    scale: 1,
+    color: "#0891b2",
+    description: "欧元兑美元汇率，用于把欧元资产收益折算为美元收益。"
+  },
+  {
+    key: "broadDollar",
+    fredId: "DTWEXBGS",
+    label: "广义美元指数",
+    category: "context",
+    unit: "点",
+    source: "FRED DTWEXBGS / Federal Reserve H.10",
+    sourceUrl: "https://fred.stlouisfed.org/series/DTWEXBGS",
+    scale: 1,
+    color: "#475569",
+    description: "美元对主要贸易伙伴货币的广义汇率指数，作为海外美元折算的全局背景。"
+  },
+  {
+    key: "t10y2y",
+    fredId: "T10Y2Y",
+    label: "10Y-2Y 利差",
+    category: "context",
+    unit: "%",
+    source: "FRED T10Y2Y / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/T10Y2Y",
+    scale: 1,
+    color: "#84cc16",
+    description: "10 年期减 2 年期收益率利差，衡量曲线形态变化。"
+  },
+  {
+    key: "t10y3m",
+    fredId: "T10Y3M",
+    label: "10Y-3M 利差",
+    category: "context",
+    unit: "%",
+    source: "FRED T10Y3M / Federal Reserve H.15",
+    sourceUrl: "https://fred.stlouisfed.org/series/T10Y3M",
+    scale: 1,
+    color: "#f43f5e",
+    description: "10 年期减 3 个月收益率利差，是常见衰退风险观察指标。"
   }
 ];
 
@@ -960,6 +1176,7 @@ async function main() {
   await writeDataset("risk-markets.json", await buildRiskDataset());
   await writeDataset("treasury-markets.json", await buildTreasuryDataset());
   await writeDataset("capex.json", await buildCapexDataset());
+  await writeDataset("cost-of-capital.json", await buildCostOfCapitalDataset());
 }
 
 async function fetchSeriesForDefinitions(definitionsForFetch) {
@@ -1123,7 +1340,7 @@ function riskMarketCharts(seriesMap) {
   }));
 }
 
-async function fetchSecCompanyCapex(company) {
+async function fetchSecCompanyQuarterlySeries(company, tag, seriesKey, description) {
   const url = `https://data.sec.gov/api/xbrl/companyfacts/CIK${company.cik}.json`;
   const response = await fetch(url, {
     headers: {
@@ -1132,7 +1349,7 @@ async function fetchSecCompanyCapex(company) {
   });
   if (!response.ok) throw new Error(`SEC ${company.label} failed: ${response.status}`);
   const payload = await response.json();
-  const facts = payload.facts?.["us-gaap"]?.[company.tag]?.units?.USD ?? [];
+  const facts = payload.facts?.["us-gaap"]?.[tag]?.units?.USD ?? [];
   const unique = new Map();
   for (const fact of facts) {
     if (!fact.start || !fact.end || !["10-Q", "10-K"].includes(fact.form)) continue;
@@ -1161,7 +1378,7 @@ async function fetchSecCompanyCapex(company) {
     let previousEnd = firstQuarter?.end ?? start;
     for (const fact of cumulativeFacts.sort((a, b) => a.end.localeCompare(b.end))) {
       const derived = fact.val - previousValue;
-      if (derived > 0) quarters.push({ start: previousEnd, end: fact.end, val: derived });
+      if (Number.isFinite(derived)) quarters.push({ start: previousEnd, end: fact.end, val: derived });
       previousValue = fact.val;
       previousEnd = fact.end;
     }
@@ -1175,20 +1392,56 @@ async function fetchSecCompanyCapex(company) {
     const contained = uniqueQuarters.filter((quarter) => quarter.start >= annual.start && quarter.end < annual.end);
     if (contained.length !== 3) continue;
     const derived = annual.val - contained.reduce((sum, quarter) => sum + quarter.val, 0);
-    if (derived > 0) uniqueQuarters.push({ start: contained.map((item) => item.end).sort().at(-1), end: annual.end, val: derived });
+    if (Number.isFinite(derived)) uniqueQuarters.push({ start: contained.map((item) => item.end).sort().at(-1), end: annual.end, val: derived });
   }
   const points = [...new Map(uniqueQuarters.map((fact) => [fact.end, { date: fact.end, value: round(fact.val / 1_000_000_000, 3) }])).values()]
     .filter((point) => point.date >= startIso)
     .sort((a, b) => a.date.localeCompare(b.date));
   return {
-    key: company.key,
+    key: seriesKey,
     label: company.label,
     color: company.color,
     unit: "十亿美元",
     source: `SEC Company Facts / ${company.label}`,
     sourceUrl: url,
-    description: "公司现金流量表中的物业及设备购置现金支出；不等同于公司单独披露的纯 AI 投资。",
+    description,
     points
+  };
+}
+
+async function fetchSecCompanyFinancials(company) {
+  const [capex, operatingCashFlow] = await Promise.all([
+    fetchSecCompanyQuarterlySeries(
+      company,
+      company.tag,
+      company.key,
+      "公司现金流量表中的物业及设备购置现金支出；不等同于公司单独披露的纯 AI 投资。"
+    ),
+    fetchSecCompanyQuarterlySeries(
+      company,
+      "NetCashProvidedByUsedInOperatingActivities",
+      `${company.key}OperatingCashFlow`,
+      "公司现金流量表中的经营活动现金净额，用于衡量资本开支的内部现金覆盖能力。"
+    )
+  ]);
+  return { company, capex, operatingCashFlow };
+}
+
+function trailingFour(points, endDate) {
+  return points.filter((point) => point.date <= endDate).slice(-4).reduce((sum, point) => sum + point.value, 0);
+}
+
+function capexGrowthSeries(series) {
+  return {
+    ...series,
+    key: `${series.key}Growth`,
+    unit: "%",
+    description: "滚动四季度现金资本开支相对上一个四季度窗口的同比增速。",
+    points: series.points.slice(7).map((point, index) => {
+      const current = series.points.slice(index + 4, index + 8).reduce((sum, item) => sum + item.value, 0);
+      const previous = series.points.slice(index, index + 4).reduce((sum, item) => sum + item.value, 0);
+      return { date: point.date, value: previous === 0 ? 0 : round(((current / previous) - 1) * 100, 2) };
+    })
   };
 }
 
@@ -1466,8 +1719,28 @@ async function buildRiskDataset() {
 }
 
 async function buildCapexDataset() {
-  const companySeries = await Promise.all(aiCapexCompanies.map(fetchSecCompanyCapex));
+  const companyFinancials = await Promise.all(aiCapexCompanies.map(fetchSecCompanyFinancials));
+  const companySeries = companyFinancials.map((item) => item.capex);
   const latestCommonDate = companySeries.map((series) => series.points.at(-1)?.date).filter(Boolean).sort().at(0) ?? endIso;
+  const capexCompanyMetrics = companyFinancials.map(({ company, capex, operatingCashFlow }) => {
+    const ttmCapex = trailingFour(capex.points, latestCommonDate);
+    const ttmOperatingCashFlow = trailingFour(operatingCashFlow.points, latestCommonDate);
+    const previousCapex = capex.points.filter((point) => point.date <= latestCommonDate).slice(-8, -4).reduce((sum, point) => sum + point.value, 0);
+    const capexGrowthYoy = previousCapex > 0 ? round(((ttmCapex / previousCapex) - 1) * 100, 2) : null;
+    const cashCoverageRatio = ttmCapex > 0 ? round(ttmOperatingCashFlow / ttmCapex, 2) : null;
+    const ttmFreeCashFlow = round(ttmOperatingCashFlow - ttmCapex, 3);
+    return {
+      key: company.key,
+      label: company.label,
+      asOf: latestCommonDate,
+      ttmCapex: round(ttmCapex, 3),
+      ttmOperatingCashFlow: round(ttmOperatingCashFlow, 3),
+      ttmFreeCashFlow,
+      capexGrowthYoy,
+      cashCoverageRatio,
+      financingStatus: ttmFreeCashFlow >= 0 ? "内部现金可覆盖" : "内部现金未完全覆盖"
+    };
+  });
   return {
     generatedAt: new Date().toISOString(),
     lookbackYears,
@@ -1479,12 +1752,18 @@ async function buildCapexDataset() {
     snapshots: [],
     capexCharts: [
       {
+        title: "滚动四季度 CapEx 同比增速",
+        description: "使用滚动四季度现金资本开支计算同比，降低单季度确认节奏造成的噪声。",
+        series: companySeries.map(capexGrowthSeries)
+      },
+      {
         title: "Hyperscaler 季度现金资本开支",
         description: "四家公司现金流量表中的物业及设备购置现金支出，统一按十亿美元展示。",
         series: companySeries
       }
     ],
     capexCommitments: aiInvestmentCommitments,
+    capexCompanyMetrics,
     composite: {
       score: null,
       label: "AI 资本开支",
@@ -1492,7 +1771,8 @@ async function buildCapexDataset() {
       series: []
     },
     notes: [
-      "季度实际值来自 SEC Company Facts，统一采用物业及设备购置现金支出，以提高跨公司可比性。",
+      "季度实际值与经营现金流来自 SEC Company Facts；自由现金流近似值为经营现金流减现金资本开支。",
+      "内部现金未完全覆盖只描述当期现金流口径，不代表公司已经宣布外部融资；现金储备、租赁和债务安排需结合公司披露判断。",
       "公司未普遍单独披露纯 AI CapEx，因此实际值包含云、数据中心、服务器、网络及其他物业设备投资。",
       "公司指引、产业项目与政府动员资金属于不同口径的承诺值，不计入季度实际支出合计。"
     ]
@@ -1529,6 +1809,438 @@ async function buildTreasuryDataset() {
       "持有人饼图采用公众持有债务近似拆分：美国国内私人部门 = Private Investors - Foreign and International Investors；另列海外/国际投资者与 Federal Reserve Banks。",
       "海外持有人细分使用 Treasury TIC Table 5 Major Foreign Holders。该表按托管/报告地口径统计，财政部提示它不一定精确代表最终受益所有人。",
       "收益率曲线使用 Federal Reserve H.15 的 3M、2Y、10Y、30Y 常数期限美债收益率；利差使用 FRED T10Y2Y 与 T10Y3M。"
+    ]
+  };
+}
+
+const costDerivedDefinitions = {
+  igTotal: {
+    key: "igTotal",
+    label: "IG 总收益率",
+    category: "credit",
+    unit: "%",
+    color: "#64748b",
+    source: "FRED DGS10 + BAMLC0A0CM",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
+    description: "10Y 美债收益率 + 投资级信用利差，代表投资级债券的美元总收益水平。"
+  },
+  hyTotal: {
+    key: "hyTotal",
+    label: "HY 总收益率",
+    category: "credit",
+    unit: "%",
+    color: "#9333ea",
+    source: "FRED DGS10 + BAMLH0A0HYM2",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
+    description: "10Y 美债收益率 + 高收益债信用利差，代表高收益债券的美元总收益水平。"
+  },
+  jgbUsd: {
+    key: "jgbUsd",
+    label: "JGB 10Y 美元近似",
+    category: "fx",
+    unit: "%",
+    color: "#0d9488",
+    source: "FRED IRLTLT01JPM156N + DEXJPUS",
+    sourceUrl: "https://fred.stlouisfed.org/series/DEXJPUS",
+    description: "JGB 本币收益率 + 近 12 个月 USD/JPY 汇率变动贡献（未对冲的美元近似收益）。"
+  },
+  bundUsd: {
+    key: "bundUsd",
+    label: "Bund 10Y 美元近似",
+    category: "fx",
+    unit: "%",
+    color: "#b45309",
+    source: "FRED IRLTLT01EZM156N + DEXUSEU",
+    sourceUrl: "https://fred.stlouisfed.org/series/DEXUSEU",
+    description: "欧元区 10Y 本币收益率 + 近 12 个月 EUR/USD 汇率变动贡献（未对冲的美元近似收益）。"
+  },
+  spxEarningsYield: {
+    key: "spxEarningsYield",
+    label: "标普盈利收益率",
+    category: "equity",
+    unit: "%",
+    color: "#e11d48",
+    source: "multpl Shiller PE",
+    sourceUrl: "https://www.multpl.com/s-p-500-pe-ratio",
+    description: "100 / Shiller PE，月度口径；代表标普 500 的盈利收益率。"
+  },
+  equityBondGap: {
+    key: "equityBondGap",
+    label: "股债差",
+    category: "context",
+    unit: "%",
+    color: "#0891b2",
+    source: "multpl Shiller PE - FRED DGS10",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
+    description: "标普盈利收益率 - 10Y 美债收益率；为正表示股票相对债券更有吸引力。"
+  }
+};
+
+const monthNames = {
+  Jan: "01",
+  Feb: "02",
+  Mar: "03",
+  Apr: "04",
+  May: "05",
+  Jun: "06",
+  Jul: "07",
+  Aug: "08",
+  Sep: "09",
+  Oct: "10",
+  Nov: "11",
+  Dec: "12"
+};
+
+function parseMultplDate(text) {
+  const match = text.match(/^([A-Za-z]{3})\s+(\d{1,2}),\s+(\d{4})$/);
+  if (!match || !monthNames[match[1]]) return null;
+  return `${match[3]}-${monthNames[match[1]]}-${String(Number(match[2])).padStart(2, "0")}`;
+}
+
+async function fetchMultplShillerPeSeries() {
+  try {
+    const url = "https://www.multpl.com/s-p-500-pe-ratio/table/by-month";
+    const response = await fetch(url, { headers: { "user-agent": "global-liquidity-monitor/0.1" } });
+    if (!response.ok) throw new Error(`multpl failed: ${response.status}`);
+    const html = await response.text();
+    const tableMatch = html.match(/<table id="datatable"[\s\S]*?<\/table>/);
+    if (!tableMatch) throw new Error("multpl table not found");
+    const rows = tableMatch[0].match(/<tr[^>]*>([\s\S]*?)<\/tr>/g) ?? [];
+    const points = [];
+    for (const row of rows) {
+      const cells = row.match(/<td[^>]*>([\s\S]*?)<\/td>/g) ?? [];
+      if (cells.length < 2) continue;
+      const dateText = cells[0].replace(/<[^>]+>/g, "").trim();
+      const valueText = cells[1]
+        .replace(/<[^>]+>/g, "")
+        .replace(/&#(?:x[0-9a-fA-F]+|\d+);/g, " ")
+        .replace(/&[a-z]+;/gi, " ")
+        .trim();
+      const date = parseMultplDate(dateText);
+      const valueMatch = valueText.match(/-?\d+(?:\.\d+)?/);
+      const value = valueMatch ? Number(valueMatch[0]) : NaN;
+      if (!date || Number.isNaN(value) || value <= 0) continue;
+      points.push({ date, value: round(value, 2) });
+    }
+    points.sort((a, b) => a.date.localeCompare(b.date));
+    return points.filter((point) => point.date >= startIso);
+  } catch (error) {
+    console.warn(`Shiller PE unavailable, equity yield will be empty: ${error.message}`);
+    return [];
+  }
+}
+
+function rollingPercentChange(series, months) {
+  const map = byDate(series);
+  return series
+    .map((point) => {
+      const base = map.get(offsetMonths(point.date, -months));
+      if (base === undefined || base === 0) return null;
+      return { date: point.date, value: round((point.value / base - 1) * 100, 4) };
+    })
+    .filter(Boolean);
+}
+
+function usdConvertedYield(localSeries, fxPctSeries, fxSign) {
+  const fxMap = byDate(fxPctSeries);
+  return localSeries
+    .map((point) => {
+      const fx = latestBeforeOrOn(fxMap, point.date);
+      if (fx === undefined) return null;
+      return { date: point.date, value: round(point.value + fxSign * fx, 4) };
+    })
+    .filter(Boolean);
+}
+
+function addSeries(left, right, rightScale = 1) {
+  const rightMap = byDate(right);
+  return left
+    .map((point) => {
+      const other = latestBeforeOrOn(rightMap, point.date);
+      if (other === undefined) return null;
+      return { date: point.date, value: round(point.value + other * rightScale, 4) };
+    })
+    .filter(Boolean);
+}
+
+function subtractSeries(left, right) {
+  const rightMap = byDate(right);
+  return left
+    .map((point) => {
+      const other = latestBeforeOrOn(rightMap, point.date);
+      if (other === undefined) return null;
+      return { date: point.date, value: round(point.value - other, 4) };
+    })
+    .filter(Boolean);
+}
+
+function changeStats(series, windows = [30, 91, 182]) {
+  const sorted = [...series].sort((a, b) => a.date.localeCompare(b.date));
+  const latest = sorted.at(-1) ?? null;
+  const previous = sorted.at(-2) ?? null;
+  const map = byDate(sorted);
+  const changes = {};
+  for (const days of windows) {
+    const base = latest ? latestBeforeOrOn(map, offsetDate(latest.date, -days)) : undefined;
+    changes[days] = latest && base !== undefined ? round(latest.value - base, 4) : null;
+  }
+  return {
+    latest,
+    previous,
+    oneMonthChange: changes[30],
+    threeMonthChange: changes[91],
+    sixMonthChange: changes[182]
+  };
+}
+
+function costSeriesDefinition(key) {
+  const definition =
+    costOfCapitalDefinitions.find((item) => item.key === key) ?? costDerivedDefinitions[key];
+  if (!definition) throw new Error(`Missing cost-of-capital definition: ${key}`);
+  return definition;
+}
+
+function costSeries(seriesMap, key) {
+  const definition = costSeriesDefinition(key);
+  return {
+    key: definition.key,
+    label: definition.label,
+    color: definition.color,
+    unit: definition.unit,
+    source: definition.source,
+    sourceUrl: definition.sourceUrl,
+    description: definition.description,
+    points: [...(seriesMap.get(key) ?? [])].sort((a, b) => a.date.localeCompare(b.date))
+  };
+}
+
+function costYieldItem(definition, series, anchorValue, extra = {}) {
+  const sorted = [...series].sort((a, b) => a.date.localeCompare(b.date));
+  const latest = sorted.at(-1) ?? null;
+  const previous = sorted.at(-2) ?? null;
+  const map = byDate(sorted);
+  const changeSince = (days) => {
+    if (!latest) return null;
+    const base = latestBeforeOrOn(map, offsetDate(latest.date, -days));
+    return base === undefined ? null : round(latest.value - base, 4);
+  };
+  const vsAnchorBp =
+    latest && anchorValue !== null && anchorValue !== undefined && definition.category !== "context"
+      ? round((latest.value - anchorValue) * 100, 1)
+      : null;
+  return {
+    key: definition.key,
+    label: definition.label,
+    category: definition.category,
+    unit: definition.unit,
+    basis: extra.basis ?? "美元年化",
+    source: definition.source,
+    sourceUrl: definition.sourceUrl,
+    description: definition.description,
+    latestDate: latest?.date ?? "",
+    latestValue: latest?.value ?? null,
+    previousValue: previous?.value ?? null,
+    oneMonthChange: changeSince(30),
+    threeMonthChange: changeSince(91),
+    sixMonthChange: changeSince(182),
+    vsAnchorBp: definition.key === "effr" ? 0 : vsAnchorBp,
+    ...extra,
+    series: sorted
+  };
+}
+
+function costSpreadItem(definition, series) {
+  const sorted = [...series].sort((a, b) => a.date.localeCompare(b.date));
+  const latest = sorted.at(-1) ?? null;
+  const previous = sorted.at(-2) ?? null;
+  const map = byDate(sorted);
+  const changeSince = (days) => {
+    if (!latest) return null;
+    const base = latestBeforeOrOn(map, offsetDate(latest.date, -days));
+    return base === undefined ? null : round(latest.value - base, 4);
+  };
+  return {
+    key: definition.key,
+    label: definition.label,
+    unit: definition.unit,
+    source: definition.source,
+    sourceUrl: definition.sourceUrl,
+    description: definition.description,
+    latestDate: latest?.date ?? "",
+    latestValue: latest?.value ?? null,
+    previousValue: previous?.value ?? null,
+    oneMonthChange: changeSince(30),
+    threeMonthChange: changeSince(91),
+    series: sorted
+  };
+}
+
+function costOfCapitalCharts(seriesMap) {
+  return [
+    {
+      title: "现金锚水位",
+      description: "EFFR、SOFR 与 3 个月美债同图，观察美元现金类资产的收益水位，以及担保融资市场相对政策利率的定价。",
+      series: [costSeries(seriesMap, "effr"), costSeries(seriesMap, "sofr"), costSeries(seriesMap, "dgs3mo")]
+    },
+    {
+      title: "美债收益率曲线",
+      description: "3M、2Y、10Y、30Y 同图，观察短端政策预期、中端增长预期和长端期限溢价的相对变化。",
+      series: [
+        costSeries(seriesMap, "dgs3mo"),
+        costSeries(seriesMap, "dgs2"),
+        costSeries(seriesMap, "dgs10"),
+        costSeries(seriesMap, "dgs30")
+      ]
+    },
+    {
+      title: "实际利率与通胀预期",
+      description: "10Y TIPS 实际利率与 10 年盈亏平衡通胀同图；实际利率抬升通常压制高估值、长久期资产。",
+      series: [costSeries(seriesMap, "dfii10"), costSeries(seriesMap, "breakeven10y")]
+    },
+    {
+      title: "信用债总收益率",
+      description: "IG/HY 总收益率 = 10Y 美债 + 各自利差；总收益率上行代表借债成本上升，利差本身单独在相对价值信号中展示。",
+      series: [costSeries(seriesMap, "dgs10"), costSeries(seriesMap, "igTotal"), costSeries(seriesMap, "hyTotal")]
+    },
+    {
+      title: "海外债券美元折算",
+      description: "美元近似收益 = 本币收益率 + 近 12 个月汇率变动贡献。日债按 USD/JPY（日元升值贡献为正），欧债按 EUR/USD（欧元升值贡献为正），均未做汇率对冲。",
+      series: [
+        costSeries(seriesMap, "jgb10y"),
+        costSeries(seriesMap, "jgbUsd"),
+        costSeries(seriesMap, "bund10y"),
+        costSeries(seriesMap, "bundUsd")
+      ]
+    },
+    {
+      title: "股债相对吸引力",
+      description: "标普 500 盈利收益率（100 / Shiller PE，月度）对比 10Y 美债；股债差为正表示股票相对债券更有吸引力。",
+      series: [costSeries(seriesMap, "spxEarningsYield"), costSeries(seriesMap, "dgs10"), costSeries(seriesMap, "equityBondGap")]
+    }
+  ];
+}
+
+async function buildCostOfCapitalDataset() {
+  const seriesMap = await fetchSeriesForDefinitions(costOfCapitalDefinitions);
+  const anchorSeries = seriesMap.get("effr") ?? [];
+  const anchorValue = anchorSeries.at(-1)?.value ?? null;
+  const shillerPe = await fetchMultplShillerPeSeries();
+  const earningsYield = shillerPe.map((point) => ({ date: point.date, value: round(100 / point.value, 3) }));
+  const usdJpyPct = rollingPercentChange(seriesMap.get("usdJpy") ?? [], 12);
+  const eurUsdPct = rollingPercentChange(seriesMap.get("eurUsd") ?? [], 12);
+
+  seriesMap.set("igTotal", addSeries(seriesMap.get("dgs10") ?? [], seriesMap.get("igOas") ?? [], 1 / 100));
+  seriesMap.set("hyTotal", addSeries(seriesMap.get("dgs10") ?? [], seriesMap.get("hyOas") ?? [], 1 / 100));
+  seriesMap.set("jgbUsd", usdConvertedYield(seriesMap.get("jgb10y") ?? [], usdJpyPct, -1));
+  seriesMap.set("bundUsd", usdConvertedYield(seriesMap.get("bund10y") ?? [], eurUsdPct, 1));
+  seriesMap.set("spxEarningsYield", earningsYield);
+  seriesMap.set("equityBondGap", subtractSeries(earningsYield, seriesMap.get("dgs10") ?? []));
+
+  const ladderKeys = [
+    "effr",
+    "sofr",
+    "dgs3mo",
+    "dgs2",
+    "dgs10",
+    "dgs30",
+    "dfii10",
+    "breakeven10y",
+    "igTotal",
+    "hyTotal",
+    "jgb10y",
+    "jgbUsd",
+    "bund10y",
+    "bundUsd",
+    "spxEarningsYield"
+  ];
+  const yields = ladderKeys.map((key) => {
+    const definition = costSeriesDefinition(key);
+    const series = seriesMap.get(key) ?? [];
+    if (key === "jgbUsd" || key === "bundUsd") {
+      const fxPct = key === "jgbUsd" ? usdJpyPct : eurUsdPct;
+      const localSeries = seriesMap.get(key === "jgbUsd" ? "jgb10y" : "bund10y") ?? [];
+      const latestPoint = series.at(-1) ?? null;
+      const fxMove = latestPoint ? latestBeforeOrOn(byDate(fxPct), latestPoint.date) ?? null : null;
+      const fxSign = key === "jgbUsd" ? -1 : 1;
+      const fxContribution = fxMove === null ? null : round(fxSign * fxMove, 3);
+      const localYield = latestPoint ? latestBeforeOrOn(byDate(localSeries), latestPoint.date) ?? null : null;
+      return costYieldItem(definition, series, anchorValue, {
+        basis: "美元年化近似",
+        fxMove: fxMove === null ? null : round(fxMove, 3),
+        fxContribution,
+        localYield: localYield === null ? null : round(localYield, 3)
+      });
+    }
+    if (key === "spxEarningsYield") {
+      const latestPoint = series.at(-1) ?? null;
+      const pe = latestPoint ? latestBeforeOrOn(byDate(shillerPe), latestPoint.date) ?? null : null;
+      return costYieldItem(definition, series, anchorValue, {
+        basis: "美元年化",
+        peRatio: pe === null ? null : round(pe, 2)
+      });
+    }
+    return costYieldItem(definition, series, anchorValue, {
+      basis: key === "jgb10y" || key === "bund10y" ? "本币年化" : "美元年化"
+    });
+  });
+
+  const spreadKeys = ["equityBondGap", "t10y2y", "t10y3m", "igOas", "hyOas", "broadDollar"];
+  const spreads = spreadKeys.map((key) => costSpreadItem(costSeriesDefinition(key), seriesMap.get(key) ?? []));
+  // 收益标尺卡片只展示最新值与变化，完整曲线由下方图表区承载；
+  // 仅保留主驾驶舱利率锚模块需要的三条序列，避免数据文件重复膨胀。
+  const keepSeriesKeys = new Set(["hyTotal", "jgbUsd", "equityBondGap"]);
+  const compactYields = yields.map((item) =>
+    keepSeriesKeys.has(item.key) ? item : { ...item, series: [] }
+  );
+  const compactSpreads = spreads.map((item) =>
+    keepSeriesKeys.has(item.key) ? item : { ...item, series: [] }
+  );
+
+  const anchorStats = changeStats(anchorSeries);
+  const anchor = {
+    key: "effr",
+    label: "EFFR 美元现金锚",
+    unit: "%",
+    latestDate: anchorStats.latest?.date ?? "",
+    latestValue: anchorStats.latest?.value ?? null,
+    previousValue: anchorStats.previous?.value ?? null,
+    oneMonthChange: anchorStats.oneMonthChange,
+    percentile: percentileRank(
+      anchorSeries.map((point) => point.value),
+      anchorStats.latest?.value
+    ),
+    source: "FRED EFFR / Federal Reserve Bank of New York",
+    sourceUrl: "https://fred.stlouisfed.org/series/EFFR",
+    description: "有效联邦基金利率是美元资金的机会成本基准：低于它的美元年化收益，意味着相对现金没有获得风险补偿。"
+  };
+
+  return {
+    generatedAt: new Date().toISOString(),
+    lookbackYears,
+    dateRange: {
+      start: startIso,
+      end: endIso
+    },
+    indicators: [],
+    snapshots: [],
+    costOfCapital: {
+      anchor,
+      yields: compactYields,
+      spreads: compactSpreads,
+      charts: costOfCapitalCharts(seriesMap)
+    },
+    composite: {
+      score: null,
+      label: "利率锚",
+      date: endIso,
+      series: []
+    },
+    notes: [
+      "统一标尺：所有收益率均为年化。美元资产直接使用美债/信用市场收益率；海外债券的美元近似收益 = 本币收益率 + 近 12 个月汇率变动贡献（日债按 USD/JPY，欧债按 EUR/USD，未做对冲）。",
+      "股债差 = 标普 500 盈利收益率（100 / Shiller PE，月度口径） - 10Y 美债收益率；为正表示股票相对债券更有吸引力。",
+      "信用债总收益率 = 10Y 美债 + 相应期权调整利差；利差走阔代表风险溢价上升，总收益率上行代表借债成本上升。",
+      "OECD 长端收益率序列存在发布滞后：日本 10Y 当前数据截至 2026-06，欧元区截至 2026-01；海外折算行显示的是该序列最近可得值。",
+      "本面板是收益率与相对价值的市场信号，不是资金流向的实盘统计；实际流向还需结合 TIC、基金流等数据交叉验证。"
     ]
   };
 }

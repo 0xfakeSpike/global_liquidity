@@ -1,13 +1,571 @@
 {
-  "generatedAt": "2026-07-28T10:29:06.317Z",
+  "generatedAt": "2026-08-13T08:07:02.278Z",
   "lookbackYears": 10,
   "dateRange": {
-    "start": "2016-07-28",
-    "end": "2026-07-28"
+    "start": "2016-08-13",
+    "end": "2026-08-13"
   },
   "indicators": [],
   "snapshots": [],
   "capexCharts": [
+    {
+      "title": "滚动四季度 CapEx 同比增速",
+      "description": "使用滚动四季度现金资本开支计算同比，降低单季度确认节奏造成的噪声。",
+      "series": [
+        {
+          "key": "alphabetGrowth",
+          "label": "Alphabet",
+          "color": "#2563eb",
+          "unit": "%",
+          "source": "SEC Company Facts / Alphabet",
+          "sourceUrl": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001652044.json",
+          "description": "滚动四季度现金资本开支相对上一个四季度窗口的同比增速。",
+          "points": [
+            {
+              "date": "2018-06-30",
+              "value": 87.96
+            },
+            {
+              "date": "2018-09-30",
+              "value": 87.08
+            },
+            {
+              "date": "2018-12-31",
+              "value": 90.68
+            },
+            {
+              "date": "2019-03-31",
+              "value": 25.05
+            },
+            {
+              "date": "2019-06-30",
+              "value": 12.15
+            },
+            {
+              "date": "2019-09-30",
+              "value": 9.89
+            },
+            {
+              "date": "2019-12-31",
+              "value": -6.33
+            },
+            {
+              "date": "2020-03-31",
+              "value": 10.84
+            },
+            {
+              "date": "2020-06-30",
+              "value": 4.55
+            },
+            {
+              "date": "2020-09-30",
+              "value": -7.01
+            },
+            {
+              "date": "2020-12-31",
+              "value": -5.38
+            },
+            {
+              "date": "2021-03-31",
+              "value": -10.82
+            },
+            {
+              "date": "2021-06-30",
+              "value": -7.68
+            },
+            {
+              "date": "2021-09-30",
+              "value": 3.86
+            },
+            {
+              "date": "2021-12-31",
+              "value": 10.59
+            },
+            {
+              "date": "2022-03-31",
+              "value": 28.2
+            },
+            {
+              "date": "2022-06-30",
+              "value": 33.57
+            },
+            {
+              "date": "2022-09-30",
+              "value": 27.54
+            },
+            {
+              "date": "2022-12-31",
+              "value": 27.78
+            },
+            {
+              "date": "2023-03-31",
+              "value": -1.74
+            },
+            {
+              "date": "2023-06-30",
+              "value": -5.93
+            },
+            {
+              "date": "2023-09-30",
+              "value": -4.78
+            },
+            {
+              "date": "2023-12-31",
+              "value": 2.43
+            },
+            {
+              "date": "2024-03-31",
+              "value": 35.68
+            },
+            {
+              "date": "2024-06-30",
+              "value": 57.84
+            },
+            {
+              "date": "2024-09-30",
+              "value": 70.94
+            },
+            {
+              "date": "2024-12-31",
+              "value": 62.89
+            },
+            {
+              "date": "2025-03-31",
+              "value": 52
+            },
+            {
+              "date": "2025-06-30",
+              "value": 51.29
+            },
+            {
+              "date": "2025-09-30",
+              "value": 58.03
+            },
+            {
+              "date": "2025-12-31",
+              "value": 74.07
+            },
+            {
+              "date": "2026-03-31",
+              "value": 90.44
+            },
+            {
+              "date": "2026-06-30",
+              "value": 97.67
+            }
+          ]
+        },
+        {
+          "key": "microsoftGrowth",
+          "label": "Microsoft",
+          "color": "#16a34a",
+          "unit": "%",
+          "source": "SEC Company Facts / Microsoft",
+          "sourceUrl": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+          "description": "滚动四季度现金资本开支相对上一个四季度窗口的同比增速。",
+          "points": [
+            {
+              "date": "2018-06-30",
+              "value": 43.09
+            },
+            {
+              "date": "2018-09-30",
+              "value": 61.79
+            },
+            {
+              "date": "2018-12-31",
+              "value": 63.56
+            },
+            {
+              "date": "2019-03-31",
+              "value": 39.45
+            },
+            {
+              "date": "2019-06-30",
+              "value": 19.71
+            },
+            {
+              "date": "2019-09-30",
+              "value": 4.63
+            },
+            {
+              "date": "2019-12-31",
+              "value": -4.76
+            },
+            {
+              "date": "2020-03-31",
+              "value": 6.45
+            },
+            {
+              "date": "2020-06-30",
+              "value": 10.89
+            },
+            {
+              "date": "2020-09-30",
+              "value": 23.75
+            },
+            {
+              "date": "2020-12-31",
+              "value": 29.87
+            },
+            {
+              "date": "2021-03-31",
+              "value": 28.25
+            },
+            {
+              "date": "2021-06-30",
+              "value": 33.55
+            },
+            {
+              "date": "2021-09-30",
+              "value": 26.89
+            },
+            {
+              "date": "2021-12-31",
+              "value": 31.97
+            },
+            {
+              "date": "2022-03-31",
+              "value": 24.07
+            },
+            {
+              "date": "2022-06-30",
+              "value": 15.83
+            },
+            {
+              "date": "2022-09-30",
+              "value": 13.17
+            },
+            {
+              "date": "2022-12-31",
+              "value": 6.69
+            },
+            {
+              "date": "2023-03-31",
+              "value": 10.94
+            },
+            {
+              "date": "2023-06-30",
+              "value": 17.67
+            },
+            {
+              "date": "2023-09-30",
+              "value": 30.31
+            },
+            {
+              "date": "2023-12-31",
+              "value": 42.13
+            },
+            {
+              "date": "2024-03-31",
+              "value": 51.9
+            },
+            {
+              "date": "2024-06-30",
+              "value": 58.24
+            },
+            {
+              "date": "2024-09-30",
+              "value": 55.9
+            },
+            {
+              "date": "2024-12-31",
+              "value": 57.81
+            },
+            {
+              "date": "2025-03-31",
+              "value": 55.12
+            },
+            {
+              "date": "2025-06-30",
+              "value": 45.13
+            },
+            {
+              "date": "2025-09-30",
+              "value": 39.49
+            },
+            {
+              "date": "2025-12-31",
+              "value": 49.58
+            },
+            {
+              "date": "2026-03-31",
+              "value": 58.49
+            },
+            {
+              "date": "2026-06-30",
+              "value": 79.62
+            }
+          ]
+        },
+        {
+          "key": "amazonGrowth",
+          "label": "Amazon",
+          "color": "#f59e0b",
+          "unit": "%",
+          "source": "SEC Company Facts / Amazon",
+          "sourceUrl": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001018724.json",
+          "description": "滚动四季度现金资本开支相对上一个四季度窗口的同比增速。",
+          "points": [
+            {
+              "date": "2019-09-30",
+              "value": -15.23
+            },
+            {
+              "date": "2019-12-31",
+              "value": 25.58
+            },
+            {
+              "date": "2020-03-31",
+              "value": 49.54
+            },
+            {
+              "date": "2020-06-30",
+              "value": 74.08
+            },
+            {
+              "date": "2020-09-30",
+              "value": 100.41
+            },
+            {
+              "date": "2020-12-31",
+              "value": 138.06
+            },
+            {
+              "date": "2021-03-31",
+              "value": 123.05
+            },
+            {
+              "date": "2021-06-30",
+              "value": 115.37
+            },
+            {
+              "date": "2021-09-30",
+              "value": 85.91
+            },
+            {
+              "date": "2021-12-31",
+              "value": 52.1
+            },
+            {
+              "date": "2022-03-31",
+              "value": 40.71
+            },
+            {
+              "date": "2022-06-30",
+              "value": 25.07
+            },
+            {
+              "date": "2022-09-30",
+              "value": 15.89
+            },
+            {
+              "date": "2022-12-31",
+              "value": 4.25
+            },
+            {
+              "date": "2023-03-31",
+              "value": -1.6
+            },
+            {
+              "date": "2023-06-30",
+              "value": -10.29
+            },
+            {
+              "date": "2023-09-30",
+              "value": -17.06
+            },
+            {
+              "date": "2023-12-31",
+              "value": -17.15
+            },
+            {
+              "date": "2024-03-31",
+              "value": -15.03
+            },
+            {
+              "date": "2024-06-30",
+              "value": 1.67
+            },
+            {
+              "date": "2024-09-30",
+              "value": 27.44
+            },
+            {
+              "date": "2024-12-31",
+              "value": 57.41
+            },
+            {
+              "date": "2025-03-31",
+              "value": 74.18
+            },
+            {
+              "date": "2025-06-30",
+              "value": 80.59
+            },
+            {
+              "date": "2025-09-30",
+              "value": 72.22
+            },
+            {
+              "date": "2025-12-31",
+              "value": 58.82
+            },
+            {
+              "date": "2026-03-31",
+              "value": 62.21
+            },
+            {
+              "date": "2026-06-30",
+              "value": 60.72
+            }
+          ]
+        },
+        {
+          "key": "metaGrowth",
+          "label": "Meta",
+          "color": "#7c3aed",
+          "unit": "%",
+          "source": "SEC Company Facts / Meta",
+          "sourceUrl": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001326801.json",
+          "description": "滚动四季度现金资本开支相对上一个四季度窗口的同比增速。",
+          "points": [
+            {
+              "date": "2018-06-30",
+              "value": 102.6
+            },
+            {
+              "date": "2018-09-30",
+              "value": 106.95
+            },
+            {
+              "date": "2018-12-31",
+              "value": 106.67
+            },
+            {
+              "date": "2019-03-31",
+              "value": 80.57
+            },
+            {
+              "date": "2019-06-30",
+              "value": 46.87
+            },
+            {
+              "date": "2019-09-30",
+              "value": 28.85
+            },
+            {
+              "date": "2019-12-31",
+              "value": 8.53
+            },
+            {
+              "date": "2020-03-31",
+              "value": -0.78
+            },
+            {
+              "date": "2020-06-30",
+              "value": -4.42
+            },
+            {
+              "date": "2020-09-30",
+              "value": -4.58
+            },
+            {
+              "date": "2020-12-31",
+              "value": 0.4
+            },
+            {
+              "date": "2021-03-31",
+              "value": 7.32
+            },
+            {
+              "date": "2021-06-30",
+              "value": 19.72
+            },
+            {
+              "date": "2021-09-30",
+              "value": 22.94
+            },
+            {
+              "date": "2021-12-31",
+              "value": 23.26
+            },
+            {
+              "date": "2022-03-31",
+              "value": 24.64
+            },
+            {
+              "date": "2022-06-30",
+              "value": 31.6
+            },
+            {
+              "date": "2022-09-30",
+              "value": 54.8
+            },
+            {
+              "date": "2022-12-31",
+              "value": 66.86
+            },
+            {
+              "date": "2023-03-31",
+              "value": 64.25
+            },
+            {
+              "date": "2023-06-30",
+              "value": 36.78
+            },
+            {
+              "date": "2023-09-30",
+              "value": 1.67
+            },
+            {
+              "date": "2023-12-31",
+              "value": -13.28
+            },
+            {
+              "date": "2024-03-31",
+              "value": -18.26
+            },
+            {
+              "date": "2024-06-30",
+              "value": -7.93
+            },
+            {
+              "date": "2024-09-30",
+              "value": 7.69
+            },
+            {
+              "date": "2024-12-31",
+              "value": 37.76
+            },
+            {
+              "date": "2025-03-31",
+              "value": 64.51
+            },
+            {
+              "date": "2025-06-30",
+              "value": 82
+            },
+            {
+              "date": "2025-09-30",
+              "value": 106.2
+            },
+            {
+              "date": "2025-12-31",
+              "value": 87.06
+            },
+            {
+              "date": "2026-03-31",
+              "value": 72.95
+            },
+            {
+              "date": "2026-06-30",
+              "value": 71.25
+            }
+          ]
+        }
+      ]
+    },
     {
       "title": "Hyperscaler 季度现金资本开支",
       "description": "四家公司现金流量表中的物业及设备购置现金支出，统一按十亿美元展示。",
@@ -347,6 +905,10 @@
             {
               "date": "2026-03-31",
               "value": 30.876
+            },
+            {
+              "date": "2026-06-30",
+              "value": 35.802
             }
           ]
         },
@@ -494,6 +1056,10 @@
             {
               "date": "2026-03-31",
               "value": 44.203
+            },
+            {
+              "date": "2026-06-30",
+              "value": 54.208
             }
           ]
         },
@@ -661,6 +1227,10 @@
             {
               "date": "2026-03-31",
               "value": 18.997
+            },
+            {
+              "date": "2026-06-30",
+              "value": 30.116
             }
           ]
         }
@@ -687,6 +1257,15 @@
       "detail": "公司口径包含融资租赁，用于持续扩充云与 AI 容量。"
     },
     {
+      "name": "Meta 2026 CapEx 指引",
+      "amount": "1,150–1,350 亿美元",
+      "horizon": "2026",
+      "type": "公司指引",
+      "announcedDate": "2026-01-28",
+      "sourceUrl": "https://investor.atmeta.com/investor-news/press-release-details/2026/Meta-Reports-Fourth-Quarter-and-Full-Year-2025-Results/",
+      "detail": "包含融资租赁本金支付，主要由 AI、超级智能实验室与核心业务基础设施推动。"
+    },
+    {
       "name": "Stargate",
       "amount": "5,000 亿美元",
       "horizon": "2025–2028",
@@ -705,14 +1284,61 @@
       "detail": "欧盟计划动员的公共与私人投资，其中包含 200 亿欧元 AI Gigafactories 基金。"
     }
   ],
+  "capexCompanyMetrics": [
+    {
+      "key": "alphabet",
+      "label": "Alphabet",
+      "asOf": "2026-06-30",
+      "ttmCapex": 132.402,
+      "ttmOperatingCashFlow": 185.675,
+      "ttmFreeCashFlow": 53.273,
+      "capexGrowthYoy": 97.67,
+      "cashCoverageRatio": 1.4,
+      "financingStatus": "内部现金可覆盖"
+    },
+    {
+      "key": "microsoft",
+      "label": "Microsoft",
+      "asOf": "2026-06-30",
+      "ttmCapex": 115.948,
+      "ttmOperatingCashFlow": 182.935,
+      "ttmFreeCashFlow": 66.987,
+      "capexGrowthYoy": 79.62,
+      "cashCoverageRatio": 1.58,
+      "financingStatus": "内部现金可覆盖"
+    },
+    {
+      "key": "amazon",
+      "label": "Amazon",
+      "asOf": "2026-06-30",
+      "ttmCapex": 173.028,
+      "ttmOperatingCashFlow": 161.403,
+      "ttmFreeCashFlow": -11.625,
+      "capexGrowthYoy": 60.72,
+      "cashCoverageRatio": 0.93,
+      "financingStatus": "内部现金未完全覆盖"
+    },
+    {
+      "key": "meta",
+      "label": "Meta",
+      "asOf": "2026-06-30",
+      "ttmCapex": 89.325,
+      "ttmOperatingCashFlow": 130.301,
+      "ttmFreeCashFlow": 40.976,
+      "capexGrowthYoy": 71.25,
+      "cashCoverageRatio": 1.46,
+      "financingStatus": "内部现金可覆盖"
+    }
+  ],
   "composite": {
     "score": null,
     "label": "AI 资本开支",
-    "date": "2026-03-31",
+    "date": "2026-06-30",
     "series": []
   },
   "notes": [
-    "季度实际值来自 SEC Company Facts，统一采用物业及设备购置现金支出，以提高跨公司可比性。",
+    "季度实际值与经营现金流来自 SEC Company Facts；自由现金流近似值为经营现金流减现金资本开支。",
+    "内部现金未完全覆盖只描述当期现金流口径，不代表公司已经宣布外部融资；现金储备、租赁和债务安排需结合公司披露判断。",
     "公司未普遍单独披露纯 AI CapEx，因此实际值包含云、数据中心、服务器、网络及其他物业设备投资。",
     "公司指引、产业项目与政府动员资金属于不同口径的承诺值，不计入季度实际支出合计。"
   ]

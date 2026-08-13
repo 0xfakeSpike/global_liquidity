@@ -752,6 +752,32 @@ footer {
   margin: 0;
 }
 
+.capex-component-card dl {
+  border-top: 1px solid #e2e8f0;
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding-top: 10px;
+}
+
+.capex-component-card dl div {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.capex-component-card dt,
+.capex-component-card dd {
+  color: #64748b;
+  font-size: 11px;
+  margin: 0;
+}
+
+.capex-component-card dd {
+  color: #0f172a;
+  font-weight: 800;
+}
+
 .capex-commitments {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e2e8f0;
@@ -1540,6 +1566,153 @@ footer {
   margin-top: 18px;
 }
 
+.cost-dashboard {
+  display: grid;
+  gap: 18px;
+}
+
+.cost-hero {
+  background: #f8fafc;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 20px;
+}
+
+.cost-hero > div {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+}
+
+.cost-hero-anchor {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.cost-hero span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cost-hero strong {
+  color: #0f172a;
+  font-size: 22px;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.cost-hero p {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cost-rule {
+  grid-column: 1 / -1;
+}
+
+.cost-rule b {
+  color: #0f172a;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.cost-ladder-grid,
+.cost-spread-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.cost-ladder-card,
+.cost-spread-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.cost-card-head {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.cost-card-head span,
+.cost-spread-card > span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cost-card-head strong,
+.cost-spread-card > strong {
+  color: #0f172a;
+  font-size: 26px;
+}
+
+.cost-ladder-card h3 {
+  color: #0f172a;
+  font-size: 17px;
+  margin: 0;
+}
+
+.cost-ladder-card p,
+.cost-spread-card p {
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.cost-ladder-card p.cost-positive,
+.cost-spread-card p.cost-positive {
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.cost-ladder-card p.cost-negative,
+.cost-spread-card p.cost-negative {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.cost-card-meta {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.cost-card-meta a {
+  color: #2563eb;
+  font-size: 11px;
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cost-card-meta span {
+  color: #94a3b8;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
 footer {
   border-top: 1px solid #e2e8f0;
   justify-content: space-between;
@@ -1574,6 +1747,15 @@ footer {
 
   .treasury-core-grid .holder-list {
     grid-template-columns: 1fr;
+  }
+
+  .cost-hero {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cost-ladder-grid,
+  .cost-spread-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -1613,7 +1795,10 @@ footer {
   .impact-strip,
   .dashboard-hero,
   .real-rate-cards,
-  .real-rate-signals {
+  .real-rate-signals,
+  .cost-hero,
+  .cost-ladder-grid,
+  .cost-spread-grid {
     grid-template-columns: 1fr;
   }
 

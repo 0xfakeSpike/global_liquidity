@@ -10,6 +10,7 @@ The app does not fetch macro data from the browser. `scripts/fetch-data.mjs` pul
 - `public/data/yen-liquidity.json` for JPY liquidity
 - `public/data/risk-markets.json` for normalized risk-market prices
 - `public/data/treasury-markets.json` for U.S. Treasury debt, ownership, yield curve, and fiscal interest cost charts
+- `public/data/cost-of-capital.json` for the USD rate anchor / cost-of-capital yield ladder
 
 USD primary series:
 
@@ -70,6 +71,18 @@ U.S. Treasury market series:
 - FRED `T10Y2Y`, `T10Y3M`: yield curve spreads
 - FRED `FDHBFRBN`, `FDHBPIN`, `FDHBFIN`: Treasury holder structure. The holder pie approximates domestic private ownership as `FDHBPIN - FDHBFIN`, then separately shows foreign/international investors and Federal Reserve Banks.
 - Treasury TIC Table 5 `slt_table5.txt`: latest major foreign holders by country/region, including Japan, Mainland China, United Kingdom, Cayman Islands, Belgium, and others. TIC country data are reported by custody/reporting location and may not identify the final beneficial owner.
+
+Cost of capital / USD rate anchor series:
+
+- FRED `EFFR`, `SOFR`, `DGS3MO`, `DGS2`, `DGS10`, `DGS30`: cash and U.S. Treasury yield ladder, with EFFR as the opportunity-cost anchor
+- FRED `DFII10`, `T10YIE`: 10-year TIPS real yield and breakeven inflation
+- FRED `BAMLC0A0CM`, `BAMLH0A0HYM2`: investment-grade and high-yield option-adjusted spreads; total credit yield = 10Y Treasury + spread
+- FRED `IRLTLT01JPM156N`, `DEXJPUS`: Japan 10Y and USD/JPY, combined into an unhedged USD-approximation yield (local yield + 12-month FX contribution)
+- FRED `IRLTLT01EZM156N`, `DEXUSEU`: Euro-area 10Y and EUR/USD, combined the same way
+- FRED `T10Y2Y`, `T10Y3M`, `DTWEXBGS`: curve spreads and broad dollar context
+- multpl Shiller P/E (monthly): S&P 500 earnings yield = 100 / P/E; equity-bond gap = earnings yield - 10Y Treasury yield
+
+The rate-anchor panel is a relative-value market-price signal, not a direct capital-flow statistic; notes on the page state the data lags (OECD long-term yields) and the unhedged FX approximation.
 
 ## Local Development
 

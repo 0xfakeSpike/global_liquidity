@@ -5,7 +5,10 @@ import { MultiLineChart } from "./components/MultiLineChart";
 import { loadLiquidityDataset, loadUpcomingEvents, type LiquidityMarket } from "./lib/data";
 import { formatChange, formatNumber } from "./lib/format";
 import type {
+  AiCapexCompanyMetrics,
   AiCapexCommitment,
+  CostOfCapitalSpread,
+  CostOfCapitalYield,
   DataPoint,
   HolderShare,
   IndicatorDefinition,
@@ -76,6 +79,14 @@ const markets: Record<
     description: "实际支出与多年承诺分开展示，避免重复计算。",
     sourceLabel: "SEC / Company IR",
     updateLabel: "Quarterly"
+  },
+  cost: {
+    label: "利率锚",
+    eyebrow: "资金成本与美元利率锚",
+    title: "把现金、美债、信用、海外债券和股票收益放到同一把美元尺子上。",
+    description: "以美联储利率为机会成本锚，对比各收益载体的美元年化收益率与变化方向。",
+    sourceLabel: "FRED / OECD / multpl",
+    updateLabel: "Build-time JSON"
   }
 };
 
@@ -88,6 +99,7 @@ function initialMarket(): ViewMode {
 function App() {
   const [dataset, setDataset] = useState<LiquidityDataset | null>(null);
   const [pairedDatasets, setPairedDatasets] = useState<{
+    cost: LiquidityDataset;
     risk: LiquidityDataset;
     usd: LiquidityDataset;
     jpy: LiquidityDataset;
@@ -108,11 +120,14 @@ function App() {
     setPairedDatasets(null);
     if (market === "combined") {
       Promise.all([
+        loadLiquidityDataset("cost"),
         loadLiquidityDataset("usd"),
         loadLiquidityDataset("jpy"),
         loadLiquidityDataset("treasury"),
         loadLiquidityDataset("risk")
-      ]).then(([usd, jpy, treasury, risk]) => setPairedDatasets({ risk, usd, jpy, treasury }));
+      ]).then(([cost, usd, jpy, treasury, risk]) =>
+        setPairedDatasets({ cost, risk, usd, jpy, treasury })
+      );
     } else {
       loadLiquidityDataset(market).then(setDataset);
     }
@@ -195,6 +210,12 @@ function App() {
                 <span>Treasury</span>
                 <span>NY Fed</span>
               </>
+            ) : market === "cost" ? (
+              <>
+                <span>EFFR</span>
+                <span>UST</span>
+                <span>Credit / FX</span>
+              </>
             ) : (
               <>
                 <span>BOJ</span>
@@ -224,6 +245,7 @@ function App() {
       {market === "combined" && pairedDatasets ? (
         <>
           <GlobalLiquidityDashboard
+            cost={pairedDatasets.cost}
             jpy={pairedDatasets.jpy}
             risk={pairedDatasets.risk}
             treasury={pairedDatasets.treasury}
@@ -235,6 +257,8 @@ function App() {
         <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} />
       ) : market === "capex" ? (
         <CapexTerminal dataset={activeDataset} />
+      ) : market === "cost" ? (
+        <CostOfCapitalTerminal dataset={activeDataset} />
       ) : market === "treasury" ? (
         <TreasuryMarketTerminal
           charts={treasuryCharts}
@@ -718,71 +742,72 @@ function riskBreadthText(positive: number, total: number) {
 }
 
 function CapexTerminal({ dataset }: { dataset: LiquidityDataset }) {
-  const chart = dataset.capexCharts?.[0];
-  const companies = chart?.series ?? [];
-  const commonDate = companies.map((series) => series.points.at(-1)?.date).filter((date): date is string => Boolean(date)).sort().at(0);
-  const commonQuarterValues = companies.map((series) => ({
-    series,
-    point: commonDate ? [...series.points].reverse().find((point) => point.date <= commonDate) : undefined
-  }));
-  const commonTotal = commonQuarterValues.reduce((sum, item) => sum + (item.point?.value ?? 0), 0);
+  const growthChart = dataset.capexCharts?.[0];
+  const absoluteChart = dataset.capexCharts?.[1];
+  const metrics = dataset.capexCompanyMetrics ?? [];
+  const totalCapex = metrics.reduce((sum, item) => sum + item.ttmCapex, 0);
+  const totalOperatingCashFlow = metrics.reduce((sum, item) => sum + item.ttmOperatingCashFlow, 0);
+  const previousTotal = metrics.reduce((sum, item) => {
+    if (item.capexGrowthYoy === null) return sum;
+    return sum + item.ttmCapex / (1 + item.capexGrowthYoy / 100);
+  }, 0);
+  const aggregateGrowth = previousTotal > 0 ? ((totalCapex / previousTotal) - 1) * 100 : null;
+  const aggregateCoverage = totalCapex > 0 ? totalOperatingCashFlow / totalCapex : null;
   const commitments = dataset.capexCommitments ?? [];
 
   return (
     <section className="terminal capex-dashboard" id="terminal">
       <div className="dashboard-hero capex-dashboard-hero">
         <div>
-          <span>四大厂商现金 CapEx</span>
-          <strong>{formatNumber(commonTotal, 1)}</strong>
-          <p>十亿美元 · {commonDate ? commonDate.slice(0, 7) : "数据不足"}</p>
+          <span>四大厂商 TTM CapEx 增速</span>
+          <strong>{formatSignedPercent(aggregateGrowth)}</strong>
+          <p>截至 {metrics[0]?.asOf?.slice(0, 7) ?? "数据不足"}</p>
         </div>
         <div className="dashboard-rule">
-          <b>可比口径</b>
-          <p>统一采用 SEC 现金流量表中的物业及设备购置现金支出。它覆盖 AI 与云基础设施，但公司没有普遍拆出纯 AI 占比。</p>
+          <b>增长可持续性</b>
+          <p>经营现金流对现金 CapEx 的整体覆盖倍数为 <strong>{aggregateCoverage === null ? "n/a" : `${formatNumber(aggregateCoverage, 2)}x`}</strong>。覆盖率与自由现金流比绝对支出更能判断扩张是否依赖融资。</p>
         </div>
       </div>
       <div className="capex-component-grid">
-        {commonQuarterValues.map(({ series, point }) => {
-          const yoy =
-            (commonDate
-              ? [...percentChangeSeries(series.points, 365)].reverse().find((item) => item.date <= commonDate)?.value
-              : null) ?? null;
-          return (
-            <div className="capex-component-card" key={series.key}>
-              <span>{series.label}</span>
-              <strong>{formatNumber(point?.value, 1)}</strong>
-              <b>十亿美元</b>
-              <p>最新同比 {formatSignedPercent(yoy)}</p>
-            </div>
-          );
-        })}
+        {metrics.map((item) => <CapexCompanyCard item={item} key={item.key} />)}
       </div>
-      {chart ? (
+      {growthChart ? (
         <div className="capex-chart-grid">
-          <section className="chart-panel" key={chart.title}>
+          <section className="chart-panel">
             <div className="chart-header">
               <div>
-                <span>SEC Company Facts</span>
-                <h3>Hyperscaler 季度现金资本开支</h3>
+                <span>Growth / Rolling Four Quarters</span>
+                <h3>CapEx 增长速度</h3>
               </div>
             </div>
-            <MultiLineChart series={chart.series} dateRange={dataset.dateRange} valueLabel={chart.title} />
-            <div className="rate-sources">
-              {chart.series.map((series) => {
-                const latest = series.points.at(-1);
-                return (
-                  <a href={series.sourceUrl} key={series.key} rel="noreferrer" target="_blank">
-                    <strong>{series.label}</strong>
-                    <span>{latest ? `${latest.date} ${formatNumber(latest.value, 3)}` : "n/a"} · {series.source}</span>
-                  </a>
-                );
-              })}
-            </div>
+            <MultiLineChart series={growthChart.series} dateRange={dataset.dateRange} valueLabel="TTM CapEx 同比增速" />
           </section>
           <CapexCommitments commitments={commitments} />
         </div>
       ) : null}
+      {absoluteChart ? (
+        <AnalysisDisclosure title="查看季度绝对支出" description="绝对金额作为辅助数据，用于核对各公司的季度现金投入节奏。">
+          <section className="chart-panel">
+            <MultiLineChart series={absoluteChart.series} dateRange={dataset.dateRange} valueLabel={absoluteChart.title} />
+          </section>
+        </AnalysisDisclosure>
+      ) : null}
     </section>
+  );
+}
+
+function CapexCompanyCard({ item }: { item: AiCapexCompanyMetrics }) {
+  return (
+    <div className="capex-component-card">
+      <span>{item.label} · TTM CapEx 增速</span>
+      <strong>{formatSignedPercent(item.capexGrowthYoy)}</strong>
+      <b>{item.financingStatus}</b>
+      <dl>
+        <div><dt>自由现金流</dt><dd>{formatNumber(item.ttmFreeCashFlow, 1)}B</dd></div>
+        <div><dt>现金覆盖</dt><dd>{item.cashCoverageRatio === null ? "n/a" : `${formatNumber(item.cashCoverageRatio, 2)}x`}</dd></div>
+        <div><dt>TTM CapEx</dt><dd>{formatNumber(item.ttmCapex, 1)}B</dd></div>
+      </dl>
+    </div>
   );
 }
 
@@ -880,6 +905,200 @@ function TreasuryMarketTerminal({
         {notes.map((note) => (
           <p key={note}>{note}</p>
         ))}
+      </div>
+    </section>
+  );
+}
+
+const costCategoryLabels: Record<string, string> = {
+  cash: "现金",
+  ust: "美债",
+  credit: "信用",
+  fx: "海外/汇率",
+  equity: "股票"
+};
+
+function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
+  const cost = dataset.costOfCapital;
+  if (!cost) {
+    return (
+      <section className="terminal" id="terminal">
+        <div className="section-heading">
+          <h2>利率锚 / 资金成本</h2>
+        </div>
+        <div className="notes risk-notes">
+          <p>数据尚未生成。请先运行数据更新脚本，再重新构建页面。</p>
+        </div>
+      </section>
+    );
+  }
+
+  const { anchor, yields, spreads, charts } = cost;
+  const byKey = new Map(yields.map((item) => [item.key, item]));
+  const tenYear = byKey.get("dgs10") ?? null;
+  const earnings = byKey.get("spxEarningsYield") ?? null;
+  const hyTotal = byKey.get("hyTotal") ?? null;
+  const jgbUsd = byKey.get("jgbUsd") ?? null;
+
+  const heroStat = (item: CostOfCapitalYield | null) => {
+    if (!item || item.latestValue === null) return "n/a";
+    const anchorDelta =
+      item.vsAnchorBp === null ? "" : ` · 锚差 ${formatChange(item.vsAnchorBp, 0)}bp`;
+    return `${formatNumber(item.latestValue, 2)}%${anchorDelta}`;
+  };
+
+  return (
+    <section className="terminal cost-dashboard" id="terminal">
+      <div className="section-heading">
+        <p>Cost of Capital / USD Rate Anchor</p>
+        <h2>利率锚：美元资金成本与统一收益标尺</h2>
+      </div>
+
+      <div className="cost-hero">
+        <div className="cost-hero-anchor">
+          <span>美元现金锚 · EFFR</span>
+          <strong>{formatNumber(anchor.latestValue, 3)}%</strong>
+          <p>{anchor.latestDate} · 十年位置 {anchor.percentile === null ? "n/a" : `${Math.round(anchor.percentile)}%`}</p>
+        </div>
+        <div>
+          <span>10Y 美债</span>
+          <strong>{heroStat(tenYear)}</strong>
+          <p>长期美元无风险收益</p>
+        </div>
+        <div>
+          <span>标普盈利收益率</span>
+          <strong>{heroStat(earnings)}</strong>
+          <p>100 / Shiller PE（月度）</p>
+        </div>
+        <div>
+          <span>HY 总收益率</span>
+          <strong>{heroStat(hyTotal)}</strong>
+          <p>10Y + 高收益利差</p>
+        </div>
+        <div>
+          <span>JGB 美元近似</span>
+          <strong>{heroStat(jgbUsd)}</strong>
+          <p>JGB + 12M 汇率贡献</p>
+        </div>
+        <div className="cost-rule">
+          <b>怎么读</b>
+          <p>{anchor.description}</p>
+          <p>收益率上行通常代表资金撤出该市场或供给压力，下行代表价格走强；结合相对变化判断股债之间资金的边际倾向。</p>
+        </div>
+      </div>
+
+      <div className="section-heading">
+        <p>Unified Yield Ladder</p>
+        <h2>统一收益标尺（美元年化）</h2>
+      </div>
+      <div className="cost-ladder-grid">
+        {yields.map((item) => (
+          <CostYieldCard item={item} key={item.key} />
+        ))}
+      </div>
+
+      <div className="section-heading">
+        <p>Relative Value Signals</p>
+        <h2>相对价值与流向信号</h2>
+      </div>
+      <div className="cost-spread-grid">
+        {spreads.map((item) => (
+          <CostSpreadCard item={item} key={item.key} />
+        ))}
+      </div>
+
+      <div className="section-heading">
+        <p>Yield History</p>
+        <h2>收益率时间序列</h2>
+      </div>
+      <div className="charts-stack">
+        {charts.map((chart) => (
+          <section className="chart-panel" key={chart.title}>
+            <div className="chart-header">
+              <div>
+                <span>Cost of Capital</span>
+                <h3>{chart.title}</h3>
+              </div>
+            </div>
+            <MultiLineChart series={chart.series} dateRange={dataset.dateRange} valueLabel={chart.title} />
+            <div className="interpretation">
+              <strong>当前解读</strong>
+              <p>{chart.description}</p>
+            </div>
+            <div className="rate-sources">
+              {chart.series.map((item) => {
+                const latest = item.points.at(-1);
+                return (
+                  <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
+                    <strong>{item.label}</strong>
+                    <span>
+                      {latest ? `${latest.date} ${formatNumber(latest.value, 3)}${item.unit}` : "n/a"} · {item.source}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <div className="notes risk-notes">
+        {dataset.notes.map((note) => (
+          <p key={note}>{note}</p>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CostYieldCard({ item }: { item: CostOfCapitalYield }) {
+  const change = (value: number | null) => (value === null ? "n/a" : `${formatChange(value, 2)}%`);
+  return (
+    <section className="cost-ladder-card">
+      <div className="cost-card-head">
+        <span>{costCategoryLabels[item.category] ?? item.category} · {item.basis}</span>
+        <strong>{item.latestValue === null ? "n/a" : `${formatNumber(item.latestValue, 2)}%`}</strong>
+      </div>
+      <h3>{item.label}</h3>
+      <p className={item.vsAnchorBp === null ? "" : item.vsAnchorBp >= 0 ? "cost-positive" : "cost-negative"}>
+        {item.key === "effr" ? "基准" : item.vsAnchorBp === null ? "—" : `vs 锚 ${formatChange(item.vsAnchorBp, 0)}bp`}
+      </p>
+      <p>1M {change(item.oneMonthChange)} · 3M {change(item.threeMonthChange)} · 6M {change(item.sixMonthChange)}</p>
+      {item.fxContribution !== undefined ? (
+        <p>
+          汇率 12M {item.fxMove === null ? "n/a" : `${formatChange(item.fxMove, 2)}%`}
+          {" · "}折算贡献 {item.fxContribution === null ? "n/a" : `${formatChange(item.fxContribution, 2)}%`}
+          {" · "}本币 {item.localYield === null ? "n/a" : `${formatNumber(item.localYield, 2)}%`}
+        </p>
+      ) : null}
+      {item.peRatio !== undefined ? (
+        <p>Shiller PE {item.peRatio === null ? "n/a" : formatNumber(item.peRatio, 1)}</p>
+      ) : null}
+      <div className="cost-card-meta">
+        <a href={item.sourceUrl} target="_blank" rel="noreferrer">
+          {item.source}
+        </a>
+        <span>{item.latestDate}</span>
+      </div>
+    </section>
+  );
+}
+
+function CostSpreadCard({ item }: { item: CostOfCapitalSpread }) {
+  const unit = item.unit === "点" ? "点" : item.unit;
+  return (
+    <section className="cost-spread-card">
+      <span>{item.label}</span>
+      <strong>{item.latestValue === null ? "n/a" : `${formatNumber(item.latestValue, 2)}${unit}`}</strong>
+      <p>
+        1M {formatChange(item.oneMonthChange, 2)}{unit} · 3M {formatChange(item.threeMonthChange, 2)}{unit}
+      </p>
+      <p>{item.description}</p>
+      <div className="cost-card-meta">
+        <a href={item.sourceUrl} target="_blank" rel="noreferrer">
+          {item.source}
+        </a>
+        <span>{item.latestDate}</span>
       </div>
     </section>
   );
@@ -1238,12 +1457,14 @@ function carrySignal(label: string, rawValue: number | undefined, unit: string, 
 }
 
 function GlobalLiquidityDashboard({
+  cost,
   jpy,
   risk,
   treasury,
   usd,
   upcomingEvents
 }: {
+  cost: LiquidityDataset;
   jpy: LiquidityDataset;
   risk: LiquidityDataset;
   treasury: LiquidityDataset;
@@ -1275,6 +1496,10 @@ function GlobalLiquidityDashboard({
   const jgb10y = jpyMap.get("jgb10y")?.series ?? [];
   const bojAssets = jpyMap.get("bojAssets")?.series ?? [];
   const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
+  const costOfCapital = cost.costOfCapital;
+  const equityBondGap = costOfCapital?.spreads.find((item) => item.key === "equityBondGap")?.series ?? [];
+  const hyTotalYield = costOfCapital?.yields.find((item) => item.key === "hyTotal")?.series ?? [];
+  const jgbUsdYield = costOfCapital?.yields.find((item) => item.key === "jgbUsd")?.series ?? [];
 
   const modules = [
     dashboardModule("美元数量", "Fed Net Liquidity / M2 / SOFR", [
@@ -1310,6 +1535,11 @@ function GlobalLiquidityDashboard({
       invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)),
       invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91))
     ]),
+    dashboardModule("利率锚", "股债差 / 信用总收益 / JGB美元折算", [
+      absoluteChangeSeries(equityBondGap, 91),
+      invertSeries(absoluteChangeSeries(hyTotalYield, 91)),
+      invertSeries(absoluteChangeSeries(jgbUsdYield, 91))
+    ]),
     dashboardModule("风险确认", "Nasdaq / HSTECH / BTC", [
       percentChangeSeries(nasdaq?.points ?? [], 91),
       percentChangeSeries(hangSengTech?.points ?? [], 91),
@@ -1317,7 +1547,7 @@ function GlobalLiquidityDashboard({
     ])
   ];
 
-  const macroModules = modules.slice(0, 5);
+  const macroModules = modules.slice(0, 6);
   const globalScore = clampScore(
     Math.round(macroModules.reduce((sum, item) => sum + item.score, 0) / Math.max(macroModules.length, 1))
   );
@@ -1338,6 +1568,11 @@ function GlobalLiquidityDashboard({
     { label: "实际10Y下行", color: "#2563eb", points: invertSeries(absoluteChangeSeries(realYield10y, 91)) },
     { label: "30Y下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)) }
   ]);
+  const rateAnchorEvidence = standardizeSeries([
+    { label: "股债差走阔", color: "#2563eb", points: absoluteChangeSeries(equityBondGap, 91) },
+    { label: "信用总收益下行", color: "#16a34a", points: invertSeries(absoluteChangeSeries(hyTotalYield, 91)) },
+    { label: "JGB美元折算收益下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(jgbUsdYield, 91)) }
+  ]);
   const riskConfirmation = [
     { label: "Nasdaq", color: "#2563eb", points: nasdaq?.points ?? [] },
     { label: "HSTECH代理", color: "#16a34a", points: hangSengTech?.points ?? [] },
@@ -1355,7 +1590,7 @@ function GlobalLiquidityDashboard({
         <div className="dashboard-rule">
           <b>硬规则</b>
           <p>
-            美元净流动性改善、日元融资稳定、长端美债不再上行、通胀不重新抬头，就是风险资产顺风；其中两项以上反向，进入黄灯或红灯。
+            美元净流动性改善、日元融资稳定、长端美债不再上行、通胀不重新抬头、股债差不继续恶化，就是风险资产顺风；其中两项以上反向，进入黄灯或红灯。
           </p>
         </div>
       </div>
@@ -1468,7 +1703,20 @@ function GlobalLiquidityDashboard({
             <section className="chart-panel">
               <div className="chart-header">
                 <div>
-                  <span>Chart 6 / Risk Confirmation</span>
+                  <span>Chart 6 / Rate Anchor</span>
+                  <h3>利率锚</h3>
+                </div>
+              </div>
+              <MultiLineChart series={rateAnchorEvidence} dateRange={usd.dateRange} valueLabel="利率锚" />
+              <div className="interpretation">
+                <strong>当前解读</strong>
+                <p>所有分项已方向化：股债差走阔、信用总收益下行、JGB 美元折算收益下行都按风险资产顺风处理；三者同时反向时提示相对收益正在倒向债市。</p>
+              </div>
+            </section>
+            <section className="chart-panel">
+              <div className="chart-header">
+                <div>
+                  <span>Chart 7 / Risk Confirmation</span>
                   <h3>风险资产确认</h3>
                 </div>
               </div>
@@ -1542,12 +1790,13 @@ function globalScoreText(score: number) {
 function assetImplications(globalScore: number, modules: { label: string; score: number }[]) {
   const yenScore = modules.find((item) => item.label === "日元融资")?.score ?? 0;
   const treasuryScore = modules.find((item) => item.label === "美元价格")?.score ?? 0;
+  const anchorScore = modules.find((item) => item.label === "利率锚")?.score ?? 0;
   const riskScore = modules.find((item) => item.label === "风险确认")?.score ?? 0;
   return [
     {
       label: "美股 AI",
       call: globalScore >= 1 && treasuryScore >= 0 ? "可进攻" : globalScore <= -1 ? "不追高" : "等确认",
-      detail: treasuryScore < 0 ? "长端利率仍是主要约束。" : "需要风险确认继续走强。"
+      detail: treasuryScore < 0 || anchorScore < 0 ? "长端利率或股债比价仍是约束。" : "需要风险确认继续走强。"
     },
     {
       label: "港科",

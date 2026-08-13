@@ -88,6 +88,79 @@ export interface AiCapexCommitment {
   detail: string;
 }
 
+export interface AiCapexCompanyMetrics {
+  key: string;
+  label: string;
+  asOf: string;
+  ttmCapex: number;
+  ttmOperatingCashFlow: number;
+  ttmFreeCashFlow: number;
+  capexGrowthYoy: number | null;
+  cashCoverageRatio: number | null;
+  financingStatus: string;
+}
+
+export type CostOfCapitalYieldCategory = "cash" | "ust" | "credit" | "fx" | "equity";
+
+export interface CostOfCapitalYield {
+  key: string;
+  label: string;
+  category: CostOfCapitalYieldCategory;
+  unit: "%";
+  basis: "美元年化" | "本币年化" | "美元年化近似";
+  source: string;
+  sourceUrl: string;
+  description: string;
+  latestDate: string;
+  latestValue: number | null;
+  previousValue: number | null;
+  oneMonthChange: number | null;
+  threeMonthChange: number | null;
+  sixMonthChange: number | null;
+  vsAnchorBp: number | null;
+  fxMove?: number | null;
+  fxContribution?: number | null;
+  localYield?: number | null;
+  peRatio?: number | null;
+  series: DataPoint[];
+}
+
+export interface CostOfCapitalSpread {
+  key: string;
+  label: string;
+  unit: "%" | "bp" | "点";
+  source: string;
+  sourceUrl: string;
+  description: string;
+  latestDate: string;
+  latestValue: number | null;
+  previousValue: number | null;
+  oneMonthChange: number | null;
+  threeMonthChange: number | null;
+  series: DataPoint[];
+}
+
+export interface CostOfCapitalAnchor {
+  key: string;
+  label: string;
+  unit: "%";
+  latestDate: string;
+  latestValue: number | null;
+  previousValue: number | null;
+  oneMonthChange: number | null;
+  percentile: number | null;
+  source: string;
+  sourceUrl: string;
+  description: string;
+}
+
+export interface CostOfCapitalDataset {
+  anchor: CostOfCapitalAnchor;
+  yields: CostOfCapitalYield[];
+  spreads: CostOfCapitalSpread[];
+  charts: InterestRateChart[];
+}
+
 export interface LiquidityDataset {
   generatedAt: string;
   lookbackYears: number;
@@ -103,6 +176,8 @@ export interface LiquidityDataset {
   treasuryCharts?: InterestRateChart[];
   capexCharts?: InterestRateChart[];
   capexCommitments?: AiCapexCommitment[];
+  capexCompanyMetrics?: AiCapexCompanyMetrics[];
+  costOfCapital?: CostOfCapitalDataset;
   holderShares?: HolderShare[];
   foreignHolderShares?: HolderShare[];
   composite: {
