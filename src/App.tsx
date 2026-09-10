@@ -23,6 +23,11 @@ import "./redesign.css";
 
 type ViewMode = LiquidityMarket | "combined" | "aster";
 
+const coreIndicatorKeys: Partial<Record<ViewMode, Set<string>>> = {
+  usd: new Set(["netLiquidity", "m2", "sofrIorb", "hyOas", "broadDollar", "realYield10y"]),
+  jpy: new Set(["bojAssets", "reserveBalances", "m2Japan", "jgb10y", "usdJpy"])
+};
+
 const markets: Record<
   ViewMode,
   {
@@ -109,7 +114,6 @@ function initialMarket(): ViewMode {
 function App() {
   const [dataset, setDataset] = useState<LiquidityDataset | null>(null);
   const [pairedDatasets, setPairedDatasets] = useState<{
-    cost: LiquidityDataset;
     risk: LiquidityDataset;
     usd: LiquidityDataset;
     jpy: LiquidityDataset;
@@ -132,13 +136,12 @@ function App() {
     setAsterDataset(null);
     if (market === "combined") {
       Promise.all([
-        loadLiquidityDataset("cost"),
         loadLiquidityDataset("usd"),
         loadLiquidityDataset("jpy"),
         loadLiquidityDataset("treasury"),
         loadLiquidityDataset("risk")
-      ]).then(([cost, usd, jpy, treasury, risk]) =>
-        setPairedDatasets({ cost, risk, usd, jpy, treasury })
+      ]).then(([usd, jpy, treasury, risk]) =>
+        setPairedDatasets({ risk, usd, jpy, treasury })
       );
     } else if (market === "aster") {
       loadAsterDataset().then(setAsterDataset);
@@ -182,6 +185,16 @@ function App() {
         : (activeDataset?.inflationCharts ?? []);
   const riskCharts = activeDataset?.riskCharts ?? [];
   const treasuryCharts = activeDataset?.treasuryCharts ?? [];
+  const decisionRateCharts = rateCharts.map((chart) => ({
+    ...chart,
+    series: chart.series.filter((series) =>
+      market === "usd"
+        ? ["effr", "fedSofr"].includes(series.key)
+        : market === "jpy"
+          ? series.key === "jpyCallAverage"
+          : true
+    )
+  }));
 
   return (
     <main>
@@ -264,7 +277,7 @@ function App() {
         <LiquidityRateOverview
           dateRange={activeDataset.dateRange}
           inflationCharts={inflationCharts}
-          rateCharts={rateCharts}
+          rateCharts={decisionRateCharts}
         />
       ) : market !== "combined" && rateCharts.length > 0 && activeDataset ? (
         <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
@@ -285,7 +298,6 @@ function App() {
       ) : market === "combined" && pairedDatasets ? (
         <>
           <GlobalLiquidityDashboard
-            cost={pairedDatasets.cost}
             jpy={pairedDatasets.jpy}
             risk={pairedDatasets.risk}
             treasury={pairedDatasets.treasury}
@@ -316,7 +328,7 @@ function App() {
             </div>
 
             <div className="charts-stack">
-              {dataset.indicators.map((definition) => {
+              {dataset.indicators.filter((definition) => coreIndicatorKeys[market]?.has(definition.key) ?? true).map((definition) => {
                 const snapshot = snapshotMap.get(definition.key);
                 if (!snapshot) return null;
                 return (
@@ -331,26 +343,9 @@ function App() {
             </div>
           </section>
 
-          <section className="composite-section">
-            <div className="section-heading">
-              <p>Composite DLI</p>
-              <h2>当前宽松程度与历史位置</h2>
-            </div>
-            <div className="composite-grid">
-              <div>
-                <LineChart
-                  series={dataset.composite.series}
-                  color="#0f766e"
-                  dateRange={dataset.dateRange}
-                  valueLabel="综合流动性评分"
-                />
-              </div>
-              <div className="notes">
-                {dataset.notes.map((note) => (
-                  <p key={note}>{note}</p>
-                ))}
-              </div>
-            </div>
+          <section className="method-note">
+            <strong>使用原则</strong>
+            <p>只用这些指标调整中期风险预算，不把单个宏观序列当作买卖信号。价格趋势、信用利差与融资压力必须至少有两类同向确认。</p>
           </section>
         </>
       ) : null}
@@ -1052,7 +1047,7 @@ function CapexTerminal({ dataset }: { dataset: LiquidityDataset }) {
         {metrics.map((item) => <CapexCompanyCard item={item} key={item.key} />)}
       </div>
       {growthChart ? (
-        <div className="capex-chart-grid">
+        <div className="capex-chart-grid capex-chart-primary">
           <section className="chart-panel">
             <div className="chart-header">
               <div>
@@ -1062,8 +1057,12 @@ function CapexTerminal({ dataset }: { dataset: LiquidityDataset }) {
             </div>
             <MultiLineChart series={growthChart.series} dateRange={dataset.dateRange} valueLabel="TTM CapEx 同比增速" />
           </section>
-          <CapexCommitments commitments={commitments} />
         </div>
+      ) : null}
+      {commitments.length > 0 ? (
+        <AnalysisDisclosure title="查看远期投资承诺" description="承诺不是实际支出，也不直接构成股票或供应链公司的盈利信号。">
+          <CapexCommitments commitments={commitments} />
+        </AnalysisDisclosure>
       ) : null}
       {absoluteChart ? (
         <AnalysisDisclosure title="查看季度绝对支出" description="绝对金额作为辅助数据，用于核对各公司的季度现金投入节奏。">
@@ -1130,29 +1129,17 @@ function TreasuryMarketTerminal({
   holderShares: HolderShare[];
   notes: string[];
 }) {
+  const decisionCharts = charts.filter((chart) =>
+    chart.series.some((series) => ["dgs3mo", "dgs2", "dgs10", "dgs30", "t10y2y"].includes(series.key))
+  );
+  const contextCharts = charts.filter((chart) => !decisionCharts.includes(chart));
   return (
     <section className="terminal" id="terminal">
       <div className="section-heading">
-        <h2>供给、承接需求与利率压力</h2>
+        <h2>利率曲线是否正在收紧风险资产估值？</h2>
       </div>
       <div className="treasury-core-grid">
-        {holderShares.length > 0 ? (
-          <HolderSharePanel
-            description="公众持有美债由美国私人部门、海外投资者和 Federal Reserve Banks 共同承接；结构变化比单一总量更能反映边际需求。"
-            eyebrow="Ownership Structure"
-            shares={holderShares}
-            title="美债持有人份额"
-          />
-        ) : null}
-        {foreignHolderShares.length > 0 ? (
-          <HolderSharePanel
-            description="拆分海外主要国家和地区持仓；TIC 按托管或报告地统计，不一定等于最终受益所有人。"
-            eyebrow="Foreign Holders"
-            shares={foreignHolderShares}
-            title="海外主要持有人细分"
-          />
-        ) : null}
-        {charts.map((chart) => (
+        {decisionCharts.map((chart) => (
           <section className="chart-panel" key={chart.title}>
             <div className="chart-header">
               <div>
@@ -1181,6 +1168,33 @@ function TreasuryMarketTerminal({
           </section>
         ))}
       </div>
+      <AnalysisDisclosure title="查看美债结构背景" description="债务存量和持有人结构变化缓慢，不作为短周期买卖信号。">
+        <div className="treasury-core-grid">
+          {holderShares.length > 0 ? (
+            <HolderSharePanel
+              description="持有人结构用于判断长期承接基础，但托管口径不能代表边际买盘。"
+              eyebrow="Ownership Structure"
+              shares={holderShares}
+              title="美债持有人份额"
+            />
+          ) : null}
+          {foreignHolderShares.length > 0 ? (
+            <HolderSharePanel
+              description="TIC 按托管或报告地统计，不一定等于最终受益所有人，因此只作背景参考。"
+              eyebrow="Foreign Holders"
+              shares={foreignHolderShares}
+              title="海外主要持有人细分"
+            />
+          ) : null}
+          {contextCharts.map((chart) => (
+            <section className="chart-panel" key={chart.title}>
+              <div className="chart-header"><div><span>Slow-moving context</span><h3>{chart.title}</h3></div></div>
+              <MultiLineChart series={chart.series} dateRange={dateRange} valueLabel={chart.title} />
+              <div className="interpretation"><strong>仅作背景</strong><p>{chart.description}</p></div>
+            </section>
+          ))}
+        </div>
+      </AnalysisDisclosure>
       <div className="notes risk-notes">
         {notes.map((note) => (
           <p key={note}>{note}</p>
@@ -1233,7 +1247,12 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
     );
   }
 
-  const { anchor, yields, spreads, charts } = cost;
+  const decisionYieldKeys = new Set(["effr", "dgs3mo", "dgs2", "dgs10", "dgs30", "dfii10", "igTotal", "hyTotal", "spxEarningsYield"]);
+  const decisionSpreadKeys = new Set(["equityBondGap", "t10y2y", "igOas", "hyOas", "broadDollar"]);
+  const { anchor } = cost;
+  const yields = cost.yields.filter((item) => decisionYieldKeys.has(item.key));
+  const spreads = cost.spreads.filter((item) => decisionSpreadKeys.has(item.key));
+  const charts = cost.charts.filter((chart) => !chart.series.some((series) => ["jgbUsd", "bundUsd"].includes(series.key)));
   const byKey = new Map(yields.map((item) => [item.key, item]));
   const seriesByKey = new Map<string, DataPoint[]>();
   charts.forEach((chart) =>
@@ -1241,7 +1260,7 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
       if (!seriesByKey.has(series.key)) seriesByKey.set(series.key, series.points);
     })
   );
-  const categoryOrder = ["cash", "ust", "credit", "fx", "equity"];
+  const categoryOrder = ["cash", "ust", "credit", "equity"];
 
   return (
     <section className="terminal cost-dashboard" id="terminal">
@@ -1597,6 +1616,9 @@ function LiquidityMomentumTerminal({
   const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
 
   const netLiquidity = usdMap.get("netLiquidity")?.series ?? [];
+  const sofrIorb = usdMap.get("sofrIorb")?.series ?? [];
+  const hyOas = usdMap.get("hyOas")?.series ?? [];
+  const broadDollar = usdMap.get("broadDollar")?.series ?? [];
   const bojAssets = jpyMap.get("bojAssets")?.series ?? [];
   const fedAssets = usdMap.get("fedBalanceSheet")?.series ?? [];
   const usM2 = usdMap.get("m2")?.series ?? [];
@@ -1849,14 +1871,12 @@ function carrySignal(label: string, rawValue: number | undefined, unit: string, 
 }
 
 function GlobalLiquidityDashboard({
-  cost,
   jpy,
   risk,
   treasury,
   usd,
   upcomingEvents
 }: {
-  cost: LiquidityDataset;
   jpy: LiquidityDataset;
   risk: LiquidityDataset;
   treasury: LiquidityDataset;
@@ -1866,71 +1886,45 @@ function GlobalLiquidityDashboard({
   const usdMap = new Map(usd.snapshots.map((item) => [item.key, item]));
   const jpyMap = new Map(jpy.snapshots.map((item) => [item.key, item]));
   const usdEffr = findSeries(usd.rateCharts, "effr");
-  const fedSofr = findSeries(usd.rateCharts, "fedSofr");
   const jpyCallAverage = findSeries(jpy.rateCharts, "jpyCallAverage");
   const usCpi = findSeries(usd.inflationCharts, "usCpiYoy");
   const dgs2 = findSeries(treasury.treasuryCharts, "dgs2");
   const dgs10 = findSeries(treasury.treasuryCharts, "dgs10");
   const dgs30 = findSeries(treasury.treasuryCharts, "dgs30");
-  const totalPublicDebt = findSeries(treasury.treasuryCharts, "totalPublicDebt");
-  const debtHeldByPublic = findSeries(treasury.treasuryCharts, "debtHeldByPublic");
-  const interestPayments = findSeries(treasury.treasuryCharts, "interestPayments");
   const btc = findSeries(risk.riskCharts, "btc");
   const nasdaq = findSeries(risk.riskCharts, "nasdaq");
   const hangSengTech = findSeries(risk.riskCharts, "hangSengTech");
 
   const netLiquidity = usdMap.get("netLiquidity")?.series ?? [];
-  const fedAssets = usdMap.get("fedBalanceSheet")?.series ?? [];
-  const tga = usdMap.get("tga")?.series ?? [];
+  const sofrIorb = usdMap.get("sofrIorb")?.series ?? [];
+  const hyOas = usdMap.get("hyOas")?.series ?? [];
+  const broadDollar = usdMap.get("broadDollar")?.series ?? [];
   const usM2 = usdMap.get("m2")?.series ?? [];
   const realYield10y = usdMap.get("realYield10y")?.series ?? [];
   const usdJpy = jpyMap.get("usdJpy")?.series ?? [];
   const jgb10y = jpyMap.get("jgb10y")?.series ?? [];
-  const bojAssets = jpyMap.get("bojAssets")?.series ?? [];
   const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
-  const costOfCapital = cost.costOfCapital;
-  const equityBondGap = costOfCapital?.spreads.find((item) => item.key === "equityBondGap")?.series ?? [];
-  const hyTotalYield = costOfCapital?.yields.find((item) => item.key === "hyTotal")?.series ?? [];
-  const jgbUsdYield = costOfCapital?.yields.find((item) => item.key === "jgbUsd")?.series ?? [];
 
   const modules = [
-    dashboardModule("美元数量", "Fed Net Liquidity / M2 / SOFR", [
+    dashboardModule("美元流动性", "净流动性 / M2 / 回购融资", [
       absoluteChangeSeries(netLiquidity, 91),
       percentChangeSeries(usM2, 91),
-      percentChangeSeries(fedAssets, 91),
-      invertSeries(absoluteChangeSeries(fedSofr?.points ?? [], 91))
+      invertSeries(absoluteChangeSeries(sofrIorb, 91))
     ]),
-    dashboardModule("美元价格", "2Y / 10Y / 30Y / 实际利率", [
-      invertSeries(absoluteChangeSeries(usdEffr?.points ?? [], 91)),
+    dashboardModule("融资压力", "信用利差 / 美元 / SOFR-IORB", [
+      invertSeries(absoluteChangeSeries(hyOas, 91)),
+      invertSeries(percentChangeSeries(broadDollar, 91)),
+      invertSeries(absoluteChangeSeries(sofrIorb, 91))
+    ]),
+    dashboardModule("利率估值", "2Y / 10Y / 实际利率", [
       invertSeries(absoluteChangeSeries(dgs2?.points ?? [], 91)),
       invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)),
-      invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)),
       invertSeries(absoluteChangeSeries(realYield10y, 91))
     ]),
-    dashboardModule("财政压力", "长债供给 / TGA / 利息成本", [
-      invertSeries(percentChangeSeries(totalPublicDebt?.points ?? [], 91)),
-      invertSeries(percentChangeSeries(debtHeldByPublic?.points ?? [], 91)),
-      invertSeries(percentChangeSeries(interestPayments?.points ?? [], 91)),
-      invertSeries(absoluteChangeSeries(tga, 91)),
-      invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91))
-    ]),
-    dashboardModule("日元融资", "EFFR-BOJ / USDJPY / JGB", [
+    dashboardModule("日元套息", "美日利差 / USDJPY / JGB", [
       absoluteChangeSeries(rateSpread, 91),
       percentChangeSeries(usdJpy, 91),
-      percentChangeSeries(bojAssets, 91),
-      invertSeries(absoluteChangeSeries(jpyCallAverage?.points ?? [], 91)),
       invertSeries(absoluteChangeSeries(jgb10y, 91))
-    ]),
-    dashboardModule("通胀压力", "CPI / 实际利率 / 长端", [
-      invertSeries(absoluteChangeSeries(usCpi?.points ?? [], 91)),
-      invertSeries(absoluteChangeSeries(realYield10y, 91)),
-      invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)),
-      invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91))
-    ]),
-    dashboardModule("利率锚", "股债差 / 信用总收益 / JGB美元折算", [
-      absoluteChangeSeries(equityBondGap, 91),
-      invertSeries(absoluteChangeSeries(hyTotalYield, 91)),
-      invertSeries(absoluteChangeSeries(jgbUsdYield, 91))
     ]),
     dashboardModule("风险确认", "Nasdaq / HSTECH / BTC", [
       percentChangeSeries(nasdaq?.points ?? [], 91),
@@ -1939,7 +1933,7 @@ function GlobalLiquidityDashboard({
     ])
   ];
 
-  const macroModules = modules.slice(0, 6);
+  const macroModules = modules.slice(0, 4);
   const macroScoreSum = macroModules.reduce((sum, item) => sum + item.score, 0);
   const globalScore = macroScoreSum;
   const normalizedGlobalScore = globalScore / Math.max(macroModules.length, 1);
@@ -1960,10 +1954,10 @@ function GlobalLiquidityDashboard({
     { label: "实际10Y下行", color: "#2563eb", points: invertSeries(absoluteChangeSeries(realYield10y, 91)) },
     { label: "30Y下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(dgs30?.points ?? [], 91)) }
   ]);
-  const rateAnchorEvidence = standardizeSeries([
-    { label: "股债差走阔", color: "#2563eb", points: absoluteChangeSeries(equityBondGap, 91) },
-    { label: "信用总收益下行", color: "#16a34a", points: invertSeries(absoluteChangeSeries(hyTotalYield, 91)) },
-    { label: "JGB美元折算收益下行", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(jgbUsdYield, 91)) }
+  const fundingEvidence = standardizeSeries([
+    { label: "HY利差收窄", color: "#2563eb", points: invertSeries(absoluteChangeSeries(hyOas, 91)) },
+    { label: "美元走弱", color: "#16a34a", points: invertSeries(percentChangeSeries(broadDollar, 91)) },
+    { label: "SOFR-IORB回落", color: "#7c3aed", points: invertSeries(absoluteChangeSeries(sofrIorb, 91)) }
   ]);
   const riskConfirmation = [
     { label: "Nasdaq", color: "#2563eb", points: nasdaq?.points ?? [] },
@@ -1975,17 +1969,17 @@ function GlobalLiquidityDashboard({
     <section className="terminal global-dashboard" id="terminal">
       <div className={`dashboard-hero tone-${globalTone}`}>
         <div>
-          <span>宏观总评分 · 6 项等权</span>
+          <span>投资环境总分 · 4 项等权</span>
           <strong>{formatScore(globalScore)}</strong>
           <p>{globalScoreText(normalizedGlobalScore)}</p>
           <small className="score-formula">
-            六个宏观模块直接相加，范围 -12 至 +12
+            四个决策模块直接相加，范围 -8 至 +8
           </small>
         </div>
         <div className="dashboard-rule">
           <b>计算规则</b>
           <p>
-            美元数量、美元价格、财政压力、日元融资、通胀压力和利率锚直接相加；不取平均、不四舍五入。“风险确认”只验证价格是否认可宏观环境，不计入总分。
+            美元流动性、融资压力、利率估值与日元套息直接相加；不取平均、不四舍五入。财政存量和 CPI 属于慢变量，不再进入交易总分；风险确认也不计分。
           </p>
         </div>
       </div>
@@ -2023,7 +2017,7 @@ function GlobalLiquidityDashboard({
           <LineChart series={globalScoreSeries} color="#0f766e" dateRange={usd.dateRange} valueLabel="全球风险流动性总分" />
           <div className="interpretation">
             <strong>当前解读</strong>
-            <p>总分由美元数量、美元价格、财政压力、日元融资、通胀压力和利率锚六个模块等权合成；风险确认单独展示，用来验证宏观判断是否被价格承认。</p>
+            <p>总分由美元流动性、融资压力、利率估值和日元套息四个模块直接相加；风险确认单独展示，用来验证宏观判断是否被价格承认。</p>
           </div>
         </section>
         <section className="chart-panel">
@@ -2098,14 +2092,14 @@ function GlobalLiquidityDashboard({
             <section className="chart-panel">
               <div className="chart-header">
                 <div>
-                  <span>Chart 6 / Rate Anchor</span>
-                  <h3>利率锚</h3>
+                  <span>Chart 6 / Funding Conditions</span>
+                  <h3>融资压力</h3>
                 </div>
               </div>
-              <MultiLineChart series={rateAnchorEvidence} dateRange={usd.dateRange} valueLabel="利率锚" />
+              <MultiLineChart series={fundingEvidence} dateRange={usd.dateRange} valueLabel="融资压力" />
               <div className="interpretation">
                 <strong>当前解读</strong>
-                <p>所有分项已方向化：股债差走阔、信用总收益下行、JGB 美元折算收益下行都按风险资产顺风处理；三者同时反向时提示相对收益正在倒向债市。</p>
+                <p>所有分项已方向化：HY 利差收窄、美元走弱、SOFR-IORB 回落都代表融资条件改善；三者同时反向时优先降低风险预算。</p>
               </div>
             </section>
             <section className="chart-panel">
@@ -2192,15 +2186,15 @@ function formatScore(score: number) {
 }
 
 function assetImplications(globalScore: number, modules: { label: string; score: number }[]) {
-  const yenScore = modules.find((item) => item.label === "日元融资")?.score ?? 0;
-  const treasuryScore = modules.find((item) => item.label === "美元价格")?.score ?? 0;
-  const anchorScore = modules.find((item) => item.label === "利率锚")?.score ?? 0;
+  const yenScore = modules.find((item) => item.label === "日元套息")?.score ?? 0;
+  const treasuryScore = modules.find((item) => item.label === "利率估值")?.score ?? 0;
+  const fundingScore = modules.find((item) => item.label === "融资压力")?.score ?? 0;
   const riskScore = modules.find((item) => item.label === "风险确认")?.score ?? 0;
   return [
     {
       label: "美股 AI",
       call: globalScore >= 1 && treasuryScore >= 0 ? "可进攻" : globalScore <= -1 ? "不追高" : "等确认",
-      detail: treasuryScore < 0 || anchorScore < 0 ? "长端利率或股债比价仍是约束。" : "需要风险确认继续走强。"
+      detail: treasuryScore < 0 || fundingScore < 0 ? "利率估值或融资条件仍是约束。" : "需要风险确认继续走强。"
     },
     {
       label: "港科",

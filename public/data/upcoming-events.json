@@ -1,51 +1,7 @@
 {
-  "generatedAt": "2026-08-13T07:51:57.854Z",
+  "generatedAt": "2026-09-10T14:27:59.653Z",
   "timezone": "Asia/Shanghai",
   "events": [
-    {
-      "id": "fed-speech-2026-08-19-governor-lisa-d-cook",
-      "date": "2026-08-19",
-      "region": "美国",
-      "category": "官员讲话",
-      "importance": "medium",
-      "title": "Fed 官员讲话：Lisa D. Cook",
-      "detail": "Fireside Chat",
-      "source": "Federal Reserve",
-      "sourceUrl": "https://www.federalreserve.gov/newsevents/2026-august.htm"
-    },
-    {
-      "id": "boj-speech-2026-08-27-himino-ryozo-deputy-governor",
-      "date": "2026-08-27",
-      "region": "日本",
-      "category": "官员讲话",
-      "importance": "medium",
-      "title": "BOJ 官员讲话：HIMINO Ryozo",
-      "detail": "At a meeting with local leaders in Saitama",
-      "source": "Bank of Japan",
-      "sourceUrl": "https://www.boj.or.jp/en/about/press/index.htm"
-    },
-    {
-      "id": "boj-speech-2026-09-02-takata-hajime-member-of-the-policy-board",
-      "date": "2026-09-02",
-      "region": "日本",
-      "category": "官员讲话",
-      "importance": "medium",
-      "title": "BOJ 官员讲话：TAKATA Hajime",
-      "detail": "At a meeting with local leaders in Sapporo",
-      "source": "Bank of Japan",
-      "sourceUrl": "https://www.boj.or.jp/en/about/press/index.htm"
-    },
-    {
-      "id": "boj-speech-2026-09-10-masu-kazuyuki-member-of-the-policy-board",
-      "date": "2026-09-10",
-      "region": "日本",
-      "category": "官员讲话",
-      "importance": "medium",
-      "title": "BOJ 官员讲话：MASU Kazuyuki",
-      "detail": "At a meeting with local leaders in Fukui",
-      "source": "Bank of Japan",
-      "sourceUrl": "https://www.boj.or.jp/en/about/press/index.htm"
-    },
     {
       "id": "fomc-2026-09-15",
       "date": "2026-09-15",
@@ -139,6 +95,54 @@
       "detail": "会议结束后公布政策决定；行长通常举行记者会",
       "source": "Bank of Japan",
       "sourceUrl": "https://www.boj.or.jp/en/mopo/mpmsche_minu/"
+    },
+    {
+      "id": "fomc-2027-01-26",
+      "date": "2027-01-26",
+      "endDate": "2027-01-27",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定与政策声明",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "fomc-2027-03-16",
+      "date": "2027-03-16",
+      "endDate": "2027-03-17",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定、声明及经济预测",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "fomc-2027-04-27",
+      "date": "2027-04-27",
+      "endDate": "2027-04-28",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定与政策声明",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "fomc-2027-06-08",
+      "date": "2027-06-08",
+      "endDate": "2027-06-09",
+      "region": "美国",
+      "category": "议息会议",
+      "importance": "high",
+      "title": "FOMC 利率决议",
+      "detail": "公布利率决定、声明及经济预测",
+      "source": "Federal Reserve",
+      "sourceUrl": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
     }
   ],
   "failures": []

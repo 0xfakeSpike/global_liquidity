@@ -161,6 +161,9 @@
 .liquidity-rate-overview > .analysis-disclosure { margin-top: 10px; }
 .liquidity-rate-overview > .analysis-disclosure > summary { padding: 11px 14px; }
 .liquidity-rate-overview .analysis-disclosure-content > .real-rate-impact { border: 0; box-shadow: none; margin: 0; }
+.capex-chart-primary { grid-template-columns: 1fr; }
+.capex-dashboard > .analysis-disclosure { margin-top: 14px; }
+.treasury-core-grid + .analysis-disclosure { margin-top: 16px; }
 
 /* USD / JPY indicator pages: compact comparison-first layout. */
 .liquidity-detail-dashboard > .charts-stack {
@@ -195,6 +198,19 @@
 .liquidity-detail-dashboard .stat {
   min-width: 78px;
 }
+
+.method-note {
+  align-items: baseline;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  border-radius: 10px;
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.method-note strong { color: #0f766e; flex: 0 0 auto; font-size: 11px; }
+.method-note p { color: #475569; font-size: 11px; line-height: 1.55; margin: 0; }
 
 @media (max-width: 980px) {
   .page-intro { margin-left: clamp(18px, 4vw, 56px); margin-right: clamp(18px, 4vw, 56px); }

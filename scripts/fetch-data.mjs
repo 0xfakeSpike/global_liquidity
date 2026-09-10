@@ -1222,12 +1222,9 @@ function usdRateCharts(seriesMap) {
   return [
     {
       title: "美元短端资金成本是否正在下降？",
-      description: "跟踪 FOMC 目标区间、有效联邦基金利率、IORB 与 SOFR 随时间变化，用于观察 Fed 政策利率走廊和隔夜融资成本。",
+      description: "EFFR 代表政策传导，SOFR 代表国债回购融资成本；两者足以判断美元短端资金价格。",
       series: [
-        interestRateSeries(rateDefinition("fedTargetUpper", usdRateDefinitions), seriesMap, "#94a3b8"),
-        interestRateSeries(rateDefinition("fedTargetLower", usdRateDefinitions), seriesMap, "#cbd5e1"),
         interestRateSeries(rateDefinition("effr", usdRateDefinitions), seriesMap, "#2563eb"),
-        interestRateSeries(rateDefinition("fedIorb", usdRateDefinitions), seriesMap, "#0f766e"),
         interestRateSeries(rateDefinition("fedSofr", usdRateDefinitions), seriesMap, "#dc2626")
       ]
     }
@@ -1238,12 +1235,9 @@ function jpyRateCharts(seriesMap) {
   return [
     {
       title: "日元短端资金成本是否正在上升？",
-      description: "跟踪 BOJ 无担保隔夜拆借利率与基本贷款利率随时间变化，用于观察日元短端政策传导和资金成本。",
+      description: "BOJ 无担保隔夜拆借平均利率是日元实际融资成本的核心高频口径；高低点和行政贷款利率不再重复展示。",
       series: [
-        interestRateSeries(rateDefinition("jpyCallAverage", jpyRateDefinitions), seriesMap, "#2563eb"),
-        interestRateSeries(rateDefinition("jpyCallHigh", jpyRateDefinitions), seriesMap, "#dc2626"),
-        interestRateSeries(rateDefinition("jpyCallLow", jpyRateDefinitions), seriesMap, "#16a34a"),
-        interestRateSeries(rateDefinition("jpyBasicLoanRate", jpyRateDefinitions), seriesMap, "#0f766e")
+        interestRateSeries(rateDefinition("jpyCallAverage", jpyRateDefinitions), seriesMap, "#2563eb")
       ]
     }
   ];
@@ -1602,8 +1596,9 @@ async function fetchMajorForeignHolders() {
 }
 
 async function buildUsdDataset() {
-  const seriesMap = await fetchSeriesForDefinitions(usdDefinitions);
-  const rateSeriesMap = await fetchSeriesForDefinitions(usdRateDefinitions);
+  const usdFetchKeys = new Set(["fedBalanceSheet", "tga", "onRrp", "m2", "hyOas", "broadDollar", "realYield10y", "sofr", "iorb"]);
+  const seriesMap = await fetchSeriesForDefinitions(usdDefinitions.filter((item) => usdFetchKeys.has(item.key)));
+  const rateSeriesMap = await fetchSeriesForDefinitions(usdRateDefinitions.filter((item) => ["effr", "fedSofr"].includes(item.key)));
   const inflationSeriesMap = await fetchSeriesForDefinitions(
     usdInflationDefinitions.map((definition) => ({ ...definition, start: inflationStartIso }))
   );
@@ -1621,10 +1616,11 @@ async function buildUsdDataset() {
   seriesMap.set("netLiquidity", net);
   seriesMap.set("sofrIorb", sofrIorb);
 
+  const usdDecisionKeys = new Set(["netLiquidity", "m2", "sofrIorb", "hyOas", "broadDollar", "realYield10y"]);
   const visibleDefinitions = [
     ...usdDefinitions.filter((definition) => !definition.hidden),
     ...usdDerivedDefinitions
-  ].sort((a, b) => b.weight - a.weight);
+  ].filter((definition) => usdDecisionKeys.has(definition.key)).sort((a, b) => b.weight - a.weight);
 
   const snapshots = visibleDefinitions.map((definition) => snapshot(definition, seriesMap.get(definition.key) ?? []));
   const composite = compositeSeries(visibleDefinitions, snapshots);
@@ -1651,18 +1647,19 @@ async function buildUsdDataset() {
       "FRED CSV 在构建阶段抓取，前端只读取本仓库生成的 JSON，避免 GitHub Pages 运行时跨域和限流问题。",
       "美国通胀使用 FRED CPIAUCSL 月度指数计算同比；实际政策利率使用 EFFR - CPI同比。",
       "净流动性采用近似口径：Fed 总资产 - TGA - ON RRP；不同机构可能使用准备金、财政现金和 RRP 的不同组合。",
-      "综合评分使用各指标十年历史 Z-score 的方向化加权值，转换为 0-100 区间；它是监控仪表盘，不是投资建议。"
+      "核心页仅保留净流动性、M2、SOFR-IORB、HY OAS、广义美元与实际利率；Fed 总资产、TGA 与 RRP 只作为净流动性的组成，不再重复计分。"
     ]
   };
 }
 
 async function buildJpyDataset() {
-  const seriesMap = await fetchSeriesForDefinitions(jpyDefinitions);
-  const rateSeriesMap = await fetchSeriesForDefinitions(jpyRateDefinitions);
+  const jpyDecisionKeys = new Set(["bojAssets", "reserveBalances", "m2Japan", "jgb10y", "usdJpy"]);
+  const seriesMap = await fetchSeriesForDefinitions(jpyDefinitions.filter((item) => jpyDecisionKeys.has(item.key)));
+  const rateSeriesMap = await fetchSeriesForDefinitions(jpyRateDefinitions.filter((item) => item.key === "jpyCallAverage"));
   const inflationSeriesMap = new Map();
   inflationSeriesMap.set("japanCpiIndex", (await fetchJapanCpiSeries()).filter((point) => point.date >= inflationStartIso));
   inflationSeriesMap.set("japanCpiYoy", yearOverYear(inflationSeriesMap.get("japanCpiIndex") ?? []));
-  const visibleDefinitions = [...jpyDefinitions].sort((a, b) => b.weight - a.weight);
+  const visibleDefinitions = [...jpyDefinitions].filter((definition) => jpyDecisionKeys.has(definition.key)).sort((a, b) => b.weight - a.weight);
   const snapshots = visibleDefinitions.map((definition) => snapshot(definition, seriesMap.get(definition.key) ?? []));
   const composite = compositeSeries(visibleDefinitions, snapshots);
   const latestComposite = composite.at(-1) ?? null;
@@ -1685,10 +1682,10 @@ async function buildJpyDataset() {
       series: composite
     },
     notes: [
-      "BOJ 官方 Time-Series Data Search API 在构建阶段抓取货币基础、当座存款、准备金、M2 与广义定义流动性 L。",
+      "核心页只保留 BOJ 总资产、银行准备金、M2、JGB 10Y 与 USD/JPY；货币基础、当座存款和广义流动性 L 因高度重叠或频率过低不再展示。",
       "日本通胀使用 e-Stat/总务省统计局 2020 基准全国 CPI All items 月度指数计算同比；实际政策利率使用 BOJ 无担保隔夜拆借平均利率 - CPI同比。",
       "BOJ 总资产、USD/JPY 和日本 10 年期国债收益率使用 FRED 无密钥 CSV 序列；其中 BOJ 总资产的原始来源仍为 Bank of Japan Accounts。",
-      "日元综合评分同样使用十年 Z-score 方向化加权。货币量、准备金和 USD/JPY 上升按偏宽松处理，JGB 10Y 上升按偏收紧处理。"
+      "日元数据用于判断套息交易环境，不能替代对汇率波动、隐含波动率与实际跨境头寸的观察。"
     ]
   };
 }
@@ -1930,28 +1927,6 @@ async function fetchMultplShillerPeSeries() {
   }
 }
 
-function rollingPercentChange(series, months) {
-  const map = byDate(series);
-  return series
-    .map((point) => {
-      const base = map.get(offsetMonths(point.date, -months));
-      if (base === undefined || base === 0) return null;
-      return { date: point.date, value: round((point.value / base - 1) * 100, 4) };
-    })
-    .filter(Boolean);
-}
-
-function usdConvertedYield(localSeries, fxPctSeries, fxSign) {
-  const fxMap = byDate(fxPctSeries);
-  return localSeries
-    .map((point) => {
-      const fx = latestBeforeOrOn(fxMap, point.date);
-      if (fx === undefined) return null;
-      return { date: point.date, value: round(point.value + fxSign * fx, 4) };
-    })
-    .filter(Boolean);
-}
-
 function addSeries(left, right, rightScale = 1) {
   const rightMap = byDate(right);
   return left
@@ -2103,16 +2078,6 @@ function costOfCapitalCharts(seriesMap) {
       series: [costSeries(seriesMap, "dgs10"), costSeries(seriesMap, "igTotal"), costSeries(seriesMap, "hyTotal")]
     },
     {
-      title: "海外债券换算成美元后是否更划算？",
-      description: "美元近似收益 = 本币收益率 + 近 12 个月汇率变动贡献。日债按 USD/JPY（日元升值贡献为正），欧债按 EUR/USD（欧元升值贡献为正），均未做汇率对冲。",
-      series: [
-        costSeries(seriesMap, "jgb10y"),
-        costSeries(seriesMap, "jgbUsd"),
-        costSeries(seriesMap, "bund10y"),
-        costSeries(seriesMap, "bundUsd")
-      ]
-    },
-    {
       title: "股票盈利收益能否覆盖美债机会成本？",
       description: "标普 500 盈利收益率（100 / Shiller PE，月度）对比 10Y 美债；股债差为正表示股票相对债券更有吸引力。",
       series: [costSeries(seriesMap, "spxEarningsYield"), costSeries(seriesMap, "dgs10"), costSeries(seriesMap, "equityBondGap")]
@@ -2121,18 +2086,15 @@ function costOfCapitalCharts(seriesMap) {
 }
 
 async function buildCostOfCapitalDataset() {
-  const seriesMap = await fetchSeriesForDefinitions(costOfCapitalDefinitions);
+  const decisionCostKeys = new Set(["effr", "sofr", "dgs3mo", "dgs2", "dgs10", "dgs30", "dfii10", "breakeven10y", "igOas", "hyOas", "broadDollar", "t10y2y"]);
+  const seriesMap = await fetchSeriesForDefinitions(costOfCapitalDefinitions.filter((item) => decisionCostKeys.has(item.key)));
   const anchorSeries = seriesMap.get("effr") ?? [];
   const anchorValue = anchorSeries.at(-1)?.value ?? null;
   const shillerPe = await fetchMultplShillerPeSeries();
   const earningsYield = shillerPe.map((point) => ({ date: point.date, value: round(100 / point.value, 3) }));
-  const usdJpyPct = rollingPercentChange(seriesMap.get("usdJpy") ?? [], 12);
-  const eurUsdPct = rollingPercentChange(seriesMap.get("eurUsd") ?? [], 12);
 
   seriesMap.set("igTotal", addSeries(seriesMap.get("dgs10") ?? [], seriesMap.get("igOas") ?? [], 1 / 100));
   seriesMap.set("hyTotal", addSeries(seriesMap.get("dgs10") ?? [], seriesMap.get("hyOas") ?? [], 1 / 100));
-  seriesMap.set("jgbUsd", usdConvertedYield(seriesMap.get("jgb10y") ?? [], usdJpyPct, -1));
-  seriesMap.set("bundUsd", usdConvertedYield(seriesMap.get("bund10y") ?? [], eurUsdPct, 1));
   seriesMap.set("spxEarningsYield", earningsYield);
   seriesMap.set("equityBondGap", subtractSeries(earningsYield, seriesMap.get("dgs10") ?? []));
 
@@ -2147,30 +2109,11 @@ async function buildCostOfCapitalDataset() {
     "breakeven10y",
     "igTotal",
     "hyTotal",
-    "jgb10y",
-    "jgbUsd",
-    "bund10y",
-    "bundUsd",
     "spxEarningsYield"
   ];
   const yields = ladderKeys.map((key) => {
     const definition = costSeriesDefinition(key);
     const series = seriesMap.get(key) ?? [];
-    if (key === "jgbUsd" || key === "bundUsd") {
-      const fxPct = key === "jgbUsd" ? usdJpyPct : eurUsdPct;
-      const localSeries = seriesMap.get(key === "jgbUsd" ? "jgb10y" : "bund10y") ?? [];
-      const latestPoint = series.at(-1) ?? null;
-      const fxMove = latestPoint ? latestBeforeOrOn(byDate(fxPct), latestPoint.date) ?? null : null;
-      const fxSign = key === "jgbUsd" ? -1 : 1;
-      const fxContribution = fxMove === null ? null : round(fxSign * fxMove, 3);
-      const localYield = latestPoint ? latestBeforeOrOn(byDate(localSeries), latestPoint.date) ?? null : null;
-      return costYieldItem(definition, series, anchorValue, {
-        basis: "美元年化近似",
-        fxMove: fxMove === null ? null : round(fxMove, 3),
-        fxContribution,
-        localYield: localYield === null ? null : round(localYield, 3)
-      });
-    }
     if (key === "spxEarningsYield") {
       const latestPoint = series.at(-1) ?? null;
       const pe = latestPoint ? latestBeforeOrOn(byDate(shillerPe), latestPoint.date) ?? null : null;
@@ -2180,15 +2123,15 @@ async function buildCostOfCapitalDataset() {
       });
     }
     return costYieldItem(definition, series, anchorValue, {
-      basis: key === "jgb10y" || key === "bund10y" ? "本币年化" : "美元年化"
+      basis: "美元年化"
     });
   });
 
-  const spreadKeys = ["equityBondGap", "t10y2y", "t10y3m", "igOas", "hyOas", "broadDollar"];
+  const spreadKeys = ["equityBondGap", "t10y2y", "igOas", "hyOas", "broadDollar"];
   const spreads = spreadKeys.map((key) => costSpreadItem(costSeriesDefinition(key), seriesMap.get(key) ?? []));
   // 收益标尺卡片只展示最新值与变化，完整曲线由下方图表区承载；
   // 仅保留主驾驶舱利率锚模块需要的三条序列，避免数据文件重复膨胀。
-  const keepSeriesKeys = new Set(["hyTotal", "jgbUsd", "equityBondGap"]);
+  const keepSeriesKeys = new Set(["hyTotal", "equityBondGap"]);
   const compactYields = yields.map((item) =>
     keepSeriesKeys.has(item.key) ? item : { ...item, series: [] }
   );
@@ -2236,10 +2179,9 @@ async function buildCostOfCapitalDataset() {
       series: []
     },
     notes: [
-      "统一标尺：所有收益率均为年化。美元资产直接使用美债/信用市场收益率；海外债券的美元近似收益 = 本币收益率 + 近 12 个月汇率变动贡献（日债按 USD/JPY，欧债按 EUR/USD，未做对冲）。",
+      "统一标尺：所有收益率均为美元年化。现金、美债、信用债和股票盈利收益只用于比较机会成本，不代表未来实际回报。",
       "股债差 = 标普 500 盈利收益率（100 / Shiller PE，月度口径） - 10Y 美债收益率；为正表示股票相对债券更有吸引力。",
       "信用债总收益率 = 10Y 美债 + 相应期权调整利差；利差走阔代表风险溢价上升，总收益率上行代表借债成本上升。",
-      "OECD 长端收益率序列存在发布滞后：日本 10Y 当前数据截至 2026-06，欧元区截至 2026-01；海外折算行显示的是该序列最近可得值。",
       "本面板是收益率与相对价值的市场信号，不是资金流向的实盘统计；实际流向还需结合 TIC、基金流等数据交叉验证。"
     ]
   };

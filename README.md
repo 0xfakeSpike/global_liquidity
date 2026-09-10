@@ -26,28 +26,23 @@ USD primary series:
 - FRED `WALCL`: Fed balance sheet total assets
 - FRED `WTREGEN`: Treasury General Account
 - FRED `RRPONTSYD`: overnight reverse repo
-- FRED `RPONTSYD`: standing repo facility usage, sourced from NY Fed repo operations through FRED
 - FRED `SOFR` and `IORB`: SOFR-IORB spread
-- FRED `WM2NS`, `VIXCLS`, `BAMLH0A0HYM2`, `DTWEXBGS`, `DFII10`
-- FRED `EFFR`, `DFEDTARL`, `DFEDTARU`, `IORB`, `SOFR`: Fed rate curves
+- FRED `WM2NS`, `BAMLH0A0HYM2`, `DTWEXBGS`, `DFII10`
+- FRED `EFFR`, `SOFR`: policy transmission and secured funding cost
 - FRED `CPIAUCSL`: U.S. CPI-U All Items index, used to calculate CPI year-over-year inflation
 
 Derived series:
 
 - Net liquidity = `WALCL - WTREGEN - RRPONTSYD`
 - U.S. real policy rate = `EFFR - CPI YoY`
-- Composite DLI score = direction-adjusted 10-year z-score weighted index, converted to a 0-100 range
+- Investment-environment score = direct sum of four discretized modules: USD liquidity, funding stress, rate valuation, and yen carry. Price confirmation is shown separately and does not enter the score.
 
 JPY primary series:
 
 - FRED `JPNASSETS`: Bank of Japan total assets
-- BOJ API `MD01/MABS1AN11`: monetary base
-- BOJ API `MD01/MABS1AN113`: current account balances at the BOJ
 - BOJ API `MD01/MABS1AN114`: reserve balances
 - BOJ API `MD02/MAM1NAM2M2MO`: M2 money stock
-- BOJ API `MD02/MAM1NABLBLMO`: broadly-defined liquidity `L`
-- BOJ API `FM01/STRDCLUCON`, `STRDCLUCONH`, `STRDCLUCONL`: uncollateralized overnight call rate curves
-- BOJ API `IR01/MADR1Z@D`: basic discount rate and basic loan rate
+- BOJ API `FM01/STRDCLUCON`: average uncollateralized overnight call rate
 - FRED `IRLTLT01JPM156N`: Japan 10-year government bond yield
 - FRED `DEXJPUS`: USD/JPY exchange rate
 - e-Stat / Statistics Bureau of Japan CPI 2020-base: Japan All items CPI index, used to calculate CPI year-over-year inflation
@@ -86,12 +81,10 @@ Cost of capital / USD rate anchor series:
 - FRED `EFFR`, `SOFR`, `DGS3MO`, `DGS2`, `DGS10`, `DGS30`: cash and U.S. Treasury yield ladder, with EFFR as the opportunity-cost anchor
 - FRED `DFII10`, `T10YIE`: 10-year TIPS real yield and breakeven inflation
 - FRED `BAMLC0A0CM`, `BAMLH0A0HYM2`: investment-grade and high-yield option-adjusted spreads; total credit yield = 10Y Treasury + spread
-- FRED `IRLTLT01JPM156N`, `DEXJPUS`: Japan 10Y and USD/JPY, combined into an unhedged USD-approximation yield (local yield + 12-month FX contribution)
-- FRED `IRLTLT01EZM156N`, `DEXUSEU`: Euro-area 10Y and EUR/USD, combined the same way
-- FRED `T10Y2Y`, `T10Y3M`, `DTWEXBGS`: curve spreads and broad dollar context
+- FRED `T10Y2Y`, `DTWEXBGS`: curve shape and broad dollar context
 - multpl Shiller P/E (monthly): S&P 500 earnings yield = 100 / P/E; equity-bond gap = earnings yield - 10Y Treasury yield
 
-The rate-anchor panel is a relative-value market-price signal, not a direct capital-flow statistic; notes on the page state the data lags (OECD long-term yields) and the unhedged FX approximation.
+The rate-anchor panel is a relative-value market-price signal, not a direct capital-flow statistic. Trailing-FX “USD-equivalent foreign bond yields” were removed because they do not represent investable forward returns.
 
 ## Local Development
 

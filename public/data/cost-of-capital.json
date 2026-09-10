@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-08-13T08:07:06.134Z",
+  "generatedAt": "2026-09-10T14:27:56.713Z",
   "lookbackYears": 10,
   "dateRange": {
-    "start": "2016-08-13",
-    "end": "2026-08-13"
+    "start": "2016-09-10",
+    "end": "2026-09-10"
   },
   "indicators": [],
   "snapshots": [],
@@ -12,10 +12,10 @@
       "key": "effr",
       "label": "EFFR 美元现金锚",
       "unit": "%",
-      "latestDate": "2026-08-11",
+      "latestDate": "2026-09-08",
       "latestValue": 3.63,
       "previousValue": 3.63,
-      "oneMonthChange": 0.01,
+      "oneMonthChange": 0,
       "percentile": 65,
       "source": "FRED EFFR / Federal Reserve Bank of New York",
       "sourceUrl": "https://fred.stlouisfed.org/series/EFFR",
@@ -31,11 +31,11 @@
         "source": "FRED EFFR / Federal Reserve Bank of New York",
         "sourceUrl": "https://fred.stlouisfed.org/series/EFFR",
         "description": "有效联邦基金利率，是美元隔夜资金的机会成本锚。",
-        "latestDate": "2026-08-11",
+        "latestDate": "2026-09-08",
         "latestValue": 3.63,
         "previousValue": 3.63,
-        "oneMonthChange": 0.01,
-        "threeMonthChange": 0,
+        "oneMonthChange": 0,
+        "threeMonthChange": 0.01,
         "sixMonthChange": -0.01,
         "vsAnchorBp": 0,
         "series": []
@@ -49,12 +49,12 @@
         "source": "FRED SOFR / Federal Reserve Bank of New York",
         "sourceUrl": "https://fred.stlouisfed.org/series/SOFR",
         "description": "以美国国债回购为抵押的隔夜融资成本，反映担保融资市场对现金的定价。",
-        "latestDate": "2026-08-11",
+        "latestDate": "2026-09-08",
         "latestValue": 3.64,
-        "previousValue": 3.63,
-        "oneMonthChange": 0.09,
+        "previousValue": 3.65,
+        "oneMonthChange": 0.02,
         "threeMonthChange": 0.04,
-        "sixMonthChange": -0.01,
+        "sixMonthChange": 0,
         "vsAnchorBp": 1,
         "series": []
       },
@@ -67,13 +67,13 @@
         "source": "FRED DGS3MO / Federal Reserve H.15",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS3MO",
         "description": "3 个月国库券收益率，是现金类资产最常见的市场利率。",
-        "latestDate": "2026-08-11",
-        "latestValue": 3.89,
-        "previousValue": 3.89,
-        "oneMonthChange": 0.04,
-        "threeMonthChange": 0.19,
-        "sixMonthChange": 0.2,
-        "vsAnchorBp": 26,
+        "latestDate": "2026-09-08",
+        "latestValue": 3.94,
+        "previousValue": 3.91,
+        "oneMonthChange": 0.07,
+        "threeMonthChange": 0.15,
+        "sixMonthChange": 0.23,
+        "vsAnchorBp": 31,
         "series": []
       },
       {
@@ -85,13 +85,13 @@
         "source": "FRED DGS2 / Federal Reserve H.15",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
         "description": "2 年期美债收益率，对政策利率预期最敏感。",
-        "latestDate": "2026-08-11",
-        "latestValue": 4.22,
-        "previousValue": 4.25,
-        "oneMonthChange": 0.01,
-        "threeMonthChange": 0.22,
-        "sixMonthChange": 0.77,
-        "vsAnchorBp": 59,
+        "latestDate": "2026-09-08",
+        "latestValue": 4.39,
+        "previousValue": 4.37,
+        "oneMonthChange": 0.2,
+        "threeMonthChange": 0.26,
+        "sixMonthChange": 0.82,
+        "vsAnchorBp": 76,
         "series": []
       },
       {
@@ -103,13 +103,13 @@
         "source": "FRED DGS10 / Federal Reserve H.15",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
         "description": "10 年期美债收益率，是全球风险资产折现率的核心锚。",
-        "latestDate": "2026-08-11",
-        "latestValue": 4.7,
-        "previousValue": 4.72,
-        "oneMonthChange": 0.14,
-        "threeMonthChange": 0.24,
-        "sixMonthChange": 0.54,
-        "vsAnchorBp": 107,
+        "latestDate": "2026-09-08",
+        "latestValue": 4.8,
+        "previousValue": 4.78,
+        "oneMonthChange": 0.15,
+        "threeMonthChange": 0.27,
+        "sixMonthChange": 0.65,
+        "vsAnchorBp": 117,
         "series": []
       },
       {
@@ -121,13 +121,13 @@
         "source": "FRED DGS30 / Federal Reserve H.15",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS30",
         "description": "30 年期美债收益率，反映长期通胀、期限溢价和财政供给压力。",
-        "latestDate": "2026-08-11",
-        "latestValue": 5.24,
-        "previousValue": 5.25,
-        "oneMonthChange": 0.18,
-        "threeMonthChange": 0.21,
-        "sixMonthChange": 0.46,
-        "vsAnchorBp": 161,
+        "latestDate": "2026-09-08",
+        "latestValue": 5.25,
+        "previousValue": 5.24,
+        "oneMonthChange": 0.06,
+        "threeMonthChange": 0.24,
+        "sixMonthChange": 0.47,
+        "vsAnchorBp": 162,
         "series": []
       },
       {
@@ -139,12 +139,12 @@
         "source": "FRED DFII10 / Federal Reserve H.15",
         "sourceUrl": "https://fred.stlouisfed.org/series/DFII10",
         "description": "10 年期 TIPS 收益率，扣除通胀预期后的实际资金成本。",
-        "latestDate": "2026-08-11",
+        "latestDate": "2026-09-08",
         "latestValue": 2.43,
         "previousValue": 2.43,
-        "oneMonthChange": 0.11,
-        "threeMonthChange": 0.44,
-        "sixMonthChange": 0.59,
+        "oneMonthChange": 0.03,
+        "threeMonthChange": 0.23,
+        "sixMonthChange": 0.61,
         "vsAnchorBp": -120,
         "series": []
       },
@@ -157,13 +157,13 @@
         "source": "FRED T10YIE / Federal Reserve H.15",
         "sourceUrl": "https://fred.stlouisfed.org/series/T10YIE",
         "description": "10 年期美债与 TIPS 的收益率差，代表市场隐含的十年平均通胀预期。",
-        "latestDate": "2026-08-12",
-        "latestValue": 2.26,
-        "previousValue": 2.27,
-        "oneMonthChange": 0,
-        "threeMonthChange": -0.21,
-        "sixMonthChange": -0.06,
-        "vsAnchorBp": -137,
+        "latestDate": "2026-09-09",
+        "latestValue": 2.37,
+        "previousValue": 2.37,
+        "oneMonthChange": 0.08,
+        "threeMonthChange": 0.03,
+        "sixMonthChange": 0.01,
+        "vsAnchorBp": -126,
         "series": []
       },
       {
@@ -175,13 +175,13 @@
         "source": "FRED DGS10 + BAMLC0A0CM",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
         "description": "10Y 美债收益率 + 投资级信用利差，代表投资级债券的美元总收益水平。",
-        "latestDate": "2026-08-11",
-        "latestValue": 5.49,
-        "previousValue": 5.5,
-        "oneMonthChange": 0.16,
-        "threeMonthChange": 0.26,
-        "sixMonthChange": 0.56,
-        "vsAnchorBp": 186,
+        "latestDate": "2026-09-08",
+        "latestValue": 5.61,
+        "previousValue": 5.59,
+        "oneMonthChange": 0.18,
+        "threeMonthChange": 0.33,
+        "sixMonthChange": 0.62,
+        "vsAnchorBp": 198,
         "series": []
       },
       {
@@ -193,90 +193,14 @@
         "source": "FRED DGS10 + BAMLH0A0HYM2",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
         "description": "10Y 美债收益率 + 高收益债信用利差，代表高收益债券的美元总收益水平。",
-        "latestDate": "2026-08-11",
-        "latestValue": 7.42,
-        "previousValue": 7.42,
-        "oneMonthChange": 0.17,
-        "threeMonthChange": 0.14,
-        "sixMonthChange": 0.4,
-        "vsAnchorBp": 379,
+        "latestDate": "2026-09-08",
+        "latestValue": 7.47,
+        "previousValue": 7.46,
+        "oneMonthChange": 0.12,
+        "threeMonthChange": 0.16,
+        "sixMonthChange": 0.26,
+        "vsAnchorBp": 384,
         "series": [
-          {
-            "date": "2023-08-14",
-            "value": 7.98
-          },
-          {
-            "date": "2023-08-15",
-            "value": 8.06
-          },
-          {
-            "date": "2023-08-16",
-            "value": 8.09
-          },
-          {
-            "date": "2023-08-17",
-            "value": 8.25
-          },
-          {
-            "date": "2023-08-18",
-            "value": 8.28
-          },
-          {
-            "date": "2023-08-21",
-            "value": 8.31
-          },
-          {
-            "date": "2023-08-22",
-            "value": 8.27
-          },
-          {
-            "date": "2023-08-23",
-            "value": 8.11
-          },
-          {
-            "date": "2023-08-24",
-            "value": 8.14
-          },
-          {
-            "date": "2023-08-25",
-            "value": 8.15
-          },
-          {
-            "date": "2023-08-28",
-            "value": 8.06
-          },
-          {
-            "date": "2023-08-29",
-            "value": 7.99
-          },
-          {
-            "date": "2023-08-30",
-            "value": 7.92
-          },
-          {
-            "date": "2023-08-31",
-            "value": 7.94
-          },
-          {
-            "date": "2023-09-01",
-            "value": 7.99
-          },
-          {
-            "date": "2023-09-05",
-            "value": 8.1
-          },
-          {
-            "date": "2023-09-06",
-            "value": 8.16
-          },
-          {
-            "date": "2023-09-07",
-            "value": 8.17
-          },
-          {
-            "date": "2023-09-08",
-            "value": 8.11
-          },
           {
             "date": "2023-09-11",
             "value": 8.11
@@ -3192,511 +3116,84 @@
           {
             "date": "2026-08-11",
             "value": 7.42
+          },
+          {
+            "date": "2026-08-12",
+            "value": 7.39
+          },
+          {
+            "date": "2026-08-13",
+            "value": 7.34
+          },
+          {
+            "date": "2026-08-14",
+            "value": 7.35
+          },
+          {
+            "date": "2026-08-17",
+            "value": 7.42
+          },
+          {
+            "date": "2026-08-18",
+            "value": 7.46
+          },
+          {
+            "date": "2026-08-19",
+            "value": 7.38
+          },
+          {
+            "date": "2026-08-20",
+            "value": 7.44
+          },
+          {
+            "date": "2026-08-21",
+            "value": 7.44
+          },
+          {
+            "date": "2026-08-24",
+            "value": 7.39
+          },
+          {
+            "date": "2026-08-25",
+            "value": 7.34
+          },
+          {
+            "date": "2026-08-26",
+            "value": 7.33
+          },
+          {
+            "date": "2026-08-27",
+            "value": 7.3
+          },
+          {
+            "date": "2026-08-28",
+            "value": 7.33
+          },
+          {
+            "date": "2026-08-31",
+            "value": 7.38
+          },
+          {
+            "date": "2026-09-01",
+            "value": 7.44
+          },
+          {
+            "date": "2026-09-02",
+            "value": 7.45
+          },
+          {
+            "date": "2026-09-03",
+            "value": 7.42
+          },
+          {
+            "date": "2026-09-04",
+            "value": 7.46
+          },
+          {
+            "date": "2026-09-08",
+            "value": 7.47
           }
         ]
-      },
-      {
-        "key": "jgb10y",
-        "label": "JGB 10Y 本币",
-        "category": "fx",
-        "unit": "%",
-        "basis": "本币年化",
-        "source": "FRED IRLTLT01JPM156N / OECD",
-        "sourceUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
-        "description": "日本 10 年期国债收益率（日元口径），反映日元长端融资成本。",
-        "latestDate": "2026-06-01",
-        "latestValue": 2.67,
-        "previousValue": 2.65,
-        "oneMonthChange": 0.02,
-        "threeMonthChange": 0.325,
-        "sixMonthChange": 0.61,
-        "vsAnchorBp": -96,
-        "series": []
-      },
-      {
-        "key": "jgbUsd",
-        "label": "JGB 10Y 美元近似",
-        "category": "fx",
-        "unit": "%",
-        "basis": "美元年化近似",
-        "source": "FRED IRLTLT01JPM156N + DEXJPUS",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DEXJPUS",
-        "description": "JGB 本币收益率 + 近 12 个月 USD/JPY 汇率变动贡献（未对冲的美元近似收益）。",
-        "latestDate": "2026-06-01",
-        "latestValue": -7.8373,
-        "previousValue": -5.1036,
-        "oneMonthChange": -2.7337,
-        "threeMonthChange": -6.0101,
-        "sixMonthChange": -8.0144,
-        "vsAnchorBp": -1146.7,
-        "fxMove": 10.507,
-        "fxContribution": -10.507,
-        "localYield": 2.67,
-        "series": [
-          {
-            "date": "2017-09-01",
-            "value": -6.5957
-          },
-          {
-            "date": "2017-10-01",
-            "value": -10.9322
-          },
-          {
-            "date": "2017-11-01",
-            "value": -9.0003
-          },
-          {
-            "date": "2017-12-01",
-            "value": 2.1965
-          },
-          {
-            "date": "2018-01-01",
-            "value": 3.2007
-          },
-          {
-            "date": "2018-02-01",
-            "value": 3.3904
-          },
-          {
-            "date": "2018-03-01",
-            "value": 5.9838
-          },
-          {
-            "date": "2018-04-01",
-            "value": 4.6836
-          },
-          {
-            "date": "2018-05-01",
-            "value": 1.8997
-          },
-          {
-            "date": "2018-06-01",
-            "value": 1.6032
-          },
-          {
-            "date": "2018-07-01",
-            "value": 1.4934
-          },
-          {
-            "date": "2018-08-01",
-            "value": -1.1499
-          },
-          {
-            "date": "2018-09-01",
-            "value": -0.7109
-          },
-          {
-            "date": "2018-10-01",
-            "value": -0.5979
-          },
-          {
-            "date": "2018-11-01",
-            "value": 1.1811
-          },
-          {
-            "date": "2018-12-01",
-            "value": -1.1142
-          },
-          {
-            "date": "2019-01-01",
-            "value": 2.2242
-          },
-          {
-            "date": "2019-02-01",
-            "value": -0.0607
-          },
-          {
-            "date": "2019-03-01",
-            "value": -4.7531
-          },
-          {
-            "date": "2019-04-01",
-            "value": -4.1948
-          },
-          {
-            "date": "2019-05-01",
-            "value": -1.4534
-          },
-          {
-            "date": "2019-06-01",
-            "value": -0.1006
-          },
-          {
-            "date": "2019-07-01",
-            "value": 2.1411
-          },
-          {
-            "date": "2019-08-01",
-            "value": 2.7991
-          },
-          {
-            "date": "2019-09-01",
-            "value": 4.1657
-          },
-          {
-            "date": "2019-10-01",
-            "value": 5.3432
-          },
-          {
-            "date": "2019-11-01",
-            "value": 4.025
-          },
-          {
-            "date": "2019-12-01",
-            "value": 3.4576
-          },
-          {
-            "date": "2020-01-01",
-            "value": 0.8739
-          },
-          {
-            "date": "2020-02-01",
-            "value": 0.1574
-          },
-          {
-            "date": "2020-03-01",
-            "value": 2.9319
-          },
-          {
-            "date": "2020-04-01",
-            "value": 3.7699
-          },
-          {
-            "date": "2020-05-01",
-            "value": 3.9755
-          },
-          {
-            "date": "2020-06-01",
-            "value": 1.3757
-          },
-          {
-            "date": "2020-07-01",
-            "value": 0.8586
-          },
-          {
-            "date": "2020-08-01",
-            "value": 2.6237
-          },
-          {
-            "date": "2020-09-01",
-            "value": 0.544
-          },
-          {
-            "date": "2020-10-01",
-            "value": 2.0549
-          },
-          {
-            "date": "2020-11-01",
-            "value": 4.016
-          },
-          {
-            "date": "2020-12-01",
-            "value": 4.2054
-          },
-          {
-            "date": "2021-01-01",
-            "value": 5.0978
-          },
-          {
-            "date": "2021-02-01",
-            "value": 4.2819
-          },
-          {
-            "date": "2021-03-01",
-            "value": 3.4908
-          },
-          {
-            "date": "2021-04-01",
-            "value": -3.2355
-          },
-          {
-            "date": "2021-05-01",
-            "value": -2.1549
-          },
-          {
-            "date": "2021-06-01",
-            "value": -1.6886
-          },
-          {
-            "date": "2021-07-01",
-            "value": -3.7617
-          },
-          {
-            "date": "2021-08-01",
-            "value": -4.4065
-          },
-          {
-            "date": "2021-09-01",
-            "value": -3.7369
-          },
-          {
-            "date": "2021-10-01",
-            "value": -5.0599
-          },
-          {
-            "date": "2021-11-01",
-            "value": -8.8716
-          },
-          {
-            "date": "2021-12-01",
-            "value": -7.9951
-          },
-          {
-            "date": "2022-01-01",
-            "value": -11.31
-          },
-          {
-            "date": "2022-02-01",
-            "value": -9.156
-          },
-          {
-            "date": "2022-03-01",
-            "value": -7.4672
-          },
-          {
-            "date": "2022-04-01",
-            "value": -10.6249
-          },
-          {
-            "date": "2022-05-01",
-            "value": -18.9499
-          },
-          {
-            "date": "2022-06-01",
-            "value": -18.6546
-          },
-          {
-            "date": "2022-07-01",
-            "value": -20.9118
-          },
-          {
-            "date": "2022-08-01",
-            "value": -21.4362
-          },
-          {
-            "date": "2022-09-01",
-            "value": -26.9344
-          },
-          {
-            "date": "2022-10-01",
-            "value": -29.5398
-          },
-          {
-            "date": "2022-11-01",
-            "value": -29.4549
-          },
-          {
-            "date": "2022-12-01",
-            "value": -19.7371
-          },
-          {
-            "date": "2023-01-01",
-            "value": -13.9582
-          },
-          {
-            "date": "2023-02-01",
-            "value": -12.134
-          },
-          {
-            "date": "2023-03-01",
-            "value": -17.918
-          },
-          {
-            "date": "2023-04-01",
-            "value": -8.9282
-          },
-          {
-            "date": "2023-05-01",
-            "value": -3.4267
-          },
-          {
-            "date": "2023-06-01",
-            "value": -6.2542
-          },
-          {
-            "date": "2023-07-01",
-            "value": -5.8756
-          },
-          {
-            "date": "2023-08-01",
-            "value": -8.1157
-          },
-          {
-            "date": "2023-09-01",
-            "value": -3.7158
-          },
-          {
-            "date": "2023-10-01",
-            "value": -2.4976
-          },
-          {
-            "date": "2023-11-01",
-            "value": -1.2642
-          },
-          {
-            "date": "2023-12-01",
-            "value": -7.8271
-          },
-          {
-            "date": "2024-01-01",
-            "value": -5.0976
-          },
-          {
-            "date": "2024-02-01",
-            "value": -12.3711
-          },
-          {
-            "date": "2024-03-01",
-            "value": -9.8625
-          },
-          {
-            "date": "2024-04-01",
-            "value": -13.0949
-          },
-          {
-            "date": "2024-05-01",
-            "value": -13.7098
-          },
-          {
-            "date": "2024-06-01",
-            "value": -11.4053
-          },
-          {
-            "date": "2024-07-01",
-            "value": -10.4991
-          },
-          {
-            "date": "2024-08-01",
-            "value": -3.7982
-          },
-          {
-            "date": "2024-09-01",
-            "value": 0.8481
-          },
-          {
-            "date": "2024-10-01",
-            "value": 5.5376
-          },
-          {
-            "date": "2024-11-01",
-            "value": -0.2616
-          },
-          {
-            "date": "2024-12-01",
-            "value": -0.959
-          },
-          {
-            "date": "2025-01-01",
-            "value": -9.7934
-          },
-          {
-            "date": "2025-02-01",
-            "value": -4.5441
-          },
-          {
-            "date": "2025-03-01",
-            "value": 1.5115
-          },
-          {
-            "date": "2025-04-01",
-            "value": 2.8391
-          },
-          {
-            "date": "2025-05-01",
-            "value": 9.2196
-          },
-          {
-            "date": "2025-06-01",
-            "value": 9.3687
-          },
-          {
-            "date": "2025-07-01",
-            "value": 12.6685
-          },
-          {
-            "date": "2025-08-01",
-            "value": 2.9328
-          },
-          {
-            "date": "2025-09-01",
-            "value": 0.3207
-          },
-          {
-            "date": "2025-10-01",
-            "value": -0.7813
-          },
-          {
-            "date": "2025-11-01",
-            "value": 0.6891
-          },
-          {
-            "date": "2025-12-01",
-            "value": 0.1771
-          },
-          {
-            "date": "2026-01-01",
-            "value": 2.6022
-          },
-          {
-            "date": "2026-02-01",
-            "value": 2.1618
-          },
-          {
-            "date": "2026-03-01",
-            "value": -1.8272
-          },
-          {
-            "date": "2026-04-01",
-            "value": -3.663
-          },
-          {
-            "date": "2026-05-01",
-            "value": -5.1036
-          },
-          {
-            "date": "2026-06-01",
-            "value": -7.8373
-          }
-        ]
-      },
-      {
-        "key": "bund10y",
-        "label": "Bund 10Y 本币",
-        "category": "fx",
-        "unit": "%",
-        "basis": "本币年化",
-        "source": "FRED IRLTLT01EZM156N / OECD",
-        "sourceUrl": "https://fred.stlouisfed.org/series/IRLTLT01EZM156N",
-        "description": "欧元区 10 年期国债收益率（欧元口径），以德国 Bund 为代表基准。",
-        "latestDate": "2026-01-01",
-        "latestValue": 3.221,
-        "previousValue": 3.2447,
-        "oneMonthChange": -0.0237,
-        "threeMonthChange": 0.0971,
-        "sixMonthChange": 0.0474,
-        "vsAnchorBp": -40.9,
-        "series": []
-      },
-      {
-        "key": "bundUsd",
-        "label": "Bund 10Y 美元近似",
-        "category": "fx",
-        "unit": "%",
-        "basis": "美元年化近似",
-        "source": "FRED IRLTLT01EZM156N + DEXUSEU",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DEXUSEU",
-        "description": "欧元区 10Y 本币收益率 + 近 12 个月 EUR/USD 汇率变动贡献（未对冲的美元近似收益）。",
-        "latestDate": "2026-01-01",
-        "latestValue": 16.6013,
-        "previousValue": 13.8353,
-        "oneMonthChange": 2.766,
-        "threeMonthChange": 7.5499,
-        "sixMonthChange": 3.6589,
-        "vsAnchorBp": 1297.1,
-        "fxMove": 13.38,
-        "fxContribution": 13.38,
-        "localYield": 3.221,
-        "series": []
       },
       {
         "key": "spxEarningsYield",
@@ -3707,14 +3204,14 @@
         "source": "multpl Shiller PE",
         "sourceUrl": "https://www.multpl.com/s-p-500-pe-ratio",
         "description": "100 / Shiller PE，月度口径；代表标普 500 的盈利收益率。",
-        "latestDate": "2026-08-12",
-        "latestValue": 3.35,
-        "previousValue": 3.483,
-        "oneMonthChange": -0.133,
-        "threeMonthChange": -0.181,
-        "sixMonthChange": -0.344,
-        "vsAnchorBp": -28,
-        "peRatio": 29.85,
+        "latestDate": "2026-09-09",
+        "latestValue": 3.833,
+        "previousValue": 3.84,
+        "oneMonthChange": 0.003,
+        "threeMonthChange": -0.132,
+        "sixMonthChange": -0.099,
+        "vsAnchorBp": 20.3,
+        "peRatio": 26.09,
         "series": []
       }
     ],
@@ -3726,16 +3223,12 @@
         "source": "multpl Shiller PE - FRED DGS10",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
         "description": "标普盈利收益率 - 10Y 美债收益率；为正表示股票相对债券更有吸引力。",
-        "latestDate": "2026-08-12",
-        "latestValue": -1.35,
-        "previousValue": -0.997,
-        "oneMonthChange": -0.353,
-        "threeMonthChange": -0.491,
+        "latestDate": "2026-09-09",
+        "latestValue": -0.967,
+        "previousValue": -0.95,
+        "oneMonthChange": -0.047,
+        "threeMonthChange": -0.462,
         "series": [
-          {
-            "date": "2016-09-01",
-            "value": 2.559
-          },
           {
             "date": "2016-10-01",
             "value": 2.643
@@ -4194,23 +3687,31 @@
           },
           {
             "date": "2026-04-01",
-            "value": -0.568
+            "value": -0.407
           },
           {
             "date": "2026-05-01",
-            "value": -0.859
+            "value": -0.557
           },
           {
             "date": "2026-06-01",
-            "value": -0.958
+            "value": -0.505
           },
           {
             "date": "2026-07-01",
-            "value": -0.997
+            "value": -0.532
           },
           {
-            "date": "2026-08-12",
-            "value": -1.35
+            "date": "2026-08-01",
+            "value": -0.92
+          },
+          {
+            "date": "2026-09-01",
+            "value": -0.95
+          },
+          {
+            "date": "2026-09-09",
+            "value": -0.967
           }
         ]
       },
@@ -4221,25 +3722,11 @@
         "source": "FRED T10Y2Y / Federal Reserve H.15",
         "sourceUrl": "https://fred.stlouisfed.org/series/T10Y2Y",
         "description": "10 年期减 2 年期收益率利差，衡量曲线形态变化。",
-        "latestDate": "2026-08-12",
-        "latestValue": 0.48,
-        "previousValue": 0.48,
-        "oneMonthChange": 0.12,
-        "threeMonthChange": 0,
-        "series": []
-      },
-      {
-        "key": "t10y3m",
-        "label": "10Y-3M 利差",
-        "unit": "%",
-        "source": "FRED T10Y3M / Federal Reserve H.15",
-        "sourceUrl": "https://fred.stlouisfed.org/series/T10Y3M",
-        "description": "10 年期减 3 个月收益率利差，是常见衰退风险观察指标。",
-        "latestDate": "2026-08-12",
-        "latestValue": 0.81,
-        "previousValue": 0.81,
-        "oneMonthChange": 0.08,
-        "threeMonthChange": 0.04,
+        "latestDate": "2026-09-09",
+        "latestValue": 0.4,
+        "previousValue": 0.41,
+        "oneMonthChange": -0.07,
+        "threeMonthChange": -0.02,
         "series": []
       },
       {
@@ -4249,11 +3736,11 @@
         "source": "FRED BAMLC0A0CM / ICE BofA",
         "sourceUrl": "https://fred.stlouisfed.org/series/BAMLC0A0CM",
         "description": "投资级公司债相对同期限国债的期权调整利差（OAS）。",
-        "latestDate": "2026-08-11",
-        "latestValue": 79,
-        "previousValue": 78,
-        "oneMonthChange": 2,
-        "threeMonthChange": 2,
+        "latestDate": "2026-09-08",
+        "latestValue": 81,
+        "previousValue": 81,
+        "oneMonthChange": 3,
+        "threeMonthChange": 6,
         "series": []
       },
       {
@@ -4263,11 +3750,11 @@
         "source": "FRED BAMLH0A0HYM2 / ICE BofA",
         "sourceUrl": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
         "description": "高收益债相对同期限国债的期权调整利差（OAS）。",
-        "latestDate": "2026-08-11",
-        "latestValue": 272,
-        "previousValue": 270,
-        "oneMonthChange": 3,
-        "threeMonthChange": -10,
+        "latestDate": "2026-09-08",
+        "latestValue": 267,
+        "previousValue": 268,
+        "oneMonthChange": -3,
+        "threeMonthChange": -11,
         "series": []
       },
       {
@@ -4277,17 +3764,17 @@
         "source": "FRED DTWEXBGS / Federal Reserve H.10",
         "sourceUrl": "https://fred.stlouisfed.org/series/DTWEXBGS",
         "description": "美元对主要贸易伙伴货币的广义汇率指数，作为海外美元折算的全局背景。",
-        "latestDate": "2026-08-07",
-        "latestValue": 119.0649,
-        "previousValue": 119.5113,
-        "oneMonthChange": -2.0658,
-        "threeMonthChange": 1.0257,
+        "latestDate": "2026-09-04",
+        "latestValue": 118.0732,
+        "previousValue": 118.127,
+        "oneMonthChange": -1.3149,
+        "threeMonthChange": -2.0099,
         "series": []
       }
     ],
     "charts": [
       {
-      "title": "美元现金的无风险回报有多高？",
+        "title": "美元现金的无风险回报有多高？",
         "description": "EFFR、SOFR 与 3 个月美债同图，观察美元现金类资产的收益水位，以及担保融资市场相对政策利率的定价。",
         "series": [
           {
@@ -4299,82 +3786,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/EFFR",
             "description": "有效联邦基金利率，是美元隔夜资金的机会成本锚。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-16",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-17",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-18",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-19",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-22",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-23",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-24",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-25",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-26",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-29",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-30",
-                "value": 0.4
-              },
-              {
-                "date": "2016-08-31",
-                "value": 0.3
-              },
-              {
-                "date": "2016-09-01",
-                "value": 0.4
-              },
-              {
-                "date": "2016-09-02",
-                "value": 0.4
-              },
-              {
-                "date": "2016-09-06",
-                "value": 0.4
-              },
-              {
-                "date": "2016-09-07",
-                "value": 0.4
-              },
-              {
-                "date": "2016-09-08",
-                "value": 0.4
-              },
-              {
-                "date": "2016-09-09",
-                "value": 0.4
-              },
               {
                 "date": "2016-09-12",
                 "value": 0.4
@@ -14330,6 +13741,82 @@
               {
                 "date": "2026-08-11",
                 "value": 3.63
+              },
+              {
+                "date": "2026-08-12",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-13",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-14",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-17",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-18",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-19",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-20",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-21",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-24",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-25",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-26",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-27",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-28",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-31",
+                "value": 3.63
+              },
+              {
+                "date": "2026-09-01",
+                "value": 3.63
+              },
+              {
+                "date": "2026-09-02",
+                "value": 3.63
+              },
+              {
+                "date": "2026-09-03",
+                "value": 3.63
+              },
+              {
+                "date": "2026-09-04",
+                "value": 3.63
+              },
+              {
+                "date": "2026-09-08",
+                "value": 3.63
               }
             ]
           },
@@ -22689,6 +22176,82 @@
               {
                 "date": "2026-08-11",
                 "value": 3.64
+              },
+              {
+                "date": "2026-08-12",
+                "value": 3.62
+              },
+              {
+                "date": "2026-08-13",
+                "value": 3.62
+              },
+              {
+                "date": "2026-08-14",
+                "value": 3.62
+              },
+              {
+                "date": "2026-08-17",
+                "value": 3.66
+              },
+              {
+                "date": "2026-08-18",
+                "value": 3.65
+              },
+              {
+                "date": "2026-08-19",
+                "value": 3.62
+              },
+              {
+                "date": "2026-08-20",
+                "value": 3.63
+              },
+              {
+                "date": "2026-08-21",
+                "value": 3.65
+              },
+              {
+                "date": "2026-08-24",
+                "value": 3.65
+              },
+              {
+                "date": "2026-08-25",
+                "value": 3.66
+              },
+              {
+                "date": "2026-08-26",
+                "value": 3.64
+              },
+              {
+                "date": "2026-08-27",
+                "value": 3.64
+              },
+              {
+                "date": "2026-08-28",
+                "value": 3.65
+              },
+              {
+                "date": "2026-08-31",
+                "value": 3.68
+              },
+              {
+                "date": "2026-09-01",
+                "value": 3.66
+              },
+              {
+                "date": "2026-09-02",
+                "value": 3.65
+              },
+              {
+                "date": "2026-09-03",
+                "value": 3.66
+              },
+              {
+                "date": "2026-09-04",
+                "value": 3.65
+              },
+              {
+                "date": "2026-09-08",
+                "value": 3.64
               }
             ]
           },
@@ -22701,82 +22264,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS3MO",
             "description": "3 个月国库券收益率，是现金类资产最常见的市场利率。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 0.31
-              },
-              {
-                "date": "2016-08-16",
-                "value": 0.27
-              },
-              {
-                "date": "2016-08-17",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-18",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-19",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-22",
-                "value": 0.29
-              },
-              {
-                "date": "2016-08-23",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-24",
-                "value": 0.31
-              },
-              {
-                "date": "2016-08-25",
-                "value": 0.33
-              },
-              {
-                "date": "2016-08-26",
-                "value": 0.34
-              },
-              {
-                "date": "2016-08-29",
-                "value": 0.33
-              },
-              {
-                "date": "2016-08-30",
-                "value": 0.33
-              },
-              {
-                "date": "2016-08-31",
-                "value": 0.33
-              },
-              {
-                "date": "2016-09-01",
-                "value": 0.33
-              },
-              {
-                "date": "2016-09-02",
-                "value": 0.33
-              },
-              {
-                "date": "2016-09-06",
-                "value": 0.32
-              },
-              {
-                "date": "2016-09-07",
-                "value": 0.34
-              },
-              {
-                "date": "2016-09-08",
-                "value": 0.35
-              },
-              {
-                "date": "2016-09-09",
-                "value": 0.35
-              },
               {
                 "date": "2016-09-12",
                 "value": 0.37
@@ -32688,13 +32175,89 @@
               {
                 "date": "2026-08-11",
                 "value": 3.89
+              },
+              {
+                "date": "2026-08-12",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-13",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-14",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-17",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-18",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-19",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-20",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-21",
+                "value": 3.88
+              },
+              {
+                "date": "2026-08-24",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-25",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-26",
+                "value": 3.85
+              },
+              {
+                "date": "2026-08-27",
+                "value": 3.84
+              },
+              {
+                "date": "2026-08-28",
+                "value": 3.9
+              },
+              {
+                "date": "2026-08-31",
+                "value": 3.91
+              },
+              {
+                "date": "2026-09-01",
+                "value": 3.92
+              },
+              {
+                "date": "2026-09-02",
+                "value": 3.92
+              },
+              {
+                "date": "2026-09-03",
+                "value": 3.89
+              },
+              {
+                "date": "2026-09-04",
+                "value": 3.91
+              },
+              {
+                "date": "2026-09-08",
+                "value": 3.94
               }
             ]
           }
         ]
       },
       {
-      "title": "承担久期风险能获得多少补偿？",
+        "title": "承担久期风险能获得多少补偿？",
         "description": "3M、2Y、10Y、30Y 同图，观察短端政策预期、中端增长预期和长端期限溢价的相对变化。",
         "series": [
           {
@@ -32707,82 +32270,6 @@
             "description": "3 个月国库券收益率，是现金类资产最常见的市场利率。",
             "points": [
               {
-                "date": "2016-08-15",
-                "value": 0.31
-              },
-              {
-                "date": "2016-08-16",
-                "value": 0.27
-              },
-              {
-                "date": "2016-08-17",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-18",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-19",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-22",
-                "value": 0.29
-              },
-              {
-                "date": "2016-08-23",
-                "value": 0.3
-              },
-              {
-                "date": "2016-08-24",
-                "value": 0.31
-              },
-              {
-                "date": "2016-08-25",
-                "value": 0.33
-              },
-              {
-                "date": "2016-08-26",
-                "value": 0.34
-              },
-              {
-                "date": "2016-08-29",
-                "value": 0.33
-              },
-              {
-                "date": "2016-08-30",
-                "value": 0.33
-              },
-              {
-                "date": "2016-08-31",
-                "value": 0.33
-              },
-              {
-                "date": "2016-09-01",
-                "value": 0.33
-              },
-              {
-                "date": "2016-09-02",
-                "value": 0.33
-              },
-              {
-                "date": "2016-09-06",
-                "value": 0.32
-              },
-              {
-                "date": "2016-09-07",
-                "value": 0.34
-              },
-              {
-                "date": "2016-09-08",
-                "value": 0.35
-              },
-              {
-                "date": "2016-09-09",
-                "value": 0.35
-              },
-              {
                 "date": "2016-09-12",
                 "value": 0.37
               },
@@ -42693,6 +42180,82 @@
               {
                 "date": "2026-08-11",
                 "value": 3.89
+              },
+              {
+                "date": "2026-08-12",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-13",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-14",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-17",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-18",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-19",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-20",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-21",
+                "value": 3.88
+              },
+              {
+                "date": "2026-08-24",
+                "value": 3.87
+              },
+              {
+                "date": "2026-08-25",
+                "value": 3.86
+              },
+              {
+                "date": "2026-08-26",
+                "value": 3.85
+              },
+              {
+                "date": "2026-08-27",
+                "value": 3.84
+              },
+              {
+                "date": "2026-08-28",
+                "value": 3.9
+              },
+              {
+                "date": "2026-08-31",
+                "value": 3.91
+              },
+              {
+                "date": "2026-09-01",
+                "value": 3.92
+              },
+              {
+                "date": "2026-09-02",
+                "value": 3.92
+              },
+              {
+                "date": "2026-09-03",
+                "value": 3.89
+              },
+              {
+                "date": "2026-09-04",
+                "value": 3.91
+              },
+              {
+                "date": "2026-09-08",
+                "value": 3.94
               }
             ]
           },
@@ -42705,82 +42268,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
             "description": "2 年期美债收益率，对政策利率预期最敏感。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 0.72
-              },
-              {
-                "date": "2016-08-16",
-                "value": 0.76
-              },
-              {
-                "date": "2016-08-17",
-                "value": 0.74
-              },
-              {
-                "date": "2016-08-18",
-                "value": 0.71
-              },
-              {
-                "date": "2016-08-19",
-                "value": 0.76
-              },
-              {
-                "date": "2016-08-22",
-                "value": 0.76
-              },
-              {
-                "date": "2016-08-23",
-                "value": 0.74
-              },
-              {
-                "date": "2016-08-24",
-                "value": 0.76
-              },
-              {
-                "date": "2016-08-25",
-                "value": 0.78
-              },
-              {
-                "date": "2016-08-26",
-                "value": 0.84
-              },
-              {
-                "date": "2016-08-29",
-                "value": 0.81
-              },
-              {
-                "date": "2016-08-30",
-                "value": 0.8
-              },
-              {
-                "date": "2016-08-31",
-                "value": 0.8
-              },
-              {
-                "date": "2016-09-01",
-                "value": 0.78
-              },
-              {
-                "date": "2016-09-02",
-                "value": 0.8
-              },
-              {
-                "date": "2016-09-06",
-                "value": 0.74
-              },
-              {
-                "date": "2016-09-07",
-                "value": 0.74
-              },
-              {
-                "date": "2016-09-08",
-                "value": 0.78
-              },
-              {
-                "date": "2016-09-09",
-                "value": 0.79
-              },
               {
                 "date": "2016-09-12",
                 "value": 0.79
@@ -52692,6 +52179,82 @@
               {
                 "date": "2026-08-11",
                 "value": 4.22
+              },
+              {
+                "date": "2026-08-12",
+                "value": 4.2
+              },
+              {
+                "date": "2026-08-13",
+                "value": 4.15
+              },
+              {
+                "date": "2026-08-14",
+                "value": 4.17
+              },
+              {
+                "date": "2026-08-17",
+                "value": 4.19
+              },
+              {
+                "date": "2026-08-18",
+                "value": 4.19
+              },
+              {
+                "date": "2026-08-19",
+                "value": 4.19
+              },
+              {
+                "date": "2026-08-20",
+                "value": 4.19
+              },
+              {
+                "date": "2026-08-21",
+                "value": 4.24
+              },
+              {
+                "date": "2026-08-24",
+                "value": 4.24
+              },
+              {
+                "date": "2026-08-25",
+                "value": 4.17
+              },
+              {
+                "date": "2026-08-26",
+                "value": 4.19
+              },
+              {
+                "date": "2026-08-27",
+                "value": 4.2
+              },
+              {
+                "date": "2026-08-28",
+                "value": 4.34
+              },
+              {
+                "date": "2026-08-31",
+                "value": 4.34
+              },
+              {
+                "date": "2026-09-01",
+                "value": 4.39
+              },
+              {
+                "date": "2026-09-02",
+                "value": 4.39
+              },
+              {
+                "date": "2026-09-03",
+                "value": 4.34
+              },
+              {
+                "date": "2026-09-04",
+                "value": 4.37
+              },
+              {
+                "date": "2026-09-08",
+                "value": 4.39
               }
             ]
           },
@@ -52704,82 +52267,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
             "description": "10 年期美债收益率，是全球风险资产折现率的核心锚。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-16",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-17",
-                "value": 1.56
-              },
-              {
-                "date": "2016-08-18",
-                "value": 1.53
-              },
-              {
-                "date": "2016-08-19",
-                "value": 1.58
-              },
-              {
-                "date": "2016-08-22",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-23",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-24",
-                "value": 1.56
-              },
-              {
-                "date": "2016-08-25",
-                "value": 1.58
-              },
-              {
-                "date": "2016-08-26",
-                "value": 1.62
-              },
-              {
-                "date": "2016-08-29",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-30",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-31",
-                "value": 1.58
-              },
-              {
-                "date": "2016-09-01",
-                "value": 1.57
-              },
-              {
-                "date": "2016-09-02",
-                "value": 1.6
-              },
-              {
-                "date": "2016-09-06",
-                "value": 1.55
-              },
-              {
-                "date": "2016-09-07",
-                "value": 1.54
-              },
-              {
-                "date": "2016-09-08",
-                "value": 1.61
-              },
-              {
-                "date": "2016-09-09",
-                "value": 1.67
-              },
               {
                 "date": "2016-09-12",
                 "value": 1.68
@@ -62691,6 +62178,82 @@
               {
                 "date": "2026-08-11",
                 "value": 4.7
+              },
+              {
+                "date": "2026-08-12",
+                "value": 4.68
+              },
+              {
+                "date": "2026-08-13",
+                "value": 4.63
+              },
+              {
+                "date": "2026-08-14",
+                "value": 4.68
+              },
+              {
+                "date": "2026-08-17",
+                "value": 4.72
+              },
+              {
+                "date": "2026-08-18",
+                "value": 4.71
+              },
+              {
+                "date": "2026-08-19",
+                "value": 4.65
+              },
+              {
+                "date": "2026-08-20",
+                "value": 4.69
+              },
+              {
+                "date": "2026-08-21",
+                "value": 4.74
+              },
+              {
+                "date": "2026-08-24",
+                "value": 4.7
+              },
+              {
+                "date": "2026-08-25",
+                "value": 4.64
+              },
+              {
+                "date": "2026-08-26",
+                "value": 4.66
+              },
+              {
+                "date": "2026-08-27",
+                "value": 4.67
+              },
+              {
+                "date": "2026-08-28",
+                "value": 4.73
+              },
+              {
+                "date": "2026-08-31",
+                "value": 4.75
+              },
+              {
+                "date": "2026-09-01",
+                "value": 4.79
+              },
+              {
+                "date": "2026-09-02",
+                "value": 4.79
+              },
+              {
+                "date": "2026-09-03",
+                "value": 4.77
+              },
+              {
+                "date": "2026-09-04",
+                "value": 4.78
+              },
+              {
+                "date": "2026-09-08",
+                "value": 4.8
               }
             ]
           },
@@ -62703,82 +62266,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS30",
             "description": "30 年期美债收益率，反映长期通胀、期限溢价和财政供给压力。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 2.27
-              },
-              {
-                "date": "2016-08-16",
-                "value": 2.29
-              },
-              {
-                "date": "2016-08-17",
-                "value": 2.27
-              },
-              {
-                "date": "2016-08-18",
-                "value": 2.26
-              },
-              {
-                "date": "2016-08-19",
-                "value": 2.29
-              },
-              {
-                "date": "2016-08-22",
-                "value": 2.24
-              },
-              {
-                "date": "2016-08-23",
-                "value": 2.24
-              },
-              {
-                "date": "2016-08-24",
-                "value": 2.24
-              },
-              {
-                "date": "2016-08-25",
-                "value": 2.27
-              },
-              {
-                "date": "2016-08-26",
-                "value": 2.29
-              },
-              {
-                "date": "2016-08-29",
-                "value": 2.22
-              },
-              {
-                "date": "2016-08-30",
-                "value": 2.23
-              },
-              {
-                "date": "2016-08-31",
-                "value": 2.23
-              },
-              {
-                "date": "2016-09-01",
-                "value": 2.23
-              },
-              {
-                "date": "2016-09-02",
-                "value": 2.28
-              },
-              {
-                "date": "2016-09-06",
-                "value": 2.24
-              },
-              {
-                "date": "2016-09-07",
-                "value": 2.23
-              },
-              {
-                "date": "2016-09-08",
-                "value": 2.32
-              },
-              {
-                "date": "2016-09-09",
-                "value": 2.39
-              },
               {
                 "date": "2016-09-12",
                 "value": 2.4
@@ -72690,13 +72177,89 @@
               {
                 "date": "2026-08-11",
                 "value": 5.24
+              },
+              {
+                "date": "2026-08-12",
+                "value": 5.24
+              },
+              {
+                "date": "2026-08-13",
+                "value": 5.21
+              },
+              {
+                "date": "2026-08-14",
+                "value": 5.25
+              },
+              {
+                "date": "2026-08-17",
+                "value": 5.31
+              },
+              {
+                "date": "2026-08-18",
+                "value": 5.28
+              },
+              {
+                "date": "2026-08-19",
+                "value": 5.19
+              },
+              {
+                "date": "2026-08-20",
+                "value": 5.23
+              },
+              {
+                "date": "2026-08-21",
+                "value": 5.27
+              },
+              {
+                "date": "2026-08-24",
+                "value": 5.23
+              },
+              {
+                "date": "2026-08-25",
+                "value": 5.17
+              },
+              {
+                "date": "2026-08-26",
+                "value": 5.18
+              },
+              {
+                "date": "2026-08-27",
+                "value": 5.19
+              },
+              {
+                "date": "2026-08-28",
+                "value": 5.22
+              },
+              {
+                "date": "2026-08-31",
+                "value": 5.25
+              },
+              {
+                "date": "2026-09-01",
+                "value": 5.27
+              },
+              {
+                "date": "2026-09-02",
+                "value": 5.27
+              },
+              {
+                "date": "2026-09-03",
+                "value": 5.25
+              },
+              {
+                "date": "2026-09-04",
+                "value": 5.24
+              },
+              {
+                "date": "2026-09-08",
+                "value": 5.25
               }
             ]
           }
         ]
       },
       {
-      "title": "实际利率是否仍在压制风险资产？",
+        "title": "实际利率是否仍在压制风险资产？",
         "description": "10Y TIPS 实际利率与 10 年盈亏平衡通胀同图；实际利率抬升通常压制高估值、长久期资产。",
         "series": [
           {
@@ -72708,82 +72271,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DFII10",
             "description": "10 年期 TIPS 收益率，扣除通胀预期后的实际资金成本。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 0.1
-              },
-              {
-                "date": "2016-08-16",
-                "value": 0.13
-              },
-              {
-                "date": "2016-08-17",
-                "value": 0.09
-              },
-              {
-                "date": "2016-08-18",
-                "value": 0.06
-              },
-              {
-                "date": "2016-08-19",
-                "value": 0.1
-              },
-              {
-                "date": "2016-08-22",
-                "value": 0.08
-              },
-              {
-                "date": "2016-08-23",
-                "value": 0.07
-              },
-              {
-                "date": "2016-08-24",
-                "value": 0.08
-              },
-              {
-                "date": "2016-08-25",
-                "value": 0.09
-              },
-              {
-                "date": "2016-08-26",
-                "value": 0.15
-              },
-              {
-                "date": "2016-08-29",
-                "value": 0.11
-              },
-              {
-                "date": "2016-08-30",
-                "value": 0.11
-              },
-              {
-                "date": "2016-08-31",
-                "value": 0.11
-              },
-              {
-                "date": "2016-09-01",
-                "value": 0.12
-              },
-              {
-                "date": "2016-09-02",
-                "value": 0.13
-              },
-              {
-                "date": "2016-09-06",
-                "value": 0.06
-              },
-              {
-                "date": "2016-09-07",
-                "value": 0.03
-              },
-              {
-                "date": "2016-09-08",
-                "value": 0.09
-              },
-              {
-                "date": "2016-09-09",
-                "value": 0.17
-              },
               {
                 "date": "2016-09-12",
                 "value": 0.17
@@ -82695,6 +82182,82 @@
               {
                 "date": "2026-08-11",
                 "value": 2.43
+              },
+              {
+                "date": "2026-08-12",
+                "value": 2.42
+              },
+              {
+                "date": "2026-08-13",
+                "value": 2.39
+              },
+              {
+                "date": "2026-08-14",
+                "value": 2.41
+              },
+              {
+                "date": "2026-08-17",
+                "value": 2.44
+              },
+              {
+                "date": "2026-08-18",
+                "value": 2.41
+              },
+              {
+                "date": "2026-08-19",
+                "value": 2.35
+              },
+              {
+                "date": "2026-08-20",
+                "value": 2.35
+              },
+              {
+                "date": "2026-08-21",
+                "value": 2.4
+              },
+              {
+                "date": "2026-08-24",
+                "value": 2.38
+              },
+              {
+                "date": "2026-08-25",
+                "value": 2.32
+              },
+              {
+                "date": "2026-08-26",
+                "value": 2.34
+              },
+              {
+                "date": "2026-08-27",
+                "value": 2.34
+              },
+              {
+                "date": "2026-08-28",
+                "value": 2.42
+              },
+              {
+                "date": "2026-08-31",
+                "value": 2.44
+              },
+              {
+                "date": "2026-09-01",
+                "value": 2.44
+              },
+              {
+                "date": "2026-09-02",
+                "value": 2.45
+              },
+              {
+                "date": "2026-09-03",
+                "value": 2.42
+              },
+              {
+                "date": "2026-09-04",
+                "value": 2.43
+              },
+              {
+                "date": "2026-09-08",
+                "value": 2.43
               }
             ]
           },
@@ -82707,82 +82270,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/T10YIE",
             "description": "10 年期美债与 TIPS 的收益率差，代表市场隐含的十年平均通胀预期。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 1.45
-              },
-              {
-                "date": "2016-08-16",
-                "value": 1.44
-              },
-              {
-                "date": "2016-08-17",
-                "value": 1.47
-              },
-              {
-                "date": "2016-08-18",
-                "value": 1.47
-              },
-              {
-                "date": "2016-08-19",
-                "value": 1.48
-              },
-              {
-                "date": "2016-08-22",
-                "value": 1.47
-              },
-              {
-                "date": "2016-08-23",
-                "value": 1.48
-              },
-              {
-                "date": "2016-08-24",
-                "value": 1.48
-              },
-              {
-                "date": "2016-08-25",
-                "value": 1.49
-              },
-              {
-                "date": "2016-08-26",
-                "value": 1.47
-              },
-              {
-                "date": "2016-08-29",
-                "value": 1.46
-              },
-              {
-                "date": "2016-08-30",
-                "value": 1.46
-              },
-              {
-                "date": "2016-08-31",
-                "value": 1.47
-              },
-              {
-                "date": "2016-09-01",
-                "value": 1.45
-              },
-              {
-                "date": "2016-09-02",
-                "value": 1.47
-              },
-              {
-                "date": "2016-09-06",
-                "value": 1.49
-              },
-              {
-                "date": "2016-09-07",
-                "value": 1.51
-              },
-              {
-                "date": "2016-09-08",
-                "value": 1.52
-              },
-              {
-                "date": "2016-09-09",
-                "value": 1.5
-              },
               {
                 "date": "2016-09-12",
                 "value": 1.51
@@ -92698,13 +92185,89 @@
               {
                 "date": "2026-08-12",
                 "value": 2.26
+              },
+              {
+                "date": "2026-08-13",
+                "value": 2.24
+              },
+              {
+                "date": "2026-08-14",
+                "value": 2.27
+              },
+              {
+                "date": "2026-08-17",
+                "value": 2.28
+              },
+              {
+                "date": "2026-08-18",
+                "value": 2.3
+              },
+              {
+                "date": "2026-08-19",
+                "value": 2.3
+              },
+              {
+                "date": "2026-08-20",
+                "value": 2.34
+              },
+              {
+                "date": "2026-08-21",
+                "value": 2.34
+              },
+              {
+                "date": "2026-08-24",
+                "value": 2.32
+              },
+              {
+                "date": "2026-08-25",
+                "value": 2.32
+              },
+              {
+                "date": "2026-08-26",
+                "value": 2.32
+              },
+              {
+                "date": "2026-08-27",
+                "value": 2.33
+              },
+              {
+                "date": "2026-08-28",
+                "value": 2.31
+              },
+              {
+                "date": "2026-08-31",
+                "value": 2.31
+              },
+              {
+                "date": "2026-09-01",
+                "value": 2.35
+              },
+              {
+                "date": "2026-09-02",
+                "value": 2.34
+              },
+              {
+                "date": "2026-09-03",
+                "value": 2.35
+              },
+              {
+                "date": "2026-09-04",
+                "value": 2.35
+              },
+              {
+                "date": "2026-09-08",
+                "value": 2.37
+              },
+              {
+                "date": "2026-09-09",
+                "value": 2.37
               }
             ]
           }
         ]
       },
       {
-      "title": "信用风险提供的额外收益够不够？",
+        "title": "信用风险提供的额外收益够不够？",
         "description": "IG/HY 总收益率 = 10Y 美债 + 各自利差；总收益率上行代表借债成本上升，利差本身单独在相对价值信号中展示。",
         "series": [
           {
@@ -92716,82 +92279,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
             "description": "10 年期美债收益率，是全球风险资产折现率的核心锚。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-16",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-17",
-                "value": 1.56
-              },
-              {
-                "date": "2016-08-18",
-                "value": 1.53
-              },
-              {
-                "date": "2016-08-19",
-                "value": 1.58
-              },
-              {
-                "date": "2016-08-22",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-23",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-24",
-                "value": 1.56
-              },
-              {
-                "date": "2016-08-25",
-                "value": 1.58
-              },
-              {
-                "date": "2016-08-26",
-                "value": 1.62
-              },
-              {
-                "date": "2016-08-29",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-30",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-31",
-                "value": 1.58
-              },
-              {
-                "date": "2016-09-01",
-                "value": 1.57
-              },
-              {
-                "date": "2016-09-02",
-                "value": 1.6
-              },
-              {
-                "date": "2016-09-06",
-                "value": 1.55
-              },
-              {
-                "date": "2016-09-07",
-                "value": 1.54
-              },
-              {
-                "date": "2016-09-08",
-                "value": 1.61
-              },
-              {
-                "date": "2016-09-09",
-                "value": 1.67
-              },
               {
                 "date": "2016-09-12",
                 "value": 1.68
@@ -102703,6 +102190,82 @@
               {
                 "date": "2026-08-11",
                 "value": 4.7
+              },
+              {
+                "date": "2026-08-12",
+                "value": 4.68
+              },
+              {
+                "date": "2026-08-13",
+                "value": 4.63
+              },
+              {
+                "date": "2026-08-14",
+                "value": 4.68
+              },
+              {
+                "date": "2026-08-17",
+                "value": 4.72
+              },
+              {
+                "date": "2026-08-18",
+                "value": 4.71
+              },
+              {
+                "date": "2026-08-19",
+                "value": 4.65
+              },
+              {
+                "date": "2026-08-20",
+                "value": 4.69
+              },
+              {
+                "date": "2026-08-21",
+                "value": 4.74
+              },
+              {
+                "date": "2026-08-24",
+                "value": 4.7
+              },
+              {
+                "date": "2026-08-25",
+                "value": 4.64
+              },
+              {
+                "date": "2026-08-26",
+                "value": 4.66
+              },
+              {
+                "date": "2026-08-27",
+                "value": 4.67
+              },
+              {
+                "date": "2026-08-28",
+                "value": 4.73
+              },
+              {
+                "date": "2026-08-31",
+                "value": 4.75
+              },
+              {
+                "date": "2026-09-01",
+                "value": 4.79
+              },
+              {
+                "date": "2026-09-02",
+                "value": 4.79
+              },
+              {
+                "date": "2026-09-03",
+                "value": 4.77
+              },
+              {
+                "date": "2026-09-04",
+                "value": 4.78
+              },
+              {
+                "date": "2026-09-08",
+                "value": 4.8
               }
             ]
           },
@@ -102715,82 +102278,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
             "description": "10Y 美债收益率 + 投资级信用利差，代表投资级债券的美元总收益水平。",
             "points": [
-              {
-                "date": "2023-08-14",
-                "value": 5.41
-              },
-              {
-                "date": "2023-08-15",
-                "value": 5.44
-              },
-              {
-                "date": "2023-08-16",
-                "value": 5.53
-              },
-              {
-                "date": "2023-08-17",
-                "value": 5.56
-              },
-              {
-                "date": "2023-08-18",
-                "value": 5.53
-              },
-              {
-                "date": "2023-08-21",
-                "value": 5.6
-              },
-              {
-                "date": "2023-08-22",
-                "value": 5.59
-              },
-              {
-                "date": "2023-08-23",
-                "value": 5.44
-              },
-              {
-                "date": "2023-08-24",
-                "value": 5.46
-              },
-              {
-                "date": "2023-08-25",
-                "value": 5.48
-              },
-              {
-                "date": "2023-08-28",
-                "value": 5.42
-              },
-              {
-                "date": "2023-08-29",
-                "value": 5.34
-              },
-              {
-                "date": "2023-08-30",
-                "value": 5.34
-              },
-              {
-                "date": "2023-08-31",
-                "value": 5.31
-              },
-              {
-                "date": "2023-09-01",
-                "value": 5.4
-              },
-              {
-                "date": "2023-09-05",
-                "value": 5.49
-              },
-              {
-                "date": "2023-09-06",
-                "value": 5.53
-              },
-              {
-                "date": "2023-09-07",
-                "value": 5.5
-              },
-              {
-                "date": "2023-09-08",
-                "value": 5.49
-              },
               {
                 "date": "2023-09-11",
                 "value": 5.52
@@ -105706,6 +105193,82 @@
               {
                 "date": "2026-08-11",
                 "value": 5.49
+              },
+              {
+                "date": "2026-08-12",
+                "value": 5.47
+              },
+              {
+                "date": "2026-08-13",
+                "value": 5.42
+              },
+              {
+                "date": "2026-08-14",
+                "value": 5.48
+              },
+              {
+                "date": "2026-08-17",
+                "value": 5.53
+              },
+              {
+                "date": "2026-08-18",
+                "value": 5.53
+              },
+              {
+                "date": "2026-08-19",
+                "value": 5.46
+              },
+              {
+                "date": "2026-08-20",
+                "value": 5.51
+              },
+              {
+                "date": "2026-08-21",
+                "value": 5.55
+              },
+              {
+                "date": "2026-08-24",
+                "value": 5.51
+              },
+              {
+                "date": "2026-08-25",
+                "value": 5.45
+              },
+              {
+                "date": "2026-08-26",
+                "value": 5.46
+              },
+              {
+                "date": "2026-08-27",
+                "value": 5.46
+              },
+              {
+                "date": "2026-08-28",
+                "value": 5.52
+              },
+              {
+                "date": "2026-08-31",
+                "value": 5.55
+              },
+              {
+                "date": "2026-09-01",
+                "value": 5.6
+              },
+              {
+                "date": "2026-09-02",
+                "value": 5.6
+              },
+              {
+                "date": "2026-09-03",
+                "value": 5.58
+              },
+              {
+                "date": "2026-09-04",
+                "value": 5.59
+              },
+              {
+                "date": "2026-09-08",
+                "value": 5.61
               }
             ]
           },
@@ -105718,82 +105281,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
             "description": "10Y 美债收益率 + 高收益债信用利差，代表高收益债券的美元总收益水平。",
             "points": [
-              {
-                "date": "2023-08-14",
-                "value": 7.98
-              },
-              {
-                "date": "2023-08-15",
-                "value": 8.06
-              },
-              {
-                "date": "2023-08-16",
-                "value": 8.09
-              },
-              {
-                "date": "2023-08-17",
-                "value": 8.25
-              },
-              {
-                "date": "2023-08-18",
-                "value": 8.28
-              },
-              {
-                "date": "2023-08-21",
-                "value": 8.31
-              },
-              {
-                "date": "2023-08-22",
-                "value": 8.27
-              },
-              {
-                "date": "2023-08-23",
-                "value": 8.11
-              },
-              {
-                "date": "2023-08-24",
-                "value": 8.14
-              },
-              {
-                "date": "2023-08-25",
-                "value": 8.15
-              },
-              {
-                "date": "2023-08-28",
-                "value": 8.06
-              },
-              {
-                "date": "2023-08-29",
-                "value": 7.99
-              },
-              {
-                "date": "2023-08-30",
-                "value": 7.92
-              },
-              {
-                "date": "2023-08-31",
-                "value": 7.94
-              },
-              {
-                "date": "2023-09-01",
-                "value": 7.99
-              },
-              {
-                "date": "2023-09-05",
-                "value": 8.1
-              },
-              {
-                "date": "2023-09-06",
-                "value": 8.16
-              },
-              {
-                "date": "2023-09-07",
-                "value": 8.17
-              },
-              {
-                "date": "2023-09-08",
-                "value": 8.11
-              },
               {
                 "date": "2023-09-11",
                 "value": 8.11
@@ -108709,1823 +108196,89 @@
               {
                 "date": "2026-08-11",
                 "value": 7.42
+              },
+              {
+                "date": "2026-08-12",
+                "value": 7.39
+              },
+              {
+                "date": "2026-08-13",
+                "value": 7.34
+              },
+              {
+                "date": "2026-08-14",
+                "value": 7.35
+              },
+              {
+                "date": "2026-08-17",
+                "value": 7.42
+              },
+              {
+                "date": "2026-08-18",
+                "value": 7.46
+              },
+              {
+                "date": "2026-08-19",
+                "value": 7.38
+              },
+              {
+                "date": "2026-08-20",
+                "value": 7.44
+              },
+              {
+                "date": "2026-08-21",
+                "value": 7.44
+              },
+              {
+                "date": "2026-08-24",
+                "value": 7.39
+              },
+              {
+                "date": "2026-08-25",
+                "value": 7.34
+              },
+              {
+                "date": "2026-08-26",
+                "value": 7.33
+              },
+              {
+                "date": "2026-08-27",
+                "value": 7.3
+              },
+              {
+                "date": "2026-08-28",
+                "value": 7.33
+              },
+              {
+                "date": "2026-08-31",
+                "value": 7.38
+              },
+              {
+                "date": "2026-09-01",
+                "value": 7.44
+              },
+              {
+                "date": "2026-09-02",
+                "value": 7.45
+              },
+              {
+                "date": "2026-09-03",
+                "value": 7.42
+              },
+              {
+                "date": "2026-09-04",
+                "value": 7.46
+              },
+              {
+                "date": "2026-09-08",
+                "value": 7.47
               }
             ]
           }
         ]
       },
       {
-      "title": "海外债券换算成美元后是否更划算？",
-        "description": "美元近似收益 = 本币收益率 + 近 12 个月汇率变动贡献。日债按 USD/JPY（日元升值贡献为正），欧债按 EUR/USD（欧元升值贡献为正），均未做汇率对冲。",
-        "series": [
-          {
-            "key": "jgb10y",
-            "label": "JGB 10Y 本币",
-            "color": "#0d9488",
-            "unit": "%",
-            "source": "FRED IRLTLT01JPM156N / OECD",
-            "sourceUrl": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N",
-            "description": "日本 10 年期国债收益率（日元口径），反映日元长端融资成本。",
-            "points": [
-              {
-                "date": "2016-08-01",
-                "value": -0.07
-              },
-              {
-                "date": "2016-09-01",
-                "value": -0.085
-              },
-              {
-                "date": "2016-10-01",
-                "value": -0.05
-              },
-              {
-                "date": "2016-11-01",
-                "value": 0.02
-              },
-              {
-                "date": "2016-12-01",
-                "value": 0.04
-              },
-              {
-                "date": "2017-01-01",
-                "value": 0.085
-              },
-              {
-                "date": "2017-02-01",
-                "value": 0.05
-              },
-              {
-                "date": "2017-03-01",
-                "value": 0.065
-              },
-              {
-                "date": "2017-04-01",
-                "value": 0.015
-              },
-              {
-                "date": "2017-05-01",
-                "value": 0.04
-              },
-              {
-                "date": "2017-06-01",
-                "value": 0.075
-              },
-              {
-                "date": "2017-07-01",
-                "value": 0.075
-              },
-              {
-                "date": "2017-08-01",
-                "value": 0.01
-              },
-              {
-                "date": "2017-09-01",
-                "value": 0.06
-              },
-              {
-                "date": "2017-10-01",
-                "value": 0.065
-              },
-              {
-                "date": "2017-11-01",
-                "value": 0.035
-              },
-              {
-                "date": "2017-12-01",
-                "value": 0.045
-              },
-              {
-                "date": "2018-01-01",
-                "value": 0.08
-              },
-              {
-                "date": "2018-02-01",
-                "value": 0.045
-              },
-              {
-                "date": "2018-03-01",
-                "value": 0.045
-              },
-              {
-                "date": "2018-04-01",
-                "value": 0.05
-              },
-              {
-                "date": "2018-05-01",
-                "value": 0.03
-              },
-              {
-                "date": "2018-06-01",
-                "value": 0.03
-              },
-              {
-                "date": "2018-07-01",
-                "value": 0.06
-              },
-              {
-                "date": "2018-08-01",
-                "value": 0.11
-              },
-              {
-                "date": "2018-09-01",
-                "value": 0.125
-              },
-              {
-                "date": "2018-10-01",
-                "value": 0.13
-              },
-              {
-                "date": "2018-11-01",
-                "value": 0.085
-              },
-              {
-                "date": "2018-12-01",
-                "value": -0.01
-              },
-              {
-                "date": "2019-01-01",
-                "value": 0
-              },
-              {
-                "date": "2019-02-01",
-                "value": -0.015
-              },
-              {
-                "date": "2019-03-01",
-                "value": -0.095
-              },
-              {
-                "date": "2019-04-01",
-                "value": -0.045
-              },
-              {
-                "date": "2019-05-01",
-                "value": -0.095
-              },
-              {
-                "date": "2019-06-01",
-                "value": -0.165
-              },
-              {
-                "date": "2019-07-01",
-                "value": -0.16
-              },
-              {
-                "date": "2019-08-01",
-                "value": -0.28
-              },
-              {
-                "date": "2019-09-01",
-                "value": -0.215
-              },
-              {
-                "date": "2019-10-01",
-                "value": -0.15
-              },
-              {
-                "date": "2019-11-01",
-                "value": -0.08
-              },
-              {
-                "date": "2019-12-01",
-                "value": -0.025
-              },
-              {
-                "date": "2020-01-01",
-                "value": -0.065
-              },
-              {
-                "date": "2020-02-01",
-                "value": -0.155
-              },
-              {
-                "date": "2020-03-01",
-                "value": 0.005
-              },
-              {
-                "date": "2020-04-01",
-                "value": -0.04
-              },
-              {
-                "date": "2020-05-01",
-                "value": 0
-              },
-              {
-                "date": "2020-06-01",
-                "value": 0.03
-              },
-              {
-                "date": "2020-07-01",
-                "value": 0.01
-              },
-              {
-                "date": "2020-08-01",
-                "value": 0.045
-              },
-              {
-                "date": "2020-09-01",
-                "value": 0.015
-              },
-              {
-                "date": "2020-10-01",
-                "value": 0.04
-              },
-              {
-                "date": "2020-11-01",
-                "value": 0.03
-              },
-              {
-                "date": "2020-12-01",
-                "value": 0.02
-              },
-              {
-                "date": "2021-01-01",
-                "value": 0.055
-              },
-              {
-                "date": "2021-02-01",
-                "value": 0.15
-              },
-              {
-                "date": "2021-03-01",
-                "value": 0.12
-              },
-              {
-                "date": "2021-04-01",
-                "value": 0.09
-              },
-              {
-                "date": "2021-05-01",
-                "value": 0.08
-              },
-              {
-                "date": "2021-06-01",
-                "value": 0.05
-              },
-              {
-                "date": "2021-07-01",
-                "value": 0.015
-              },
-              {
-                "date": "2021-08-01",
-                "value": 0.02
-              },
-              {
-                "date": "2021-09-01",
-                "value": 0.065
-              },
-              {
-                "date": "2021-10-01",
-                "value": 0.095
-              },
-              {
-                "date": "2021-11-01",
-                "value": 0.05
-              },
-              {
-                "date": "2021-12-01",
-                "value": 0.07
-              },
-              {
-                "date": "2022-01-01",
-                "value": 0.17
-              },
-              {
-                "date": "2022-02-01",
-                "value": 0.18
-              },
-              {
-                "date": "2022-03-01",
-                "value": 0.21
-              },
-              {
-                "date": "2022-04-01",
-                "value": 0.215
-              },
-              {
-                "date": "2022-05-01",
-                "value": 0.235
-              },
-              {
-                "date": "2022-06-01",
-                "value": 0.225
-              },
-              {
-                "date": "2022-07-01",
-                "value": 0.18
-              },
-              {
-                "date": "2022-08-01",
-                "value": 0.22
-              },
-              {
-                "date": "2022-09-01",
-                "value": 0.24
-              },
-              {
-                "date": "2022-10-01",
-                "value": 0.245
-              },
-              {
-                "date": "2022-11-01",
-                "value": 0.25
-              },
-              {
-                "date": "2022-12-01",
-                "value": 0.41
-              },
-              {
-                "date": "2023-01-01",
-                "value": 0.49
-              },
-              {
-                "date": "2023-02-01",
-                "value": 0.5
-              },
-              {
-                "date": "2023-03-01",
-                "value": 0.32
-              },
-              {
-                "date": "2023-04-01",
-                "value": 0.385
-              },
-              {
-                "date": "2023-05-01",
-                "value": 0.43
-              },
-              {
-                "date": "2023-06-01",
-                "value": 0.395
-              },
-              {
-                "date": "2023-07-01",
-                "value": 0.595
-              },
-              {
-                "date": "2023-08-01",
-                "value": 0.64
-              },
-              {
-                "date": "2023-09-01",
-                "value": 0.765
-              },
-              {
-                "date": "2023-10-01",
-                "value": 0.95
-              },
-              {
-                "date": "2023-11-01",
-                "value": 0.66
-              },
-              {
-                "date": "2023-12-01",
-                "value": 0.62
-              },
-              {
-                "date": "2024-01-01",
-                "value": 0.73
-              },
-              {
-                "date": "2024-02-01",
-                "value": 0.71
-              },
-              {
-                "date": "2024-03-01",
-                "value": 0.725
-              },
-              {
-                "date": "2024-04-01",
-                "value": 0.87
-              },
-              {
-                "date": "2024-05-01",
-                "value": 1.07
-              },
-              {
-                "date": "2024-06-01",
-                "value": 1.05
-              },
-              {
-                "date": "2024-07-01",
-                "value": 1.045
-              },
-              {
-                "date": "2024-08-01",
-                "value": 0.89
-              },
-              {
-                "date": "2024-09-01",
-                "value": 0.855
-              },
-              {
-                "date": "2024-10-01",
-                "value": 0.935
-              },
-              {
-                "date": "2024-11-01",
-                "value": 1.05
-              },
-              {
-                "date": "2024-12-01",
-                "value": 1.09
-              },
-              {
-                "date": "2025-01-01",
-                "value": 1.245
-              },
-              {
-                "date": "2025-02-01",
-                "value": 1.37
-              },
-              {
-                "date": "2025-03-01",
-                "value": 1.485
-              },
-              {
-                "date": "2025-04-01",
-                "value": 1.31
-              },
-              {
-                "date": "2025-05-01",
-                "value": 1.5
-              },
-              {
-                "date": "2025-06-01",
-                "value": 1.42
-              },
-              {
-                "date": "2025-07-01",
-                "value": 1.545
-              },
-              {
-                "date": "2025-08-01",
-                "value": 1.6
-              },
-              {
-                "date": "2025-09-01",
-                "value": 1.645
-              },
-              {
-                "date": "2025-10-01",
-                "value": 1.655
-              },
-              {
-                "date": "2025-11-01",
-                "value": 1.805
-              },
-              {
-                "date": "2025-12-01",
-                "value": 2.06
-              },
-              {
-                "date": "2026-01-01",
-                "value": 2.24
-              },
-              {
-                "date": "2026-02-01",
-                "value": 2.11
-              },
-              {
-                "date": "2026-03-01",
-                "value": 2.345
-              },
-              {
-                "date": "2026-04-01",
-                "value": 2.515
-              },
-              {
-                "date": "2026-05-01",
-                "value": 2.65
-              },
-              {
-                "date": "2026-06-01",
-                "value": 2.67
-              }
-            ]
-          },
-          {
-            "key": "jgbUsd",
-            "label": "JGB 10Y 美元近似",
-            "color": "#0d9488",
-            "unit": "%",
-            "source": "FRED IRLTLT01JPM156N + DEXJPUS",
-            "sourceUrl": "https://fred.stlouisfed.org/series/DEXJPUS",
-            "description": "JGB 本币收益率 + 近 12 个月 USD/JPY 汇率变动贡献（未对冲的美元近似收益）。",
-            "points": [
-              {
-                "date": "2017-09-01",
-                "value": -6.5957
-              },
-              {
-                "date": "2017-10-01",
-                "value": -10.9322
-              },
-              {
-                "date": "2017-11-01",
-                "value": -9.0003
-              },
-              {
-                "date": "2017-12-01",
-                "value": 2.1965
-              },
-              {
-                "date": "2018-01-01",
-                "value": 3.2007
-              },
-              {
-                "date": "2018-02-01",
-                "value": 3.3904
-              },
-              {
-                "date": "2018-03-01",
-                "value": 5.9838
-              },
-              {
-                "date": "2018-04-01",
-                "value": 4.6836
-              },
-              {
-                "date": "2018-05-01",
-                "value": 1.8997
-              },
-              {
-                "date": "2018-06-01",
-                "value": 1.6032
-              },
-              {
-                "date": "2018-07-01",
-                "value": 1.4934
-              },
-              {
-                "date": "2018-08-01",
-                "value": -1.1499
-              },
-              {
-                "date": "2018-09-01",
-                "value": -0.7109
-              },
-              {
-                "date": "2018-10-01",
-                "value": -0.5979
-              },
-              {
-                "date": "2018-11-01",
-                "value": 1.1811
-              },
-              {
-                "date": "2018-12-01",
-                "value": -1.1142
-              },
-              {
-                "date": "2019-01-01",
-                "value": 2.2242
-              },
-              {
-                "date": "2019-02-01",
-                "value": -0.0607
-              },
-              {
-                "date": "2019-03-01",
-                "value": -4.7531
-              },
-              {
-                "date": "2019-04-01",
-                "value": -4.1948
-              },
-              {
-                "date": "2019-05-01",
-                "value": -1.4534
-              },
-              {
-                "date": "2019-06-01",
-                "value": -0.1006
-              },
-              {
-                "date": "2019-07-01",
-                "value": 2.1411
-              },
-              {
-                "date": "2019-08-01",
-                "value": 2.7991
-              },
-              {
-                "date": "2019-09-01",
-                "value": 4.1657
-              },
-              {
-                "date": "2019-10-01",
-                "value": 5.3432
-              },
-              {
-                "date": "2019-11-01",
-                "value": 4.025
-              },
-              {
-                "date": "2019-12-01",
-                "value": 3.4576
-              },
-              {
-                "date": "2020-01-01",
-                "value": 0.8739
-              },
-              {
-                "date": "2020-02-01",
-                "value": 0.1574
-              },
-              {
-                "date": "2020-03-01",
-                "value": 2.9319
-              },
-              {
-                "date": "2020-04-01",
-                "value": 3.7699
-              },
-              {
-                "date": "2020-05-01",
-                "value": 3.9755
-              },
-              {
-                "date": "2020-06-01",
-                "value": 1.3757
-              },
-              {
-                "date": "2020-07-01",
-                "value": 0.8586
-              },
-              {
-                "date": "2020-08-01",
-                "value": 2.6237
-              },
-              {
-                "date": "2020-09-01",
-                "value": 0.544
-              },
-              {
-                "date": "2020-10-01",
-                "value": 2.0549
-              },
-              {
-                "date": "2020-11-01",
-                "value": 4.016
-              },
-              {
-                "date": "2020-12-01",
-                "value": 4.2054
-              },
-              {
-                "date": "2021-01-01",
-                "value": 5.0978
-              },
-              {
-                "date": "2021-02-01",
-                "value": 4.2819
-              },
-              {
-                "date": "2021-03-01",
-                "value": 3.4908
-              },
-              {
-                "date": "2021-04-01",
-                "value": -3.2355
-              },
-              {
-                "date": "2021-05-01",
-                "value": -2.1549
-              },
-              {
-                "date": "2021-06-01",
-                "value": -1.6886
-              },
-              {
-                "date": "2021-07-01",
-                "value": -3.7617
-              },
-              {
-                "date": "2021-08-01",
-                "value": -4.4065
-              },
-              {
-                "date": "2021-09-01",
-                "value": -3.7369
-              },
-              {
-                "date": "2021-10-01",
-                "value": -5.0599
-              },
-              {
-                "date": "2021-11-01",
-                "value": -8.8716
-              },
-              {
-                "date": "2021-12-01",
-                "value": -7.9951
-              },
-              {
-                "date": "2022-01-01",
-                "value": -11.31
-              },
-              {
-                "date": "2022-02-01",
-                "value": -9.156
-              },
-              {
-                "date": "2022-03-01",
-                "value": -7.4672
-              },
-              {
-                "date": "2022-04-01",
-                "value": -10.6249
-              },
-              {
-                "date": "2022-05-01",
-                "value": -18.9499
-              },
-              {
-                "date": "2022-06-01",
-                "value": -18.6546
-              },
-              {
-                "date": "2022-07-01",
-                "value": -20.9118
-              },
-              {
-                "date": "2022-08-01",
-                "value": -21.4362
-              },
-              {
-                "date": "2022-09-01",
-                "value": -26.9344
-              },
-              {
-                "date": "2022-10-01",
-                "value": -29.5398
-              },
-              {
-                "date": "2022-11-01",
-                "value": -29.4549
-              },
-              {
-                "date": "2022-12-01",
-                "value": -19.7371
-              },
-              {
-                "date": "2023-01-01",
-                "value": -13.9582
-              },
-              {
-                "date": "2023-02-01",
-                "value": -12.134
-              },
-              {
-                "date": "2023-03-01",
-                "value": -17.918
-              },
-              {
-                "date": "2023-04-01",
-                "value": -8.9282
-              },
-              {
-                "date": "2023-05-01",
-                "value": -3.4267
-              },
-              {
-                "date": "2023-06-01",
-                "value": -6.2542
-              },
-              {
-                "date": "2023-07-01",
-                "value": -5.8756
-              },
-              {
-                "date": "2023-08-01",
-                "value": -8.1157
-              },
-              {
-                "date": "2023-09-01",
-                "value": -3.7158
-              },
-              {
-                "date": "2023-10-01",
-                "value": -2.4976
-              },
-              {
-                "date": "2023-11-01",
-                "value": -1.2642
-              },
-              {
-                "date": "2023-12-01",
-                "value": -7.8271
-              },
-              {
-                "date": "2024-01-01",
-                "value": -5.0976
-              },
-              {
-                "date": "2024-02-01",
-                "value": -12.3711
-              },
-              {
-                "date": "2024-03-01",
-                "value": -9.8625
-              },
-              {
-                "date": "2024-04-01",
-                "value": -13.0949
-              },
-              {
-                "date": "2024-05-01",
-                "value": -13.7098
-              },
-              {
-                "date": "2024-06-01",
-                "value": -11.4053
-              },
-              {
-                "date": "2024-07-01",
-                "value": -10.4991
-              },
-              {
-                "date": "2024-08-01",
-                "value": -3.7982
-              },
-              {
-                "date": "2024-09-01",
-                "value": 0.8481
-              },
-              {
-                "date": "2024-10-01",
-                "value": 5.5376
-              },
-              {
-                "date": "2024-11-01",
-                "value": -0.2616
-              },
-              {
-                "date": "2024-12-01",
-                "value": -0.959
-              },
-              {
-                "date": "2025-01-01",
-                "value": -9.7934
-              },
-              {
-                "date": "2025-02-01",
-                "value": -4.5441
-              },
-              {
-                "date": "2025-03-01",
-                "value": 1.5115
-              },
-              {
-                "date": "2025-04-01",
-                "value": 2.8391
-              },
-              {
-                "date": "2025-05-01",
-                "value": 9.2196
-              },
-              {
-                "date": "2025-06-01",
-                "value": 9.3687
-              },
-              {
-                "date": "2025-07-01",
-                "value": 12.6685
-              },
-              {
-                "date": "2025-08-01",
-                "value": 2.9328
-              },
-              {
-                "date": "2025-09-01",
-                "value": 0.3207
-              },
-              {
-                "date": "2025-10-01",
-                "value": -0.7813
-              },
-              {
-                "date": "2025-11-01",
-                "value": 0.6891
-              },
-              {
-                "date": "2025-12-01",
-                "value": 0.1771
-              },
-              {
-                "date": "2026-01-01",
-                "value": 2.6022
-              },
-              {
-                "date": "2026-02-01",
-                "value": 2.1618
-              },
-              {
-                "date": "2026-03-01",
-                "value": -1.8272
-              },
-              {
-                "date": "2026-04-01",
-                "value": -3.663
-              },
-              {
-                "date": "2026-05-01",
-                "value": -5.1036
-              },
-              {
-                "date": "2026-06-01",
-                "value": -7.8373
-              }
-            ]
-          },
-          {
-            "key": "bund10y",
-            "label": "Bund 10Y 本币",
-            "color": "#b45309",
-            "unit": "%",
-            "source": "FRED IRLTLT01EZM156N / OECD",
-            "sourceUrl": "https://fred.stlouisfed.org/series/IRLTLT01EZM156N",
-            "description": "欧元区 10 年期国债收益率（欧元口径），以德国 Bund 为代表基准。",
-            "points": [
-              {
-                "date": "2016-08-01",
-                "value": 0.6112
-              },
-              {
-                "date": "2016-09-01",
-                "value": 0.7325
-              },
-              {
-                "date": "2016-10-01",
-                "value": 0.7664
-              },
-              {
-                "date": "2016-11-01",
-                "value": 1.2259
-              },
-              {
-                "date": "2016-12-01",
-                "value": 1.2832
-              },
-              {
-                "date": "2017-01-01",
-                "value": 1.3074
-              },
-              {
-                "date": "2017-02-01",
-                "value": 1.4371
-              },
-              {
-                "date": "2017-03-01",
-                "value": 1.4531
-              },
-              {
-                "date": "2017-04-01",
-                "value": 1.2626
-              },
-              {
-                "date": "2017-05-01",
-                "value": 1.1724
-              },
-              {
-                "date": "2017-06-01",
-                "value": 1.0721
-              },
-              {
-                "date": "2017-07-01",
-                "value": 1.2065
-              },
-              {
-                "date": "2017-08-01",
-                "value": 1.0445
-              },
-              {
-                "date": "2017-09-01",
-                "value": 1.1159
-              },
-              {
-                "date": "2017-10-01",
-                "value": 1.1494
-              },
-              {
-                "date": "2017-11-01",
-                "value": 0.9487
-              },
-              {
-                "date": "2017-12-01",
-                "value": 0.879
-              },
-              {
-                "date": "2018-01-01",
-                "value": 1.0309
-              },
-              {
-                "date": "2018-02-01",
-                "value": 1.2697
-              },
-              {
-                "date": "2018-03-01",
-                "value": 1.1684
-              },
-              {
-                "date": "2018-04-01",
-                "value": 1.1255
-              },
-              {
-                "date": "2018-05-01",
-                "value": 1.2362
-              },
-              {
-                "date": "2018-06-01",
-                "value": 1.2873
-              },
-              {
-                "date": "2018-07-01",
-                "value": 1.1959
-              },
-              {
-                "date": "2018-08-01",
-                "value": 1.3658
-              },
-              {
-                "date": "2018-09-01",
-                "value": 1.3192
-              },
-              {
-                "date": "2018-10-01",
-                "value": 1.554
-              },
-              {
-                "date": "2018-11-01",
-                "value": 1.4052
-              },
-              {
-                "date": "2018-12-01",
-                "value": 1.2106
-              },
-              {
-                "date": "2019-01-01",
-                "value": 1.2024
-              },
-              {
-                "date": "2019-02-01",
-                "value": 1.12
-              },
-              {
-                "date": "2019-03-01",
-                "value": 0.992
-              },
-              {
-                "date": "2019-04-01",
-                "value": 0.952
-              },
-              {
-                "date": "2019-05-01",
-                "value": 0.8715
-              },
-              {
-                "date": "2019-06-01",
-                "value": 0.574
-              },
-              {
-                "date": "2019-07-01",
-                "value": 0.3576
-              },
-              {
-                "date": "2019-08-01",
-                "value": 0.0995
-              },
-              {
-                "date": "2019-09-01",
-                "value": 0.0475
-              },
-              {
-                "date": "2019-10-01",
-                "value": 0.1316
-              },
-              {
-                "date": "2019-11-01",
-                "value": 0.3013
-              },
-              {
-                "date": "2019-12-01",
-                "value": 0.366
-              },
-              {
-                "date": "2020-01-01",
-                "value": 0.3159
-              },
-              {
-                "date": "2020-02-01",
-                "value": 0.1323
-              },
-              {
-                "date": "2020-03-01",
-                "value": 0.3726
-              },
-              {
-                "date": "2020-04-01",
-                "value": 0.5538
-              },
-              {
-                "date": "2020-05-01",
-                "value": 0.4791
-              },
-              {
-                "date": "2020-06-01",
-                "value": 0.3515
-              },
-              {
-                "date": "2020-07-01",
-                "value": 0.2209
-              },
-              {
-                "date": "2020-08-01",
-                "value": 0.1601
-              },
-              {
-                "date": "2020-09-01",
-                "value": 0.1235
-              },
-              {
-                "date": "2020-10-01",
-                "value": 0.0004
-              },
-              {
-                "date": "2020-11-01",
-                "value": -0.055
-              },
-              {
-                "date": "2020-12-01",
-                "value": -0.0919
-              },
-              {
-                "date": "2021-01-01",
-                "value": -0.0638
-              },
-              {
-                "date": "2021-02-01",
-                "value": 0.0632
-              },
-              {
-                "date": "2021-03-01",
-                "value": 0.1479
-              },
-              {
-                "date": "2021-04-01",
-                "value": 0.2049
-              },
-              {
-                "date": "2021-05-01",
-                "value": 0.3772
-              },
-              {
-                "date": "2021-06-01",
-                "value": 0.304
-              },
-              {
-                "date": "2021-07-01",
-                "value": 0.1634
-              },
-              {
-                "date": "2021-08-01",
-                "value": 0.0595
-              },
-              {
-                "date": "2021-09-01",
-                "value": 0.1971
-              },
-              {
-                "date": "2021-10-01",
-                "value": 0.3525
-              },
-              {
-                "date": "2021-11-01",
-                "value": 0.3122
-              },
-              {
-                "date": "2021-12-01",
-                "value": 0.2784
-              },
-              {
-                "date": "2022-01-01",
-                "value": 0.5345
-              },
-              {
-                "date": "2022-02-01",
-                "value": 0.9441
-              },
-              {
-                "date": "2022-03-01",
-                "value": 1.0535
-              },
-              {
-                "date": "2022-04-01",
-                "value": 1.5679
-              },
-              {
-                "date": "2022-05-01",
-                "value": 1.8741
-              },
-              {
-                "date": "2022-06-01",
-                "value": 2.4387
-              },
-              {
-                "date": "2022-07-01",
-                "value": 2.093
-              },
-              {
-                "date": "2022-08-01",
-                "value": 2.0566
-              },
-              {
-                "date": "2022-09-01",
-                "value": 2.8138
-              },
-              {
-                "date": "2022-10-01",
-                "value": 3.1842
-              },
-              {
-                "date": "2022-11-01",
-                "value": 2.9375
-              },
-              {
-                "date": "2022-12-01",
-                "value": 2.9996
-              },
-              {
-                "date": "2023-01-01",
-                "value": 3.0441
-              },
-              {
-                "date": "2023-02-01",
-                "value": 3.221
-              },
-              {
-                "date": "2023-03-01",
-                "value": 3.2331
-              },
-              {
-                "date": "2023-04-01",
-                "value": 3.1931
-              },
-              {
-                "date": "2023-05-01",
-                "value": 3.2053
-              },
-              {
-                "date": "2023-06-01",
-                "value": 3.1642
-              },
-              {
-                "date": "2023-07-01",
-                "value": 3.2689
-              },
-              {
-                "date": "2023-08-01",
-                "value": 3.3424
-              },
-              {
-                "date": "2023-09-01",
-                "value": 3.5043
-              },
-              {
-                "date": "2023-10-01",
-                "value": 3.7221
-              },
-              {
-                "date": "2023-11-01",
-                "value": 3.4187
-              },
-              {
-                "date": "2023-12-01",
-                "value": 2.8643
-              },
-              {
-                "date": "2024-01-01",
-                "value": 2.9044
-              },
-              {
-                "date": "2024-02-01",
-                "value": 3.0254
-              },
-              {
-                "date": "2024-03-01",
-                "value": 2.9533
-              },
-              {
-                "date": "2024-04-01",
-                "value": 3.0736
-              },
-              {
-                "date": "2024-05-01",
-                "value": 3.1215
-              },
-              {
-                "date": "2024-06-01",
-                "value": 3.165
-              },
-              {
-                "date": "2024-07-01",
-                "value": 3.113
-              },
-              {
-                "date": "2024-08-01",
-                "value": 2.9059
-              },
-              {
-                "date": "2024-09-01",
-                "value": 2.8342
-              },
-              {
-                "date": "2024-10-01",
-                "value": 2.8659
-              },
-              {
-                "date": "2024-11-01",
-                "value": 2.9291
-              },
-              {
-                "date": "2024-12-01",
-                "value": 2.8123
-              },
-              {
-                "date": "2025-01-01",
-                "value": 3.088
-              },
-              {
-                "date": "2025-02-01",
-                "value": 2.9887
-              },
-              {
-                "date": "2025-03-01",
-                "value": 3.3138
-              },
-              {
-                "date": "2025-04-01",
-                "value": 3.0972
-              },
-              {
-                "date": "2025-05-01",
-                "value": 3.071
-              },
-              {
-                "date": "2025-06-01",
-                "value": 3.0848
-              },
-              {
-                "date": "2025-07-01",
-                "value": 3.1736
-              },
-              {
-                "date": "2025-08-01",
-                "value": 3.205
-              },
-              {
-                "date": "2025-09-01",
-                "value": 3.233
-              },
-              {
-                "date": "2025-10-01",
-                "value": 3.1239
-              },
-              {
-                "date": "2025-11-01",
-                "value": 3.1362
-              },
-              {
-                "date": "2025-12-01",
-                "value": 3.2447
-              },
-              {
-                "date": "2026-01-01",
-                "value": 3.221
-              }
-            ]
-          },
-          {
-            "key": "bundUsd",
-            "label": "Bund 10Y 美元近似",
-            "color": "#b45309",
-            "unit": "%",
-            "source": "FRED IRLTLT01EZM156N + DEXUSEU",
-            "sourceUrl": "https://fred.stlouisfed.org/series/DEXUSEU",
-            "description": "欧元区 10Y 本币收益率 + 近 12 个月 EUR/USD 汇率变动贡献（未对冲的美元近似收益）。",
-            "points": [
-              {
-                "date": "2017-09-01",
-                "value": 7.2263
-              },
-              {
-                "date": "2017-10-01",
-                "value": 6.2099
-              },
-              {
-                "date": "2017-11-01",
-                "value": 6.1651
-              },
-              {
-                "date": "2017-12-01",
-                "value": 12.8782
-              },
-              {
-                "date": "2018-01-01",
-                "value": 15.679
-              },
-              {
-                "date": "2018-02-01",
-                "value": 17.295
-              },
-              {
-                "date": "2018-03-01",
-                "value": 16.8064
-              },
-              {
-                "date": "2018-04-01",
-                "value": 15.9866
-              },
-              {
-                "date": "2018-05-01",
-                "value": 11.2069
-              },
-              {
-                "date": "2018-06-01",
-                "value": 5.4339
-              },
-              {
-                "date": "2018-07-01",
-                "value": 3.4463
-              },
-              {
-                "date": "2018-08-01",
-                "value": 0.2386
-              },
-              {
-                "date": "2018-09-01",
-                "value": -1.1863
-              },
-              {
-                "date": "2018-10-01",
-                "value": 0.2463
-              },
-              {
-                "date": "2018-11-01",
-                "value": -0.5056
-              },
-              {
-                "date": "2018-12-01",
-                "value": -3.6221
-              },
-              {
-                "date": "2019-01-01",
-                "value": -3.0396
-              },
-              {
-                "date": "2019-02-01",
-                "value": -6.9556
-              },
-              {
-                "date": "2019-03-01",
-                "value": -5.8842
-              },
-              {
-                "date": "2019-04-01",
-                "value": -7.7412
-              },
-              {
-                "date": "2019-05-01",
-                "value": -5.4118
-              },
-              {
-                "date": "2019-06-01",
-                "value": -3.8904
-              },
-              {
-                "date": "2019-07-01",
-                "value": -1.4383
-              },
-              {
-                "date": "2019-08-01",
-                "value": -5.0779
-              },
-              {
-                "date": "2019-09-01",
-                "value": -5.5939
-              },
-              {
-                "date": "2019-10-01",
-                "value": -5.3582
-              },
-              {
-                "date": "2019-11-01",
-                "value": -1.6906
-              },
-              {
-                "date": "2019-12-01",
-                "value": -2.8232
-              },
-              {
-                "date": "2020-01-01",
-                "value": -1.6831
-              },
-              {
-                "date": "2020-02-01",
-                "value": -3.1155
-              },
-              {
-                "date": "2020-03-01",
-                "value": -2.9493
-              },
-              {
-                "date": "2020-04-01",
-                "value": -1.9083
-              },
-              {
-                "date": "2020-05-01",
-                "value": -1.7261
-              },
-              {
-                "date": "2020-06-01",
-                "value": 0.0911
-              },
-              {
-                "date": "2020-07-01",
-                "value": -0.2036
-              },
-              {
-                "date": "2020-08-01",
-                "value": 6.3775
-              },
-              {
-                "date": "2020-09-01",
-                "value": 7.4945
-              },
-              {
-                "date": "2020-10-01",
-                "value": 7.5013
-              },
-              {
-                "date": "2020-11-01",
-                "value": 4.656
-              },
-              {
-                "date": "2020-12-01",
-                "value": 8.0741
-              },
-              {
-                "date": "2021-01-01",
-                "value": 8.87
-              },
-              {
-                "date": "2021-02-01",
-                "value": 10.3413
-              },
-              {
-                "date": "2021-03-01",
-                "value": 11.2253
-              },
-              {
-                "date": "2021-04-01",
-                "value": 7.8691
-              },
-              {
-                "date": "2021-05-01",
-                "value": 10.401
-              },
-              {
-                "date": "2021-06-01",
-                "value": 10.3552
-              },
-              {
-                "date": "2021-07-01",
-                "value": 5.4747
-              },
-              {
-                "date": "2021-08-01",
-                "value": 0.6786
-              },
-              {
-                "date": "2021-09-01",
-                "value": -0.6314
-              },
-              {
-                "date": "2021-10-01",
-                "value": -0.9579
-              },
-              {
-                "date": "2021-11-01",
-                "value": -0.597
-              },
-              {
-                "date": "2021-12-01",
-                "value": -5.6689
-              },
-              {
-                "date": "2022-01-01",
-                "value": -7.2994
-              },
-              {
-                "date": "2022-02-01",
-                "value": -5.9407
-              },
-              {
-                "date": "2022-03-01",
-                "value": -6.836
-              },
-              {
-                "date": "2022-04-01",
-                "value": -4.6248
-              },
-              {
-                "date": "2022-05-01",
-                "value": -11.1152
-              },
-              {
-                "date": "2022-06-01",
-                "value": -10.5913
-              },
-              {
-                "date": "2022-07-01",
-                "value": -10.1192
-              },
-              {
-                "date": "2022-08-01",
-                "value": -12.1113
-              },
-              {
-                "date": "2022-09-01",
-                "value": -13.22
-              },
-              {
-                "date": "2022-10-01",
-                "value": -12.312
-              },
-              {
-                "date": "2022-11-01",
-                "value": -11.9016
-              },
-              {
-                "date": "2022-12-01",
-                "value": -4.2865
-              },
-              {
-                "date": "2023-01-01",
-                "value": -2.4339
-              },
-              {
-                "date": "2023-02-01",
-                "value": 0.356
-              },
-              {
-                "date": "2023-03-01",
-                "value": -0.6307
-              },
-              {
-                "date": "2023-04-01",
-                "value": 1.2009
-              },
-              {
-                "date": "2023-05-01",
-                "value": 8.3482
-              },
-              {
-                "date": "2023-06-01",
-                "value": 4.1599
-              },
-              {
-                "date": "2023-07-01",
-                "value": 7.5769
-              },
-              {
-                "date": "2023-08-01",
-                "value": 10.1681
-              },
-              {
-                "date": "2023-09-01",
-                "value": 11.9164
-              },
-              {
-                "date": "2023-10-01",
-                "value": 12.0094
-              },
-              {
-                "date": "2023-11-01",
-                "value": 10.1759
-              },
-              {
-                "date": "2023-12-01",
-                "value": 6.484
-              },
-              {
-                "date": "2024-01-01",
-                "value": 6.5977
-              },
-              {
-                "date": "2024-02-01",
-                "value": 2.5491
-              },
-              {
-                "date": "2024-03-01",
-                "value": 4.4335
-              },
-              {
-                "date": "2024-04-01",
-                "value": 2.7503
-              },
-              {
-                "date": "2024-05-01",
-                "value": 0.4779
-              },
-              {
-                "date": "2024-06-01",
-                "value": 4.9671
-              },
-              {
-                "date": "2024-07-01",
-                "value": 1.343
-              },
-              {
-                "date": "2024-08-01",
-                "value": 1.247
-              },
-              {
-                "date": "2024-09-01",
-                "value": 4.0606
-              },
-              {
-                "date": "2024-10-01",
-                "value": 9.041
-              },
-              {
-                "date": "2024-11-01",
-                "value": 5.8708
-              },
-              {
-                "date": "2024-12-01",
-                "value": -1.0349
-              },
-              {
-                "date": "2025-01-01",
-                "value": -3.1294
-              },
-              {
-                "date": "2025-02-01",
-                "value": -1.2029
-              },
-              {
-                "date": "2025-03-01",
-                "value": -0.7533
-              },
-              {
-                "date": "2025-04-01",
-                "value": 3.7214
-              },
-              {
-                "date": "2025-05-01",
-                "value": 8.6796
-              },
-              {
-                "date": "2025-06-01",
-                "value": 7.7909
-              },
-              {
-                "date": "2025-07-01",
-                "value": 12.9424
-              },
-              {
-                "date": "2025-08-01",
-                "value": 10.3048
-              },
-              {
-                "date": "2025-09-01",
-                "value": 8.7264
-              },
-              {
-                "date": "2025-10-01",
-                "value": 9.0514
-              },
-              {
-                "date": "2025-11-01",
-                "value": 9.4559
-              },
-              {
-                "date": "2025-12-01",
-                "value": 13.8353
-              },
-              {
-                "date": "2026-01-01",
-                "value": 16.6013
-              }
-            ]
-          }
-        ]
-      },
-      {
-      "title": "股票盈利收益能否覆盖美债机会成本？",
+        "title": "股票盈利收益能否覆盖美债机会成本？",
         "description": "标普 500 盈利收益率（100 / Shiller PE，月度）对比 10Y 美债；股债差为正表示股票相对债券更有吸引力。",
         "series": [
           {
@@ -110537,10 +108290,6 @@
             "sourceUrl": "https://www.multpl.com/s-p-500-pe-ratio",
             "description": "100 / Shiller PE，月度口径；代表标普 500 的盈利收益率。",
             "points": [
-              {
-                "date": "2016-09-01",
-                "value": 4.129
-              },
               {
                 "date": "2016-10-01",
                 "value": 4.243
@@ -110999,23 +108748,31 @@
               },
               {
                 "date": "2026-04-01",
-                "value": 3.762
+                "value": 3.923
               },
               {
                 "date": "2026-05-01",
-                "value": 3.531
+                "value": 3.833
               },
               {
                 "date": "2026-06-01",
-                "value": 3.512
+                "value": 3.965
               },
               {
                 "date": "2026-07-01",
-                "value": 3.483
+                "value": 3.948
               },
               {
-                "date": "2026-08-12",
-                "value": 3.35
+                "date": "2026-08-01",
+                "value": 3.83
+              },
+              {
+                "date": "2026-09-01",
+                "value": 3.84
+              },
+              {
+                "date": "2026-09-09",
+                "value": 3.833
               }
             ]
           },
@@ -111028,82 +108785,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
             "description": "10 年期美债收益率，是全球风险资产折现率的核心锚。",
             "points": [
-              {
-                "date": "2016-08-15",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-16",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-17",
-                "value": 1.56
-              },
-              {
-                "date": "2016-08-18",
-                "value": 1.53
-              },
-              {
-                "date": "2016-08-19",
-                "value": 1.58
-              },
-              {
-                "date": "2016-08-22",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-23",
-                "value": 1.55
-              },
-              {
-                "date": "2016-08-24",
-                "value": 1.56
-              },
-              {
-                "date": "2016-08-25",
-                "value": 1.58
-              },
-              {
-                "date": "2016-08-26",
-                "value": 1.62
-              },
-              {
-                "date": "2016-08-29",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-30",
-                "value": 1.57
-              },
-              {
-                "date": "2016-08-31",
-                "value": 1.58
-              },
-              {
-                "date": "2016-09-01",
-                "value": 1.57
-              },
-              {
-                "date": "2016-09-02",
-                "value": 1.6
-              },
-              {
-                "date": "2016-09-06",
-                "value": 1.55
-              },
-              {
-                "date": "2016-09-07",
-                "value": 1.54
-              },
-              {
-                "date": "2016-09-08",
-                "value": 1.61
-              },
-              {
-                "date": "2016-09-09",
-                "value": 1.67
-              },
               {
                 "date": "2016-09-12",
                 "value": 1.68
@@ -121015,6 +118696,82 @@
               {
                 "date": "2026-08-11",
                 "value": 4.7
+              },
+              {
+                "date": "2026-08-12",
+                "value": 4.68
+              },
+              {
+                "date": "2026-08-13",
+                "value": 4.63
+              },
+              {
+                "date": "2026-08-14",
+                "value": 4.68
+              },
+              {
+                "date": "2026-08-17",
+                "value": 4.72
+              },
+              {
+                "date": "2026-08-18",
+                "value": 4.71
+              },
+              {
+                "date": "2026-08-19",
+                "value": 4.65
+              },
+              {
+                "date": "2026-08-20",
+                "value": 4.69
+              },
+              {
+                "date": "2026-08-21",
+                "value": 4.74
+              },
+              {
+                "date": "2026-08-24",
+                "value": 4.7
+              },
+              {
+                "date": "2026-08-25",
+                "value": 4.64
+              },
+              {
+                "date": "2026-08-26",
+                "value": 4.66
+              },
+              {
+                "date": "2026-08-27",
+                "value": 4.67
+              },
+              {
+                "date": "2026-08-28",
+                "value": 4.73
+              },
+              {
+                "date": "2026-08-31",
+                "value": 4.75
+              },
+              {
+                "date": "2026-09-01",
+                "value": 4.79
+              },
+              {
+                "date": "2026-09-02",
+                "value": 4.79
+              },
+              {
+                "date": "2026-09-03",
+                "value": 4.77
+              },
+              {
+                "date": "2026-09-04",
+                "value": 4.78
+              },
+              {
+                "date": "2026-09-08",
+                "value": 4.8
               }
             ]
           },
@@ -121027,10 +118784,6 @@
             "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
             "description": "标普盈利收益率 - 10Y 美债收益率；为正表示股票相对债券更有吸引力。",
             "points": [
-              {
-                "date": "2016-09-01",
-                "value": 2.559
-              },
               {
                 "date": "2016-10-01",
                 "value": 2.643
@@ -121489,23 +119242,31 @@
               },
               {
                 "date": "2026-04-01",
-                "value": -0.568
+                "value": -0.407
               },
               {
                 "date": "2026-05-01",
-                "value": -0.859
+                "value": -0.557
               },
               {
                 "date": "2026-06-01",
-                "value": -0.958
+                "value": -0.505
               },
               {
                 "date": "2026-07-01",
-                "value": -0.997
+                "value": -0.532
               },
               {
-                "date": "2026-08-12",
-                "value": -1.35
+                "date": "2026-08-01",
+                "value": -0.92
+              },
+              {
+                "date": "2026-09-01",
+                "value": -0.95
+              },
+              {
+                "date": "2026-09-09",
+                "value": -0.967
               }
             ]
           }
@@ -121516,14 +119277,13 @@
   "composite": {
     "score": null,
     "label": "利率锚",
-    "date": "2026-08-13",
+    "date": "2026-09-10",
     "series": []
   },
   "notes": [
-    "统一标尺：所有收益率均为年化。美元资产直接使用美债/信用市场收益率；海外债券的美元近似收益 = 本币收益率 + 近 12 个月汇率变动贡献（日债按 USD/JPY，欧债按 EUR/USD，未做对冲）。",
+    "统一标尺：所有收益率均为美元年化。现金、美债、信用债和股票盈利收益只用于比较机会成本，不代表未来实际回报。",
     "股债差 = 标普 500 盈利收益率（100 / Shiller PE，月度口径） - 10Y 美债收益率；为正表示股票相对债券更有吸引力。",
     "信用债总收益率 = 10Y 美债 + 相应期权调整利差；利差走阔代表风险溢价上升，总收益率上行代表借债成本上升。",
-    "OECD 长端收益率序列存在发布滞后：日本 10Y 当前数据截至 2026-06，欧元区截至 2026-01；海外折算行显示的是该序列最近可得值。",
     "本面板是收益率与相对价值的市场信号，不是资金流向的实盘统计；实际流向还需结合 TIC、基金流等数据交叉验证。"
   ]
 }
