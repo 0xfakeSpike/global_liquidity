@@ -1,0 +1,108 @@
+{
+  "generatedAt": "2026-09-10T00:00:00Z",
+  "token": {
+    "name": "Aster",
+    "symbol": "ASTER",
+    "chain": "BNB Smart Chain",
+    "contract": "0x000Ae314E2A2172a039B26378814C252734f556A",
+    "maxSupply": 8000000000
+  },
+  "metrics": {
+    "circulating": {
+      "label": "流通供应量",
+      "value": 2702279094.931246,
+      "unit": "ASTER",
+      "detail": "CoinMarketCap 公布的市场流通口径，包含可交易及部分已释放代币，不等同于纯自由流通盘。",
+      "source": "CoinMarketCap",
+      "sourceUrl": "https://coinmarketcap.com/currencies/aster/"
+    },
+    "totalSupply": {
+      "label": "当前总供应量",
+      "value": 7799908210.88,
+      "unit": "ASTER",
+      "detail": "以 80 亿初始供应量扣除官方披露的累计销毁估算；应与链上 totalSupply 定期复核。",
+      "source": "Aster 官方披露",
+      "sourceUrl": "https://docs.asterdex.com/usdaster-token/tokenomics"
+    },
+    "circulatingRatio": {
+      "label": "流通比例",
+      "value": 33.7784886866,
+      "unit": "%",
+      "detail": "流通供应量 / 80 亿初始最大供应量。未来释放、质押与销毁会改变实际可交易浮筹。",
+      "source": "CoinMarketCap",
+      "sourceUrl": "https://coinmarketcap.com/currencies/aster/"
+    },
+    "cumulativeBurn": {
+      "label": "累计销毁",
+      "value": 200091789.12,
+      "unit": "ASTER",
+      "detail": "截至 2026-09-07 的官方累计披露，包含升级机制前后的所有销毁计划。",
+      "source": "Aster 官方频道",
+      "sourceUrl": "https://x.com/Aster_DEX"
+    },
+    "latestBuyback": {
+      "label": "最近两周回购",
+      "value": 4060091.52,
+      "unit": "ASTER",
+      "detail": "2026-08-24 至 2026-09-07，回购代币进入 veASTER 奖励，同时储备等量销毁。",
+      "source": "Aster 官方频道",
+      "sourceUrl": "https://x.com/Aster_DEX"
+    }
+  },
+  "unlocks": [
+    {
+      "date": "2026-09-14",
+      "amount": 450000,
+      "category": "生态质押排放",
+      "status": "recurring",
+      "detail": "当前生态与社区分配仅通过质押奖励排放；该周按当前每周参数估算，参数可由治理调整。",
+      "sourceUrl": "https://docs.asterdex.com/usdaster-token/tokenomics"
+    },
+    {
+      "date": "2026-09-21",
+      "amount": 450000,
+      "category": "生态质押排放",
+      "status": "recurring",
+      "detail": "每周排放不是一次性大额解锁，需与 veASTER 锁仓和买回奖励一起观察。",
+      "sourceUrl": "https://docs.asterdex.com/usdaster-token/tokenomics"
+    },
+    {
+      "date": "2026-11-04",
+      "amount": 63379391.84,
+      "category": "Stage 6 空投归属领取",
+      "status": "scheduled",
+      "detail": "选择 100% 归属方案的 Stage 6 空投进入领取窗口；实际进入市场数量取决于领取行为。",
+      "sourceUrl": "https://www.asterdex.com/en/airdrop"
+    },
+    {
+      "date": "2027-09-17",
+      "amount": 10000000,
+      "category": "团队线性解锁开始",
+      "status": "postponed",
+      "detail": "4 亿团队分配的首次月度解锁已由 2026-09-17 推迟一年；之后计划 40 个月、每月 1000 万枚。",
+      "sourceUrl": "https://www.binance.com/en/square/post/09-01-2026-aster-unlock-delayed-by-400-million-aster-tokens-361919410428239"
+    }
+  ],
+  "buybacks": [
+    {
+      "startDate": "2026-08-24",
+      "endDate": "2026-09-07",
+      "bought": 4060091.52,
+      "burned": 4060091.52,
+      "detail": "99% 平台费用于 TWAP 回购并分配给 veASTER；团队储备同步等量销毁。",
+      "sourceUrl": "https://x.com/Aster_DEX"
+    }
+  ],
+  "allocation": [
+    { "label": "空投", "percent": 53.5, "amount": 4280000000, "color": "#0f766e" },
+    { "label": "生态与社区", "percent": 30, "amount": 2400000000, "color": "#2563eb" },
+    { "label": "基金会金库", "percent": 7, "amount": 560000000, "color": "#7c3aed" },
+    { "label": "团队与顾问", "percent": 5, "amount": 400000000, "color": "#f59e0b" },
+    { "label": "流动性与上市", "percent": 4.5, "amount": 360000000, "color": "#64748b" }
+  ],
+  "notes": [
+    "流通量来自市场数据商口径，并非合约可直接读取字段；跨链、交易所托管、质押和项目金库都会造成口径差异。",
+    "计划解锁不等于当天全部卖出；空投领取、质押排放和团队归属应分别判断实际链上流向。",
+    "回购与销毁是两条不同路径：回购代币奖励 veASTER 持有人，等量储备代币销毁才直接降低总供应量。"
+  ]
+}

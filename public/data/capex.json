@@ -9,7 +9,7 @@
   "snapshots": [],
   "capexCharts": [
     {
-      "title": "滚动四季度 CapEx 同比增速",
+      "title": "AI 资本开支增速是否仍在加快？",
       "description": "使用滚动四季度现金资本开支计算同比，降低单季度确认节奏造成的噪声。",
       "series": [
         {
@@ -567,7 +567,7 @@
       ]
     },
     {
-      "title": "Hyperscaler 季度现金资本开支",
+      "title": "云厂商每季度投入了多少现金？",
       "description": "四家公司现金流量表中的物业及设备购置现金支出，统一按十亿美元展示。",
       "series": [
         {

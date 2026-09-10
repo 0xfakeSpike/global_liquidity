@@ -1,12 +1,13 @@
-import { Activity, CalendarClock, ExternalLink } from "lucide-react";
+import { Activity, CalendarClock, Coins, ExternalLink, Flame, LockKeyhole } from "lucide-react";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { LineChart } from "./components/LineChart";
 import { MultiLineChart } from "./components/MultiLineChart";
-import { loadLiquidityDataset, loadUpcomingEvents, type LiquidityMarket } from "./lib/data";
+import { loadAsterDataset, loadLiquidityDataset, loadUpcomingEvents, type LiquidityMarket } from "./lib/data";
 import { formatChange, formatNumber } from "./lib/format";
 import type {
   AiCapexCompanyMetrics,
   AiCapexCommitment,
+  AsterDataset,
   CostOfCapitalSpread,
   CostOfCapitalYield,
   DataPoint,
@@ -18,8 +19,9 @@ import type {
   UpcomingEvent
 } from "./types/liquidity";
 import "./styles.css";
+import "./redesign.css";
 
-type ViewMode = LiquidityMarket | "combined";
+type ViewMode = LiquidityMarket | "combined" | "aster";
 
 const markets: Record<
   ViewMode,
@@ -35,58 +37,66 @@ const markets: Record<
   combined: {
     label: "宏观流动性",
     eyebrow: "全球风险流动性仪表盘",
-    title: "全球风险流动性驾驶舱",
-    description: "汇总美元、日元、美债与风险市场，用红黄绿灯回答全球流动性现在是顺风还是逆风。",
+    title: "全球流动性对风险资产是顺风还是逆风？",
+    description: "从美元水位、日元融资、美债压力和市场价格确认四个维度，判断风险偏好是否具备持续扩张的条件。",
     sourceLabel: "Fed / BOJ / 美国财政部",
     updateLabel: "工作日自动更新"
   },
   usd: {
     label: "美元流动性",
     eyebrow: "美元全球流动性监控",
-    title: "把 Fed 资产、TGA、ON RRP、融资压力和风险价格放到一张表里。",
-    description: "每张图表按指标依次展开，构建阶段自动更新公开数据，页面端读取最新发布快照。",
+    title: "美元流动性正在扩张，还是被财政与融资市场抽走？",
+    description: "Fed 扩表提供流动性，TGA 与逆回购吸收流动性，融资利差验证银行体系是否真正宽松。",
     sourceLabel: "FRED / NY Fed",
     updateLabel: "Build-time JSON"
   },
   jpy: {
     label: "日元流动性",
     eyebrow: "日元全球流动性监控",
-    title: "把 BOJ 资产、基础货币、当座存款、广义流动性和日元融资压力放到一张表里。",
-    description: "数据来自 BOJ 官方统计 API 与 FRED 镜像序列，构建阶段生成日元流动性快照。",
+    title: "日本流动性与日元融资条件，正在支持还是压制全球风险偏好？",
+    description: "同时观察 BOJ 货币投放、银行准备金、广义货币和日元融资成本，识别套息交易扩张或反转的环境。",
     sourceLabel: "BOJ / FRED",
     updateLabel: "Build-time JSON"
   },
   treasury: {
     label: "美债市场",
     eyebrow: "美国国债市场监控",
-    title: "把债务规模、持有人结构、收益率曲线和财政利息成本放到一页里。",
-    description: "跟踪美债供给、谁在吸收美债、长短端利率和曲线形态，观察美元资产定价的底层锚。",
+    title: "美债供给由谁承接，长端利率压力是否正在上升？",
+    description: "债务增长只有在需求不足、期限溢价抬升或利息负担恶化时，才会显著收紧风险资产的估值环境。",
     sourceLabel: "FRED / Treasury",
     updateLabel: "Build-time JSON"
   },
   risk: {
     label: "风险市场",
     eyebrow: "风险资产价格监控",
-    title: "把 BTC、纳斯达克和恒生科技放到同一时间轴里。",
-    description: "三条价格曲线按首个可用日期归一为 100，用来观察风险资产之间的相对强弱和节奏。",
+    title: "风险偏好是否形成跨市场共振？",
+    description: "比较 BTC、纳斯达克与恒生科技的方向和强弱；只有多类风险资产同步走强，流动性改善才更可信。",
     sourceLabel: "FRED / Yahoo",
     updateLabel: "Normalized prices"
   },
   capex: {
     label: "资本开支",
     eyebrow: "AI 产业资本开支",
-    title: "跟踪头部云厂商的实际资本开支与全球 AI 投资承诺。",
-    description: "实际支出与多年承诺分开展示，避免重复计算。",
+    title: "AI 资本开支能否由经营现金流持续覆盖？",
+    description: "用真实支出、同比增速与现金覆盖率检验投资周期质量；多年承诺仅作为远期需求线索，不计入当期支出。",
     sourceLabel: "SEC / Company IR",
     updateLabel: "Quarterly"
   },
   cost: {
     label: "利率锚",
     eyebrow: "资金成本与美元利率锚",
-    title: "把现金、美债、信用、海外债券和股票收益放到同一把美元尺子上。",
-    description: "以美联储利率为机会成本锚，对比各收益载体的美元年化收益率与变化方向。",
+    title: "持有风险资产，是否足以补偿美元无风险收益？",
+    description: "以美元现金利率为机会成本，比较美债、信用、海外债券和股票收益，识别风险溢价是否值得承担。",
     sourceLabel: "FRED / OECD / multpl",
     updateLabel: "Build-time JSON"
+  },
+  aster: {
+    label: "ASTER 供给",
+    eyebrow: "BNB Chain Token Monitor",
+    title: "未来代币释放能否被回购与销毁吸收？",
+    description: "区分市场流通、计划解锁、实际回购和链上销毁，判断 ASTER 的净供应压力是在扩大还是收敛。",
+    sourceLabel: "Aster / BscScan / CMC",
+    updateLabel: "披露与链上复核"
   }
 };
 
@@ -107,6 +117,7 @@ function App() {
   } | null>(null);
   const [market, setMarket] = useState<ViewMode>(initialMarket);
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
+  const [asterDataset, setAsterDataset] = useState<AsterDataset | null>(null);
 
   useEffect(() => {
     loadUpcomingEvents()
@@ -118,6 +129,7 @@ function App() {
     window.location.hash = market;
     setDataset(null);
     setPairedDatasets(null);
+    setAsterDataset(null);
     if (market === "combined") {
       Promise.all([
         loadLiquidityDataset("cost"),
@@ -128,6 +140,8 @@ function App() {
       ]).then(([cost, usd, jpy, treasury, risk]) =>
         setPairedDatasets({ cost, risk, usd, jpy, treasury })
       );
+    } else if (market === "aster") {
+      loadAsterDataset().then(setAsterDataset);
     } else {
       loadLiquidityDataset(market).then(setDataset);
     }
@@ -137,7 +151,11 @@ function App() {
     return new Map(dataset?.snapshots.map((snapshot) => [snapshot.key, snapshot]) ?? []);
   }, [dataset]);
 
-  if (market !== "combined" && !dataset) {
+  if (market === "aster" && !asterDataset) {
+    return <div className="loading">Loading ASTER supply monitor...</div>;
+  }
+
+  if (market !== "combined" && market !== "aster" && !dataset) {
     return <div className="loading">Loading liquidity monitor...</div>;
   }
 
@@ -146,7 +164,7 @@ function App() {
   }
 
   const activeDataset = dataset ?? pairedDatasets?.usd ?? null;
-  if (!activeDataset) {
+  if (!activeDataset && market !== "aster") {
     return <div className="loading">Loading liquidity monitor...</div>;
   }
 
@@ -155,15 +173,15 @@ function App() {
       ? [...(pairedDatasets.usd.rateCharts ?? []), ...(pairedDatasets.jpy.rateCharts ?? [])]
       : market === "risk"
         ? []
-        : (activeDataset.rateCharts ?? []);
+        : (activeDataset?.rateCharts ?? []);
   const inflationCharts =
     market === "combined" && pairedDatasets
       ? [...(pairedDatasets.usd.inflationCharts ?? []), ...(pairedDatasets.jpy.inflationCharts ?? [])]
       : market === "risk"
         ? []
-        : (activeDataset.inflationCharts ?? []);
-  const riskCharts = activeDataset.riskCharts ?? [];
-  const treasuryCharts = activeDataset.treasuryCharts ?? [];
+        : (activeDataset?.inflationCharts ?? []);
+  const riskCharts = activeDataset?.riskCharts ?? [];
+  const treasuryCharts = activeDataset?.treasuryCharts ?? [];
 
   return (
     <main>
@@ -228,11 +246,31 @@ function App() {
 
       </header>
 
-      {market !== "combined" && rateCharts.length > 0 ? (
+      {market !== "aster" ? (
+        <section className={`page-intro page-intro-${market}`}>
+          <div>
+            <span>{markets[market].eyebrow}</span>
+            <h1>{markets[market].title}</h1>
+            <p>{markets[market].description}</p>
+          </div>
+          <div className="page-intro-meta">
+            <div><small>DATA SOURCE</small><strong>{markets[market].sourceLabel}</strong></div>
+            <div><small>UPDATE MODE</small><strong>{markets[market].updateLabel}</strong></div>
+          </div>
+        </section>
+      ) : null}
+
+      {(market === "usd" || market === "jpy") && activeDataset && rateCharts.length > 0 ? (
+        <LiquidityRateOverview
+          dateRange={activeDataset.dateRange}
+          inflationCharts={inflationCharts}
+          rateCharts={rateCharts}
+        />
+      ) : market !== "combined" && rateCharts.length > 0 && activeDataset ? (
         <InterestRateSection charts={rateCharts} dateRange={activeDataset.dateRange} />
       ) : null}
 
-      {market !== "combined" && inflationCharts.length > 0 ? (
+      {market !== "usd" && market !== "jpy" && market !== "combined" && inflationCharts.length > 0 && activeDataset ? (
         <ChartGroupSection
           charts={inflationCharts}
           dateRange={activeDataset.dateRange}
@@ -242,7 +280,9 @@ function App() {
         />
       ) : null}
 
-      {market === "combined" && pairedDatasets ? (
+      {market === "aster" && asterDataset ? (
+        <AsterSupplyTerminal dataset={asterDataset} />
+      ) : market === "combined" && pairedDatasets ? (
         <>
           <GlobalLiquidityDashboard
             cost={pairedDatasets.cost}
@@ -254,25 +294,25 @@ function App() {
           />
         </>
       ) : market === "risk" ? (
-        <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset.dateRange} />
+        <RiskMarketTerminal charts={riskCharts} dateRange={activeDataset!.dateRange} />
       ) : market === "capex" ? (
-        <CapexTerminal dataset={activeDataset} />
+        <CapexTerminal dataset={activeDataset!} />
       ) : market === "cost" ? (
-        <CostOfCapitalTerminal dataset={activeDataset} />
+        <CostOfCapitalTerminal dataset={activeDataset!} />
       ) : market === "treasury" ? (
         <TreasuryMarketTerminal
           charts={treasuryCharts}
-          dateRange={activeDataset.dateRange}
-          foreignHolderShares={activeDataset.foreignHolderShares ?? []}
-          holderShares={activeDataset.holderShares ?? []}
-          notes={activeDataset.notes}
+          dateRange={activeDataset!.dateRange}
+          foreignHolderShares={activeDataset!.foreignHolderShares ?? []}
+          holderShares={activeDataset!.holderShares ?? []}
+          notes={activeDataset!.notes}
         />
       ) : dataset ? (
         <>
-          <section className="terminal" id="terminal">
+          <section className="terminal liquidity-detail-dashboard" id="terminal">
             <div className="section-heading">
               <p>Indicator Terminal</p>
-              <h2>全部指标图表</h2>
+              <h2>{market === "usd" ? "美元流动性的驱动项" : "日元流动性的驱动项"}</h2>
             </div>
 
             <div className="charts-stack">
@@ -294,7 +334,7 @@ function App() {
           <section className="composite-section">
             <div className="section-heading">
               <p>Composite DLI</p>
-              <h2>综合流动性指数</h2>
+              <h2>当前宽松程度与历史位置</h2>
             </div>
             <div className="composite-grid">
               <div>
@@ -316,10 +356,199 @@ function App() {
       ) : null}
 
       <footer>
-        <span>Generated at {new Date(activeDataset.generatedAt).toLocaleString("zh-CN")}</span>
+        <span>Generated at {new Date(asterDataset?.generatedAt ?? activeDataset?.generatedAt ?? "").toLocaleString("zh-CN")}</span>
         <span>仅供研究与教育用途，不构成投资建议。</span>
       </footer>
     </main>
+  );
+}
+
+function AsterSupplyTerminal({ dataset }: { dataset: AsterDataset }) {
+  const metricItems = Object.values(dataset.metrics);
+  const circulating = dataset.metrics.circulating.value;
+  const supply = dataset.metrics.totalSupply.value;
+  const lockedOrReserved = Math.max(0, supply - circulating);
+  const nextUnlock = dataset.unlocks.find((item) => new Date(`${item.date}T00:00:00Z`).getTime() >= Date.now());
+  const fmtAster = (value: number) => `${formatNumber(value / 1_000_000, value >= 100_000_000 ? 1 : 2)}M`;
+
+  return (
+    <section className="terminal aster-dashboard" id="terminal">
+      <div className="aster-title-row">
+        <div>
+          <span>ASTER · BNB SMART CHAIN</span>
+          <h1>ASTER 净供应压力</h1>
+          <p>计划释放形成潜在新增供应，协议收入回购与储备销毁形成对冲；两者的差额比单看解锁数量更有意义。</p>
+        </div>
+        <a className="contract-pill" href={`https://bscscan.com/token/${dataset.token.contract}`} target="_blank" rel="noreferrer">
+          <span>合约</span>
+          <strong>{dataset.token.contract.slice(0, 8)}…{dataset.token.contract.slice(-6)}</strong>
+          <ExternalLink size={14} />
+        </a>
+      </div>
+
+      <div className="aster-metric-grid">
+        {metricItems.map((item, index) => (
+          <article className="aster-metric-card" key={item.label}>
+            <div className="aster-metric-icon">{index === 3 ? <Flame size={18} /> : index === 4 ? <Coins size={18} /> : <LockKeyhole size={18} />}</div>
+            <span>{item.label}</span>
+            <strong>{item.unit === "%" ? `${formatNumber(item.value, 2)}%` : fmtAster(item.value)}</strong>
+            <p>{item.detail}</p>
+            <a href={item.sourceUrl} target="_blank" rel="noreferrer">{item.source}<ExternalLink size={12} /></a>
+          </article>
+        ))}
+      </div>
+
+      <div className="aster-supply-panel">
+        <div className="aster-panel-heading">
+          <div><span>SUPPLY MAP</span><h2>当前供应结构</h2></div>
+          <strong>{formatNumber(dataset.metrics.circulatingRatio.value, 2)}% 已流通</strong>
+        </div>
+        <div className="supply-bar" aria-label="ASTER circulating supply ratio">
+          <div style={{ width: `${Math.min(100, circulating / supply * 100)}%` }} />
+        </div>
+        <div className="supply-bar-labels">
+          <span><b>{fmtAster(circulating)}</b> 市场流通口径</span>
+          <span><b>{fmtAster(lockedOrReserved)}</b> 未流通 / 储备估算</span>
+          <span><b>{fmtAster(dataset.metrics.cumulativeBurn.value)}</b> 累计销毁</span>
+        </div>
+      </div>
+
+      <AsterPressureCharts dataset={dataset} />
+
+      <div className="aster-two-column">
+        <div className="aster-supply-panel">
+          <div className="aster-panel-heading">
+            <div><span>UNLOCK WATCH</span><h2>未来释放日历</h2></div>
+            {nextUnlock ? <strong>下一项 {nextUnlock.date}</strong> : null}
+          </div>
+          <div className="unlock-list">
+            {dataset.unlocks.map((item) => (
+              <article className="unlock-row" key={`${item.date}-${item.category}`}>
+                <time>{item.date}</time>
+                <div>
+                  <div><strong>{item.category}</strong><span className={`unlock-status ${item.status}`}>{item.status === "recurring" ? "周期排放" : item.status === "postponed" ? "已推迟" : "计划释放"}</span></div>
+                  <b>{fmtAster(item.amount)} ASTER</b>
+                  <p>{item.detail}</p>
+                  <a href={item.sourceUrl} target="_blank" rel="noreferrer">查看依据 <ExternalLink size={12} /></a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="aster-supply-panel buyback-panel">
+          <div className="aster-panel-heading"><div><span>BUYBACK / BURN</span><h2>回购与销毁</h2></div></div>
+          <div className="mechanism-flow">
+            <div><span>平台日手续费</span><strong>99%</strong></div><b>→</b><div><span>TWAP 回购</span><strong>奖励 veASTER</strong></div><b>+</b><div><span>储备等量销毁</span><strong>降低总供应</strong></div>
+          </div>
+          {dataset.buybacks.map((item) => (
+            <article className="buyback-record" key={item.endDate}>
+              <div><span>{item.startDate} → {item.endDate}</span><b>最近披露周期</b></div>
+              <dl><div><dt>回购</dt><dd>{fmtAster(item.bought)}</dd></div><div><dt>销毁</dt><dd>{fmtAster(item.burned)}</dd></div></dl>
+              <p>{item.detail}</p>
+              <a href={item.sourceUrl} target="_blank" rel="noreferrer">官方更新 <ExternalLink size={12} /></a>
+            </article>
+          ))}
+          <div className="buyback-wallets">
+            <a href="https://bscscan.com/address/0xa0edBaBcb48034e368de286b49F9603C7AfA1b60" target="_blank" rel="noreferrer"><span>公开回购钱包</span><strong>0xa0ed…1b60</strong></a>
+            <a href="https://bscscan.com/address/0x39C473f4420e4ae9Ab3fe9e7ceDFc08F9684bB1a" target="_blank" rel="noreferrer"><span>上币费钱包</span><strong>0x39C4…bB1a</strong></a>
+          </div>
+        </div>
+      </div>
+
+      <div className="aster-supply-panel allocation-panel">
+        <div className="aster-panel-heading"><div><span>GENESIS ALLOCATION</span><h2>初始 80 亿枚分配</h2></div></div>
+        <div className="allocation-bar">{dataset.allocation.map((item) => <div key={item.label} style={{ background: item.color, width: `${item.percent}%` }} title={`${item.label} ${item.percent}%`} />)}</div>
+        <div className="allocation-legend">{dataset.allocation.map((item) => <div key={item.label}><i style={{ background: item.color }} /><span>{item.label}</span><strong>{item.percent}%</strong><small>{fmtAster(item.amount)}</small></div>)}</div>
+      </div>
+
+      <div className="aster-notes">{dataset.notes.map((note) => <p key={note}>{note}</p>)}</div>
+    </section>
+  );
+}
+
+function AsterPressureCharts({ dataset }: { dataset: AsterDataset }) {
+  const start = new Date("2026-09-01T00:00:00Z");
+  const months = Array.from({ length: 19 }, (_, index) => {
+    const date = new Date(start);
+    date.setUTCMonth(date.getUTCMonth() + index);
+    return date.toISOString().slice(0, 10);
+  });
+  const latestPeriod = dataset.buybacks[0];
+  const dailyBuyback = latestPeriod
+    ? latestPeriod.burned / Math.max(1, (Date.parse(latestPeriod.endDate) - Date.parse(latestPeriod.startDate)) / 86_400_000)
+    : 0;
+  let cumulativeUnlock = 0;
+  let cumulativeBurn = 0;
+  const monthlyUnlocks: DataPoint[] = [];
+  const monthlyBuyback: DataPoint[] = [];
+  const unlockCurve: DataPoint[] = [];
+  const burnCurve: DataPoint[] = [];
+  const netCurve: DataPoint[] = [];
+
+  months.forEach((date, index) => {
+    const monthStart = new Date(`${date}T00:00:00Z`);
+    const monthEnd = new Date(monthStart);
+    monthEnd.setUTCMonth(monthEnd.getUTCMonth() + 1);
+    const days = (monthEnd.getTime() - monthStart.getTime()) / 86_400_000;
+    const recurringEmission = (450_000 / 7) * days;
+    const teamMonthlyUnlock = date >= "2027-10-01" ? 10_000_000 : 0;
+    const datedUnlocks = dataset.unlocks
+      .filter((item) => item.status !== "recurring" && item.date >= date && item.date < monthEnd.toISOString().slice(0, 10))
+      .reduce((sum, item) => sum + item.amount, 0);
+    const monthUnlock = recurringEmission + datedUnlocks + teamMonthlyUnlock;
+    const monthBurn = dailyBuyback * days;
+    if (index > 0) {
+      cumulativeUnlock += monthUnlock;
+      cumulativeBurn += monthBurn;
+    }
+    monthlyUnlocks.push({ date, value: monthUnlock / 1_000_000 });
+    monthlyBuyback.push({ date, value: monthBurn / 1_000_000 });
+    unlockCurve.push({ date, value: cumulativeUnlock / 1_000_000 });
+    burnCurve.push({ date, value: cumulativeBurn / 1_000_000 });
+    netCurve.push({ date, value: (cumulativeUnlock - cumulativeBurn) / 1_000_000 });
+  });
+
+  const dateRange = { start: months[0], end: months.at(-1) ?? months[0] };
+  const projectedMonthlyBurn = monthlyBuyback[1]?.value ?? 0;
+  return (
+    <div className="aster-chart-grid">
+      <section className="aster-supply-panel aster-chart-card">
+        <div className="aster-panel-heading">
+          <div><span>18-MONTH SCENARIO</span><h2>累计供应压力与销毁对冲</h2></div>
+          <strong>单位：百万 ASTER</strong>
+        </div>
+        <MultiLineChart
+          dateRange={dateRange}
+          fixedRange
+          height={300}
+          series={[
+            { label: "计划新增供应", color: "#f59e0b", points: unlockCurve },
+            { label: "销毁对冲（情景）", color: "#0f766e", points: burnCurve },
+            { label: "净供应压力", color: "#dc2626", points: netCurve }
+          ]}
+          valueLabel="ASTER 累计供应压力情景"
+        />
+        <p className="chart-method">橙线包含当前每周 45 万枚质押排放、已披露空投领取与延期后的团队月度解锁；绿线假设最近 14 天销毁速度保持不变。红线为两者之差，不是价格预测。</p>
+      </section>
+      <section className="aster-supply-panel aster-chart-card">
+        <div className="aster-panel-heading">
+          <div><span>MONTHLY FORCE</span><h2>月度新增供应 vs 回购力度</h2></div>
+          <strong>当前速度约 {formatNumber(projectedMonthlyBurn, 2)}M/月</strong>
+        </div>
+        <MultiLineChart
+          dateRange={dateRange}
+          fixedRange
+          height={300}
+          series={[
+            { label: "当月计划释放", color: "#f59e0b", points: monthlyUnlocks },
+            { label: "回购 / 等量销毁情景", color: "#2563eb", points: monthlyBuyback }
+          ]}
+          valueLabel="ASTER 月度供需力度情景"
+        />
+        <p className="chart-method">尖峰对应集中领取或团队归属开始。蓝线按最近披露周期年化，仅用于回答“当前回购力度能否覆盖计划释放”，实际回购会随平台手续费变化。</p>
+      </section>
+    </div>
   );
 }
 
@@ -345,7 +574,7 @@ function UpcomingEvents({ events }: { events: UpcomingEvent[] }) {
       <div className="events-heading">
         <div>
           <span>官方日历 · 自动更新</span>
-          <h2 id="upcoming-events-title">未来关键事件</h2>
+          <h2 id="upcoming-events-title">哪些事件可能改变流动性方向？</h2>
         </div>
         <CalendarClock size={24} />
       </div>
@@ -419,7 +648,7 @@ function CuratedLiquidityDetail({
 }
 
 function CuratedTreasuryDetail({ dataset }: { dataset: LiquidityDataset }) {
-  const selectedTitles = new Set(["美国联邦债务规模", "联邦政府利息支出", "美债长短端收益率"]);
+  const selectedTitles = new Set(["市场需要吸收多少美国国债？", "高利率正在多快传导至财政？", "期限溢价是否正在推高长端利率？"]);
   const charts = (dataset.treasuryCharts ?? []).filter((chart) => selectedTitles.has(chart.title));
   return (
     <div id="treasury-details">
@@ -466,6 +695,57 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function LiquidityRateOverview({
+  dateRange,
+  inflationCharts,
+  rateCharts
+}: {
+  dateRange: LiquidityDataset["dateRange"];
+  inflationCharts: InterestRateChart[];
+  rateCharts: InterestRateChart[];
+}) {
+  const charts = [...rateCharts, ...inflationCharts];
+  return (
+    <section className="rate-section liquidity-rate-overview">
+      <div className="compact-section-heading">
+        <div>
+          <span>RATE REGIME</span>
+          <h2>利率环境是否正在转向？</h2>
+        </div>
+        <p>名义资金成本与实际利率共同决定现金吸引力和风险资产估值压力。</p>
+      </div>
+      <div className="liquidity-rate-grid">
+        {charts.map((chart) => (
+          <article className="compact-rate-card" key={chart.title}>
+            <div className="compact-rate-header">
+              <div><span>{chart === rateCharts[0] ? "POLICY RATE" : "REAL RATE"}</span><h3>{chart.title}</h3></div>
+              <p>{chart.description}</p>
+            </div>
+            <MultiLineChart series={chart.series} dateRange={dateRange} height={210} valueLabel={chart.title} />
+            <div className="compact-rate-sources">
+              {chart.series.map((item) => {
+                const latest = item.points.at(-1);
+                return (
+                  <a href={item.sourceUrl} key={item.key} target="_blank" rel="noreferrer">
+                    <i style={{ background: item.color }} />
+                    <span>{item.label}</span>
+                    <strong>{latest ? `${formatNumber(latest.value, 2)}${item.unit}` : "n/a"}</strong>
+                  </a>
+                );
+              })}
+            </div>
+          </article>
+        ))}
+      </div>
+      {inflationCharts.length > 0 ? (
+        <AnalysisDisclosure title="如何理解名义利率与实际利率" description="展开查看现金收益、通胀和风险资产估值之间的关系。">
+          <RealRateImpactPanel charts={inflationCharts} />
+        </AnalysisDisclosure>
+      ) : null}
+    </section>
+  );
+}
+
 function InterestRateSection({
   charts,
   dateRange
@@ -477,7 +757,7 @@ function InterestRateSection({
     <section className="rate-section">
       <div className="section-heading">
         <p>Policy Rates</p>
-        <h2>央行利率曲线</h2>
+        <h2>政策利率正在走向宽松还是收紧？</h2>
       </div>
       <div className="rate-grid">
         {charts.map((chart) => (
@@ -577,7 +857,7 @@ function RealRateImpactPanel({ charts }: { charts: InterestRateChart[] }) {
     <div className="real-rate-impact">
       <div className="real-rate-impact-header">
         <span>Asset Attraction Framework</span>
-        <h3>实际利率对其他资产吸引力的影响</h3>
+        <h3>现金的实际回报是否仍在压制风险资产？</h3>
         <p>
           名义短端利率决定账户里的现金收益、融资成本和 carry；实际政策利率决定现金在购买力维度是否真正变贵。
           对 BTC、黄金、成长股、港股科技这类高久期或抗通胀资产，最关键的是名义利率和实际利率是否同时偏高。
@@ -667,7 +947,7 @@ function RiskMarketTerminal({
           <div className="chart-header">
             <div>
               <span>Risk Breadth / Log Return</span>
-              <h3>风险资产相对强弱</h3>
+              <h3>上涨是否扩散到多个风险市场？</h3>
             </div>
           </div>
           <MultiLineChart
@@ -777,7 +1057,7 @@ function CapexTerminal({ dataset }: { dataset: LiquidityDataset }) {
             <div className="chart-header">
               <div>
                 <span>Growth / Rolling Four Quarters</span>
-                <h3>CapEx 增长速度</h3>
+                <h3>资本开支是在加速还是降温？</h3>
               </div>
             </div>
             <MultiLineChart series={growthChart.series} dateRange={dataset.dateRange} valueLabel="TTM CapEx 同比增速" />
@@ -817,7 +1097,7 @@ function CapexCommitments({ commitments }: { commitments: AiCapexCommitment[] })
       <div className="chart-header">
         <div>
           <span>Guidance / Announced Commitments</span>
-          <h3>已宣布 AI 投资</h3>
+          <h3>远期投资承诺能否转化为真实订单？</h3>
         </div>
       </div>
       <div className="commitment-list">
@@ -853,12 +1133,12 @@ function TreasuryMarketTerminal({
   return (
     <section className="terminal" id="terminal">
       <div className="section-heading">
-        <h2>美债市场核心指标</h2>
+        <h2>供给、承接需求与利率压力</h2>
       </div>
       <div className="treasury-core-grid">
         {holderShares.length > 0 ? (
           <HolderSharePanel
-            description="把公众持有美债拆成美国国内私人部门、海外与国际投资者和 Federal Reserve Banks，用于观察新增供给由谁吸收。"
+            description="公众持有美债由美国私人部门、海外投资者和 Federal Reserve Banks 共同承接；结构变化比单一总量更能反映边际需求。"
             eyebrow="Ownership Structure"
             shares={holderShares}
             title="美债持有人份额"
@@ -944,7 +1224,7 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
     return (
       <section className="terminal" id="terminal">
         <div className="section-heading">
-          <h2>利率锚 / 资金成本</h2>
+          <h2>美元现金收益是否仍具吸引力？</h2>
         </div>
         <div className="notes risk-notes">
           <p>数据尚未生成。请先运行数据更新脚本，再重新构建页面。</p>
@@ -967,7 +1247,7 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
     <section className="terminal cost-dashboard" id="terminal">
       <div className="section-heading">
         <p>Cost of Capital / USD Rate Anchor</p>
-        <h2>利率锚：美元资金成本与统一收益标尺</h2>
+        <h2>风险资产需要跨过多高的收益门槛？</h2>
       </div>
 
       <div className="cost-hero">
@@ -1010,7 +1290,7 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
 
       <div className="section-heading">
         <p>Unified Yield Ladder</p>
-        <h2>统一收益标尺（美元年化）</h2>
+        <h2>各类资产能提供多少美元年化收益？</h2>
       </div>
       <div className="cost-ladder-grid">
         {categoryOrder.flatMap((category) => [
@@ -1028,7 +1308,7 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
 
       <div className="section-heading">
         <p>Relative Value Signals</p>
-        <h2>相对价值与流向信号</h2>
+        <h2>哪些风险溢价正在扩大或收窄？</h2>
       </div>
       <div className="cost-spread-grid">
         {spreads.map((item) => (
@@ -1038,7 +1318,7 @@ function CostOfCapitalTerminal({ dataset }: { dataset: LiquidityDataset }) {
 
       <div className="section-heading">
         <p>Yield History</p>
-        <h2>收益率时间序列</h2>
+        <h2>资金价格的趋势是否发生转向？</h2>
       </div>
       <div className="charts-stack">
         {charts.map((chart) => (
@@ -1369,10 +1649,10 @@ function LiquidityMomentumTerminal({
     <section className="terminal">
       <div className="section-heading">
         <p>Global Liquidity Momentum</p>
-        <h2>全球流动性动量</h2>
+        <h2>流动性是在改善，还是仅仅维持高位？</h2>
       </div>
       <div className="overlay-note">
-        存量决定水位，变化量决定方向，变化率的变化决定拐点。这里把数量流动性和融资条件都转成 4W、13W、26W 或 13W 动量观察，重点看风险资产的边际顺风/逆风。
+        存量决定水位，变化量决定方向，变化率的变化决定拐点。数量流动性和融资条件统一转换为 4W、13W、26W 动量，重点识别风险资产的边际顺风或逆风。
       </div>
       <div className="momentum-summary">
         {latestSignals.map((signal) => (
@@ -1388,7 +1668,7 @@ function LiquidityMomentumTerminal({
           <div className="chart-header">
             <div>
               <span>Quantity Momentum</span>
-              <h3>美元净流动性变化量</h3>
+              <h3>美元净流动性正在加速还是减速？</h3>
             </div>
           </div>
           <MultiLineChart series={netLiquidityMomentum} dateRange={usd.dateRange} valueLabel="美元净流动性变化量" />
@@ -1401,20 +1681,20 @@ function LiquidityMomentumTerminal({
           <div className="chart-header">
             <div>
               <span>Balance Sheet / Money Momentum</span>
-              <h3>数量流动性 13周增速</h3>
+              <h3>主要货币水位是否同步扩张？</h3>
             </div>
           </div>
           <MultiLineChart series={quantityMomentum} dateRange={usd.dateRange} valueLabel="数量流动性 13周增速" />
           <div className="interpretation">
             <strong>当前解读</strong>
-            <p>把 Fed 净流动性、Fed 资产、BOJ 资产和两国 M2 都转为 13 周百分比变化，用来观察主要水位是否在同步加速或减速。</p>
+          <p>Fed 净流动性、Fed 与 BOJ 资产及两国 M2 均转换为 13 周增速；同向上升代表货币水位形成共振，分化则意味着改善并不全面。</p>
           </div>
         </section>
         <section className="chart-panel">
           <div className="chart-header">
             <div>
               <span>Funding Momentum</span>
-              <h3>融资条件 13周风险顺风指数</h3>
+              <h3>融资市场是否为风险资产提供顺风？</h3>
             </div>
           </div>
           <MultiLineChart series={fundingImpulse} dateRange={usd.dateRange} valueLabel="融资条件 13周风险顺风指数" />
@@ -1482,7 +1762,7 @@ function YenCarryStressTerminal({
     <section className="terminal">
       <div className="section-heading">
         <p>Yen Carry Stress</p>
-        <h2>日元 Carry Trade 压力</h2>
+        <h2>日元套息交易是否接近反转？</h2>
       </div>
       <div className="overlay-note">
         这里衡量的是日元融资套利的市场压力代理，不是完整资金规模。CFTC 可看期货拥挤度，BIS 可看中长期日元融资规模；本页先用更高频的利差、汇率、JGB 和美债长端收益率观察 unwind 风险。
@@ -1501,7 +1781,7 @@ function YenCarryStressTerminal({
           <div className="chart-header">
             <div>
               <span>Carry Return Base</span>
-              <h3>日元融资套利基础</h3>
+              <h3>借入日元的收益空间还有多大？</h3>
             </div>
           </div>
           <MultiLineChart
@@ -1523,7 +1803,7 @@ function YenCarryStressTerminal({
           <div className="chart-header">
             <div>
               <span>Unwind Pressure</span>
-              <h3>Carry Unwind 压力指数</h3>
+              <h3>平仓压力是否正在累积？</h3>
             </div>
             <div className="latest-value">
               <strong>{formatNumber(latestStress, 2)}</strong>
@@ -1542,7 +1822,7 @@ function YenCarryStressTerminal({
           <div className="chart-header">
             <div>
               <span>Stress Components</span>
-              <h3>Carry 压力分项</h3>
+              <h3>压力来自汇率、利差还是长端利率？</h3>
             </div>
           </div>
           <MultiLineChart series={stressComponents} dateRange={usd.dateRange} valueLabel="Carry 压力分项" />
@@ -1660,10 +1940,10 @@ function GlobalLiquidityDashboard({
   ];
 
   const macroModules = modules.slice(0, 6);
-  const globalScore = clampScore(
-    Math.round(macroModules.reduce((sum, item) => sum + item.score, 0) / Math.max(macroModules.length, 1))
-  );
-  const globalTone = toneForScore(globalScore);
+  const macroScoreSum = macroModules.reduce((sum, item) => sum + item.score, 0);
+  const globalScore = macroScoreSum;
+  const normalizedGlobalScore = globalScore / Math.max(macroModules.length, 1);
+  const globalTone = toneForScore(normalizedGlobalScore);
   const globalScoreSeries = scoreSeriesFromModuleIndexes(macroModules);
   const treasuryPressure = standardizeSeries([
     { label: "10Y下行", color: "#2563eb", points: invertSeries(absoluteChangeSeries(dgs10?.points ?? [], 91)) },
@@ -1695,14 +1975,17 @@ function GlobalLiquidityDashboard({
     <section className="terminal global-dashboard" id="terminal">
       <div className={`dashboard-hero tone-${globalTone}`}>
         <div>
-          <span>总评分</span>
-          <strong>{globalScore > 0 ? `+${globalScore}` : globalScore}</strong>
-          <p>{globalScoreText(globalScore)}</p>
+          <span>宏观总评分 · 6 项等权</span>
+          <strong>{formatScore(globalScore)}</strong>
+          <p>{globalScoreText(normalizedGlobalScore)}</p>
+          <small className="score-formula">
+            六个宏观模块直接相加，范围 -12 至 +12
+          </small>
         </div>
         <div className="dashboard-rule">
-          <b>硬规则</b>
+          <b>计算规则</b>
           <p>
-            美元净流动性改善、日元融资稳定、长端美债不再上行、通胀不重新抬头、股债差不继续恶化，就是风险资产顺风；其中两项以上反向，进入黄灯或红灯。
+            美元数量、美元价格、财政压力、日元融资、通胀压力和利率锚直接相加；不取平均、不四舍五入。“风险确认”只验证价格是否认可宏观环境，不计入总分。
           </p>
         </div>
       </div>
@@ -1716,7 +1999,7 @@ function GlobalLiquidityDashboard({
         ))}
       </div>
       <div className="impact-strip">
-        {assetImplications(globalScore, modules).map((item) => (
+        {assetImplications(normalizedGlobalScore, modules).map((item) => (
           <div key={item.label}>
             <span>{item.label}</span>
             <strong>{item.call}</strong>
@@ -1730,17 +2013,17 @@ function GlobalLiquidityDashboard({
           <div className="chart-header">
             <div>
               <span>Layer 1 / Composite Score</span>
-              <h3>全球风险流动性总分</h3>
+              <h3>宏观环境对风险资产有多友好？</h3>
             </div>
             <div className="latest-value">
-              <strong>{globalScore > 0 ? `+${globalScore}` : globalScore}</strong>
-              <small>{globalScoreText(globalScore).slice(0, 2)}</small>
+              <strong>{formatScore(globalScore)}</strong>
+              <small>{globalScoreText(normalizedGlobalScore).slice(0, 2)}</small>
             </div>
           </div>
           <LineChart series={globalScoreSeries} color="#0f766e" dateRange={usd.dateRange} valueLabel="全球风险流动性总分" />
           <div className="interpretation">
             <strong>当前解读</strong>
-            <p>总分由美元数量、美元价格、财政压力、日元融资和通胀压力五个模块等权合成；风险确认单独展示，用来验证宏观判断是否被价格承认。</p>
+            <p>总分由美元数量、美元价格、财政压力、日元融资、通胀压力和利率锚六个模块等权合成；风险确认单独展示，用来验证宏观判断是否被价格承认。</p>
           </div>
         </section>
         <section className="chart-panel">
@@ -1765,7 +2048,7 @@ function GlobalLiquidityDashboard({
           />
           <div className="interpretation">
             <strong>当前解读</strong>
-            <p>这张图把水位和动量放在一起看。净流动性绝对值高但 13 周变化转负，风险资产应按黄灯处理。</p>
+            <p>净流动性绝对水位决定环境，13 周变化决定方向；即使水位仍高，只要动量转负，也应视为边际收紧。</p>
           </div>
         </section>
         <AnalysisDisclosure
@@ -1865,10 +2148,18 @@ function dashboardModule(label: string, detail: string, components: DataPoint[][
 }
 
 function scoreSeriesFromModuleIndexes(modules: { index: DataPoint[] }[]) {
-  const series = averageAlignedSeries(
-    modules.map((module, index) => ({ label: `module-${index}`, color: "#0f766e", points: module.index }))
-  );
-  return series.map((point) => ({ date: point.date, value: scoreFromZ(point.value) }));
+  const maps = modules.map((module) => new Map(module.index.map((point) => [point.date, point.value])));
+  const dates = [...new Set(modules.flatMap((module) => module.index.map((point) => point.date)))].sort();
+  return dates
+    .map((date) => {
+      const values = maps.map((map) => latestBeforeOrOn(map, date));
+      if (values.some((value) => value === undefined)) return null;
+      return {
+        date,
+        value: values.reduce<number>((sum, value) => sum + scoreFromZ(value ?? 0), 0)
+      };
+    })
+    .filter((point): point is DataPoint => point !== null);
 }
 
 function scoreFromZ(value: number) {
@@ -1879,24 +2170,25 @@ function scoreFromZ(value: number) {
   return 0;
 }
 
-function clampScore(value: number) {
-  return Math.max(-2, Math.min(2, value));
-}
-
 function toneForScore(score: number) {
-  if (score >= 2) return "green";
-  if (score === 1) return "light";
-  if (score === 0) return "neutral";
-  if (score === -1) return "yellow";
+  if (score >= 1.5) return "green";
+  if (score >= 0.5) return "light";
+  if (score > -0.5) return "neutral";
+  if (score > -1.5) return "yellow";
   return "red";
 }
 
 function globalScoreText(score: number) {
-  if (score >= 2) return "强顺风";
-  if (score === 1) return "温和顺风";
-  if (score === 0) return "中性震荡";
-  if (score === -1) return "黄灯偏紧";
+  if (score >= 1.5) return "强顺风";
+  if (score >= 0.5) return "温和顺风";
+  if (score > -0.5) return "中性震荡";
+  if (score > -1.5) return "黄灯偏紧";
   return "红灯防守";
+}
+
+function formatScore(score: number) {
+  const formatted = formatNumber(score, 2);
+  return score > 0 ? `+${formatted}` : formatted;
 }
 
 function assetImplications(globalScore: number, modules: { label: string; score: number }[]) {
@@ -1987,7 +2279,7 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
   const rateSpread = usdEffr && jpyCallAverage ? spreadSeries(usdEffr.points, jpyCallAverage.points) : [];
   const pairs = [
     {
-      title: "央行资产负债表",
+      title: "两大央行是否同步扩张资产负债表？",
       description: "Fed 总资产与 BOJ 总资产，观察两大央行基础流动性的相对扩张或收缩。",
       left: usdMap.get("fedBalanceSheet"),
       right: jpyMap.get("bojAssets"),
@@ -1995,7 +2287,7 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
       rightLabel: "BOJ JPNASSETS"
     },
     {
-      title: "广义货币",
+      title: "美国与日本的广义货币是否同步增长？",
       description: "美国 M2 与日本 M2，观察两国广义货币环境的中周期方向。",
       left: usdMap.get("m2"),
       right: jpyMap.get("m2Japan"),
@@ -2003,7 +2295,7 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
       rightLabel: "Japan M2"
     },
     {
-      title: "央行综合流动性评分",
+      title: "哪种货币环境对风险资产更友好？",
       description: "美元 DLI 与日元 DLI 使用同一 0-100 评分区间，可直接比较宽松/收紧温度。",
       left: { series: usd.composite.series } as IndicatorSnapshot,
       right: { series: jpy.composite.series } as IndicatorSnapshot,
@@ -2012,7 +2304,7 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
       rawScale: true
     },
     {
-      title: "长端利率约束",
+      title: "长端资金成本是否同步抬升？",
       description: "美国 10Y 实际利率与日本 10Y 国债收益率，观察资金价格是否同步抬升。",
       left: usdMap.get("realYield10y"),
       right: jpyMap.get("jgb10y"),
@@ -2020,7 +2312,7 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
       rightLabel: "JGB 10Y"
     },
     {
-      title: "汇率压力",
+      title: "美元走强是否正在放大日元套息压力？",
       description: "广义美元指数与 USD/JPY，观察美元强弱和日元套息环境是否同步变化。",
       left: usdMap.get("broadDollar"),
       right: jpyMap.get("usdJpy"),
@@ -2033,7 +2325,7 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
     <section className="terminal" id="terminal">
       <div className="section-heading">
         <p>Overlay Terminal</p>
-        <h2>美元与日元对应指标叠加</h2>
+        <h2>美元与日元流动性是否同向？</h2>
       </div>
       <div className="overlay-note">
         除 DLI 评分外，每组曲线均以首个共同日期归一为 100。这里看的是相对方向和节奏，不是绝对规模。
@@ -2044,7 +2336,7 @@ function CombinedTerminal({ usd, jpy }: { usd: LiquidityDataset; jpy: LiquidityD
             <div className="chart-header">
               <div>
                 <span>USD - JPY Rate Spread</span>
-                <h3>美元-日元隔夜利差</h3>
+                <h3>美元与日元的短端息差还有多大？</h3>
               </div>
               <div className="latest-value">
                 <strong>{formatNumber(rateSpread.at(-1)?.value, 3)}</strong>

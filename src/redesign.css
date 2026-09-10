@@ -1,0 +1,224 @@
+/* Final cascade layer for the shared interface refresh. */
+.page-intro {
+  align-items: end;
+  background: #08111f;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  color: #fff;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin: 12px auto 18px;
+  max-width: 1128px;
+  overflow: hidden;
+  padding: clamp(24px, 4vw, 36px);
+  position: relative;
+}
+
+.page-intro::after {
+  background: radial-gradient(circle, rgba(45, 212, 191, .28), transparent 68%);
+  content: "";
+  height: 340px;
+  pointer-events: none;
+  position: absolute;
+  right: -80px;
+  top: -190px;
+  width: 340px;
+}
+
+.page-intro > div { position: relative; z-index: 1; }
+.page-intro > div > span { color: #2dd4bf; font-size: 11px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.page-intro h1 { color: #fff; font-size: clamp(31px, 4vw, 48px); line-height: 1.04; margin-top: 8px; max-width: 880px; }
+.page-intro p { color: #aebbc9; font-size: 14px; line-height: 1.65; margin: 13px 0 0; max-width: 720px; }
+.page-intro-meta { display: grid; gap: 8px; min-width: 210px; }
+.page-intro-meta div { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 9px; padding: 10px 12px; }
+.page-intro-meta small { color: #7dd3c7; display: block; font-size: 9px; font-weight: 800; letter-spacing: .1em; }
+.page-intro-meta strong { display: block; font-size: 12px; margin-top: 4px; }
+
+.section-heading { align-items: end; display: flex; justify-content: space-between; }
+.section-heading::after { color: #94a3b8; content: "LIVE DATA VIEW"; font-size: 9px; font-weight: 800; letter-spacing: .12em; padding-bottom: 4px; }
+.section-heading h2 { letter-spacing: -.025em; }
+
+.dashboard-hero,
+.real-rate-impact,
+.holder-panel,
+.capex-commitments,
+.cost-hero {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, .05);
+}
+
+.dashboard-hero { overflow: hidden; padding: 24px; position: relative; }
+.dashboard-hero::before { background: var(--accent); content: ""; inset: 0 auto 0 0; position: absolute; width: 3px; }
+.dashboard-hero strong { letter-spacing: -.04em; }
+.score-formula { color: #64748b; display: block; font-size: 10px; font-variant-numeric: tabular-nums; line-height: 1.5; margin-top: 8px; white-space: nowrap; }
+
+.module-light,
+.impact-strip > div,
+.risk-momentum-card,
+.capex-component-card,
+.cost-ladder-card,
+.cost-spread-card,
+.real-rate-card,
+.real-rate-signal,
+.event-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+  transition: border-color 170ms ease, box-shadow 170ms ease, transform 170ms var(--ease-out);
+}
+
+.module-light:hover,
+.risk-momentum-card:hover,
+.capex-component-card:hover,
+.cost-ladder-card:hover,
+.cost-spread-card:hover,
+.event-card:hover { border-color: #b9c8d8; box-shadow: 0 10px 26px rgba(15, 23, 42, .07); transform: translateY(-2px); }
+
+.rate-card,
+.chart-panel,
+.notes {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, .05);
+  overflow: hidden;
+}
+
+.rate-card-header,
+.chart-header { border-bottom: 1px solid var(--line-soft); padding-bottom: 15px; }
+.rate-card-header h3,
+.chart-header h3 { letter-spacing: -.02em; }
+.rate-chart { padding-top: 10px; }
+.chart-panel { padding: 22px; }
+.line-chart { overflow: visible; }
+.line-chart path { vector-effect: non-scaling-stroke; }
+.line-chart > path,
+.line-chart g > path { stroke-linecap: round; stroke-linejoin: round; }
+.chart-grid line,
+.chart-x-grid { stroke: #edf1f5; }
+
+.rate-sources { background: #f8fafc; border-radius: 8px; gap: 2px; padding: 5px; }
+.rate-sources a { border-radius: 6px; padding: 9px 10px; transition: background-color 150ms ease, transform 140ms var(--ease-out); }
+.rate-sources a:hover { background: #fff; }
+
+.analysis-disclosure { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: clip; }
+.analysis-disclosure > summary { cursor: pointer; padding: 17px 20px; transition: background-color 160ms ease; }
+.analysis-disclosure > summary:hover { background: #f8fafc; }
+.analysis-disclosure > summary b { background: #e8f5f2; border-radius: 999px; color: var(--accent); font-size: 10px; padding: 5px 9px; }
+.analysis-disclosure[open] > summary { border-bottom: 1px solid var(--line-soft); }
+
+.composition-grid a,
+.commitment-list a,
+.holder-list a { border-radius: 9px; transition: background-color 160ms ease, border-color 160ms ease, transform 150ms var(--ease-out); }
+.composition-grid a:hover,
+.commitment-list a:hover,
+.holder-list a:hover { transform: translateY(-1px); }
+
+.chart-range-control { background: #eef2f6; border: 1px solid #dbe3ec; border-radius: 8px; padding: 3px; }
+.chart-range-control button { border-radius: 5px; transition: background-color 140ms ease, color 140ms ease, transform 120ms var(--ease-out); }
+.chart-range-control button.active { background: #fff; box-shadow: 0 1px 3px rgba(15,23,42,.12); }
+.interpretation { background: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 9px; }
+
+/* Dense rate overview for the USD and JPY pages. */
+.page-intro-usd,
+.page-intro-jpy {
+  align-items: center;
+  padding-bottom: 22px;
+  padding-top: 22px;
+}
+
+.page-intro-usd h1,
+.page-intro-jpy h1 { font-size: clamp(27px, 3vw, 38px); max-width: 760px; }
+.page-intro-usd p,
+.page-intro-jpy p { font-size: 12px; margin-top: 8px; }
+.page-intro-usd .page-intro-meta,
+.page-intro-jpy .page-intro-meta { grid-template-columns: 1fr 1fr; min-width: 330px; }
+
+.liquidity-rate-overview { padding-bottom: 12px; padding-top: 12px; }
+.compact-section-heading { align-items: end; display: flex; gap: 20px; justify-content: space-between; margin-bottom: 12px; }
+.compact-section-heading span,
+.compact-rate-header span { color: var(--accent); font-size: 9px; font-weight: 850; letter-spacing: .11em; }
+.compact-section-heading h2 { font-size: 22px; letter-spacing: -.025em; margin: 3px 0 0; }
+.compact-section-heading > p { color: var(--muted); font-size: 11px; margin: 0; max-width: 460px; text-align: right; }
+.liquidity-rate-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.compact-rate-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; min-width: 0; overflow: hidden; padding: 16px; }
+.compact-rate-header { align-items: start; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) minmax(180px, .8fr); }
+.compact-rate-header h3 { font-size: 17px; letter-spacing: -.02em; line-height: 1.25; margin: 4px 0 0; }
+.compact-rate-header > p { color: var(--muted); font-size: 10px; line-height: 1.45; margin: 0; }
+.compact-rate-card .multi-chart-wrap { margin-top: 4px; }
+.compact-rate-card .chart-range-control { margin-bottom: -8px; position: relative; z-index: 2; }
+.compact-rate-card .line-chart { height: 210px; width: 100%; }
+.compact-rate-card .multi-chart-legend { display: none; }
+.compact-rate-sources { border-top: 1px solid var(--line-soft); display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 2px; padding-top: 9px; }
+.compact-rate-sources a { align-items: center; display: inline-flex; font-size: 10px; gap: 4px; }
+.compact-rate-sources i { border-radius: 50%; height: 6px; width: 6px; }
+.compact-rate-sources span { color: var(--muted); }
+.compact-rate-sources strong { color: var(--ink); }
+.liquidity-rate-overview > .analysis-disclosure { margin-top: 10px; }
+.liquidity-rate-overview > .analysis-disclosure > summary { padding: 11px 14px; }
+.liquidity-rate-overview .analysis-disclosure-content > .real-rate-impact { border: 0; box-shadow: none; margin: 0; }
+
+/* USD / JPY indicator pages: compact comparison-first layout. */
+.liquidity-detail-dashboard > .charts-stack {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.liquidity-detail-dashboard > .charts-stack > .chart-panel {
+  min-width: 0;
+}
+
+.liquidity-detail-dashboard .chart-panel .line-chart {
+  height: auto;
+  width: 100%;
+}
+
+.liquidity-detail-dashboard .chart-header {
+  align-items: flex-start;
+  min-height: 76px;
+}
+
+.liquidity-detail-dashboard .chart-header h3 {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.liquidity-detail-dashboard .chart-stats {
+  gap: 8px;
+}
+
+.liquidity-detail-dashboard .stat {
+  min-width: 78px;
+}
+
+@media (max-width: 980px) {
+  .page-intro { margin-left: clamp(18px, 4vw, 56px); margin-right: clamp(18px, 4vw, 56px); }
+  .liquidity-detail-dashboard > .charts-stack { grid-template-columns: 1fr; }
+  .liquidity-rate-grid { grid-template-columns: 1fr; }
+  .page-intro-usd .page-intro-meta,
+  .page-intro-jpy .page-intro-meta { min-width: 260px; }
+}
+
+@media (max-width: 720px) {
+  .hero-compact nav { align-items: stretch; }
+  .brand { padding: 0 2px; }
+  .market-tabs { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
+  .market-tabs::-webkit-scrollbar { display: none; }
+  .market-tabs button { flex: 0 0 auto; }
+  .page-intro { align-items: stretch; grid-template-columns: 1fr; }
+  .page-intro-meta { grid-template-columns: 1fr 1fr; min-width: 0; }
+  .compact-section-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .compact-section-heading > p { text-align: left; }
+  .compact-rate-header { grid-template-columns: 1fr; }
+  .section-heading { align-items: flex-start; }
+  .section-heading::after { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}

@@ -1221,7 +1221,7 @@ function rateDefinition(key, definitionsForRates) {
 function usdRateCharts(seriesMap) {
   return [
     {
-      title: "美联储利率变化曲线",
+      title: "美元短端资金成本是否正在下降？",
       description: "跟踪 FOMC 目标区间、有效联邦基金利率、IORB 与 SOFR 随时间变化，用于观察 Fed 政策利率走廊和隔夜融资成本。",
       series: [
         interestRateSeries(rateDefinition("fedTargetUpper", usdRateDefinitions), seriesMap, "#94a3b8"),
@@ -1237,7 +1237,7 @@ function usdRateCharts(seriesMap) {
 function jpyRateCharts(seriesMap) {
   return [
     {
-      title: "日本央行利率变化曲线",
+      title: "日元短端资金成本是否正在上升？",
       description: "跟踪 BOJ 无担保隔夜拆借利率与基本贷款利率随时间变化，用于观察日元短端政策传导和资金成本。",
       series: [
         interestRateSeries(rateDefinition("jpyCallAverage", jpyRateDefinitions), seriesMap, "#2563eb"),
@@ -1254,7 +1254,7 @@ function usdInflationCharts(rateSeriesMap, inflationSeriesMap) {
   const realEffr = realPolicyRate(rateSeriesMap.get("effr") ?? [], cpiYoy);
   return [
     {
-      title: "美国通胀与实际政策利率",
+      title: "通胀回落是否为美联储打开宽松空间？",
       description: "美国 CPI 同比与 EFFR 扣除 CPI 同比后的实际政策利率。实际政策利率使用常见口径：名义政策利率 - 通胀同比。",
       series: [
         {
@@ -1287,7 +1287,7 @@ function jpyInflationCharts(rateSeriesMap, inflationSeriesMap) {
   const realCallRate = realPolicyRate(rateSeriesMap.get("jpyCallAverage") ?? [], cpiYoy);
   return [
     {
-      title: "日本通胀与实际政策利率",
+      title: "日本实际利率是否仍有正常化空间？",
       description: "日本 CPI 同比与 BOJ 无担保隔夜拆借平均利率扣除 CPI 同比后的实际政策利率。",
       series: [
         {
@@ -1323,7 +1323,7 @@ function normalizeToFirst(series) {
 
 function riskMarketCharts(seriesMap) {
   return riskDefinitions.map((definition) => ({
-    title: `${definition.label} 价格变化`,
+    title: `${definition.label} 的趋势是否确认风险偏好？`,
     description: `${definition.description} 曲线按该资产首个可用日期归一为 100，使用独立纵轴显示自身波动。`,
     series: [
       {
@@ -1467,7 +1467,7 @@ function treasuryDefinition(key) {
 function treasuryMarketCharts(seriesMap) {
   return [
     {
-      title: "美国联邦债务规模",
+      title: "市场需要吸收多少美国国债？",
       description: "联邦总债务与公众持有债务都按万亿美元展示，用于观察财政供给压力和市场需要吸收的国债规模。",
       series: [
         treasurySeries(treasuryDefinition("totalPublicDebt"), seriesMap),
@@ -1475,17 +1475,17 @@ function treasuryMarketCharts(seriesMap) {
       ]
     },
     {
-      title: "联邦债务/GDP",
+      title: "债务增长是否快于美国经济？",
       description: "总债务相对 GDP 的比例越高，市场越容易关注财政可持续性、期限溢价和长期国债供给压力。",
       series: [treasurySeries(treasuryDefinition("debtToGdp"), seriesMap)]
     },
     {
-      title: "联邦政府利息支出",
+      title: "高利率正在多快传导至财政？",
       description: "利息支出上行代表高利率逐步传导到财政现金流，影响赤字、发债需求和长期期限溢价。",
       series: [treasurySeries(treasuryDefinition("interestPayments"), seriesMap)]
     },
     {
-      title: "美债长短端收益率",
+      title: "期限溢价是否正在推高长端利率？",
       description: "3M、2Y、10Y、30Y 同图观察政策利率、增长预期、通胀预期和期限溢价的相对变化。",
       series: [
         treasurySeries(treasuryDefinition("dgs3mo"), seriesMap),
@@ -1495,7 +1495,7 @@ function treasuryMarketCharts(seriesMap) {
       ]
     },
     {
-      title: "收益率曲线利差",
+      title: "收益率曲线在定价衰退还是复苏？",
       description: "10Y-2Y 与 10Y-3M 利差用于观察倒挂、再陡峭化和衰退定价节奏。",
       series: [
         treasurySeries(treasuryDefinition("t10y2y"), seriesMap),
@@ -1752,12 +1752,12 @@ async function buildCapexDataset() {
     snapshots: [],
     capexCharts: [
       {
-        title: "滚动四季度 CapEx 同比增速",
+        title: "AI 资本开支增速是否仍在加快？",
         description: "使用滚动四季度现金资本开支计算同比，降低单季度确认节奏造成的噪声。",
         series: companySeries.map(capexGrowthSeries)
       },
       {
-        title: "Hyperscaler 季度现金资本开支",
+        title: "云厂商每季度投入了多少现金？",
         description: "四家公司现金流量表中的物业及设备购置现金支出，统一按十亿美元展示。",
         series: companySeries
       }
@@ -2078,12 +2078,12 @@ function costSpreadItem(definition, series) {
 function costOfCapitalCharts(seriesMap) {
   return [
     {
-      title: "现金锚水位",
+      title: "美元现金的无风险回报有多高？",
       description: "EFFR、SOFR 与 3 个月美债同图，观察美元现金类资产的收益水位，以及担保融资市场相对政策利率的定价。",
       series: [costSeries(seriesMap, "effr"), costSeries(seriesMap, "sofr"), costSeries(seriesMap, "dgs3mo")]
     },
     {
-      title: "美债收益率曲线",
+      title: "承担久期风险能获得多少补偿？",
       description: "3M、2Y、10Y、30Y 同图，观察短端政策预期、中端增长预期和长端期限溢价的相对变化。",
       series: [
         costSeries(seriesMap, "dgs3mo"),
@@ -2093,17 +2093,17 @@ function costOfCapitalCharts(seriesMap) {
       ]
     },
     {
-      title: "实际利率与通胀预期",
+      title: "实际利率是否仍在压制风险资产？",
       description: "10Y TIPS 实际利率与 10 年盈亏平衡通胀同图；实际利率抬升通常压制高估值、长久期资产。",
       series: [costSeries(seriesMap, "dfii10"), costSeries(seriesMap, "breakeven10y")]
     },
     {
-      title: "信用债总收益率",
+      title: "信用风险提供的额外收益够不够？",
       description: "IG/HY 总收益率 = 10Y 美债 + 各自利差；总收益率上行代表借债成本上升，利差本身单独在相对价值信号中展示。",
       series: [costSeries(seriesMap, "dgs10"), costSeries(seriesMap, "igTotal"), costSeries(seriesMap, "hyTotal")]
     },
     {
-      title: "海外债券美元折算",
+      title: "海外债券换算成美元后是否更划算？",
       description: "美元近似收益 = 本币收益率 + 近 12 个月汇率变动贡献。日债按 USD/JPY（日元升值贡献为正），欧债按 EUR/USD（欧元升值贡献为正），均未做汇率对冲。",
       series: [
         costSeries(seriesMap, "jgb10y"),
@@ -2113,7 +2113,7 @@ function costOfCapitalCharts(seriesMap) {
       ]
     },
     {
-      title: "股债相对吸引力",
+      title: "股票盈利收益能否覆盖美债机会成本？",
       description: "标普 500 盈利收益率（100 / Shiller PE，月度）对比 10Y 美债；股债差为正表示股票相对债券更有吸引力。",
       series: [costSeries(seriesMap, "spxEarningsYield"), costSeries(seriesMap, "dgs10"), costSeries(seriesMap, "equityBondGap")]
     }

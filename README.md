@@ -1,6 +1,6 @@
 # Global Liquidity Monitor
 
-React + Vite implementation of a global liquidity monitoring terminal inspired by DollarLiquidity-style indicator pages. It currently includes parallel USD and JPY liquidity pages.
+React + Vite implementation of a global liquidity monitoring terminal inspired by DollarLiquidity-style indicator pages. It includes macro liquidity pages plus an ASTER supply-side monitor.
 
 ## Data Sources
 
@@ -11,6 +11,15 @@ The app does not fetch macro data from the browser. `scripts/fetch-data.mjs` pul
 - `public/data/risk-markets.json` for normalized risk-market prices
 - `public/data/treasury-markets.json` for U.S. Treasury debt, ownership, yield curve, and fiscal interest cost charts
 - `public/data/cost-of-capital.json` for the USD rate anchor / cost-of-capital yield ladder
+- `public/data/aster.json` for ASTER circulation, unlock, buyback, burn, and allocation disclosures
+
+ASTER monitor methodology:
+
+- Circulating supply uses the market-data-provider figure and is explicitly separated from on-chain total supply and liquid float.
+- Unlock events distinguish recurring staking emissions, claim windows, and team vesting; a scheduled unlock is not treated as realized selling.
+- Buybacks and burns are tracked separately because bought tokens are distributed to veASTER while the matching reserve burn reduces total supply.
+- Official Aster tokenomics and announcements are the primary sources for mechanism changes. The page links the BSC token, buyback, and listing-fee wallets for independent verification.
+- `public/data/aster.json` is a dated disclosure snapshot and should be refreshed when Aster publishes a new biweekly buyback/burn update or changes an unlock schedule.
 
 USD primary series:
 

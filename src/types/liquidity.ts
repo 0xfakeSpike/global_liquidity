@@ -78,6 +78,55 @@ export interface UpcomingEventsDataset {
   failures?: string[];
 }
 
+export interface AsterMetric {
+  label: string;
+  value: number;
+  unit: "ASTER" | "%" | "USD";
+  detail: string;
+  source: string;
+  sourceUrl: string;
+}
+
+export interface AsterUnlockEvent {
+  date: string;
+  amount: number;
+  category: string;
+  status: "scheduled" | "recurring" | "postponed";
+  detail: string;
+  sourceUrl: string;
+}
+
+export interface AsterBuybackEvent {
+  startDate: string;
+  endDate: string;
+  bought: number;
+  burned: number;
+  detail: string;
+  sourceUrl: string;
+}
+
+export interface AsterDataset {
+  generatedAt: string;
+  token: {
+    name: string;
+    symbol: string;
+    chain: string;
+    contract: string;
+    maxSupply: number;
+  };
+  metrics: {
+    circulating: AsterMetric;
+    totalSupply: AsterMetric;
+    circulatingRatio: AsterMetric;
+    cumulativeBurn: AsterMetric;
+    latestBuyback: AsterMetric;
+  };
+  unlocks: AsterUnlockEvent[];
+  buybacks: AsterBuybackEvent[];
+  allocation: { label: string; percent: number; amount: number; color: string }[];
+  notes: string[];
+}
+
 export interface AiCapexCommitment {
   name: string;
   amount: string;

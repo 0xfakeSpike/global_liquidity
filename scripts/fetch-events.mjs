@@ -35,7 +35,7 @@ async function fetchText(url) {
 function cleanHtml(value) {
   return value
     .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;|&#160;/g, " ")
+    .replace(/&nbsp;|&#160;|&#x20;|&#32;/gi, " ")
     .replace(/&amp;/g, "&")
     .replace(/&#39;|&apos;/g, "'")
     .replace(/&quot;/g, '"')
@@ -118,7 +118,7 @@ function parseBojSpeeches(html, events) {
       region: "日本",
       category: "官员讲话",
       importance: /,\s*Governor$/i.test(cells[1]) ? "high" : "medium",
-      title: cells[1],
+      title: `BOJ 官员讲话：${cells[1].split(",")[0]}`,
       detail: cells[2],
       source: "Bank of Japan",
       sourceUrl: sources.bojSpeeches
@@ -142,7 +142,7 @@ function parseFedSpeeches(html, events, year, monthName, sourceUrl) {
       region: "美国",
       category: "官员讲话",
       importance: /Chair(?! for Supervision)|Chairman/i.test(speaker) ? "high" : "medium",
-      title: speaker,
+      title: `Fed 官员讲话：${speaker.replace(/^Governor\s+/i, "")}`,
       detail: title,
       source: "Federal Reserve",
       sourceUrl

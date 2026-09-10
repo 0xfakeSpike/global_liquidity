@@ -17,9 +17,10 @@ interface MultiLineChartProps {
   height?: number;
   transform?: "log-return";
   valueLabel?: string;
+  fixedRange?: boolean;
 }
 
-export function MultiLineChart({ series, dateRange, height = 260, transform, valueLabel }: MultiLineChartProps) {
+export function MultiLineChart({ series, dateRange, height = 260, transform, valueLabel, fixedRange = false }: MultiLineChartProps) {
   const [rangeYears, setRangeYears] = useState<ChartRangeYears>(5);
   const [hovered, setHovered] = useState<{
     date: string;
@@ -40,7 +41,7 @@ export function MultiLineChart({ series, dateRange, height = 260, transform, val
 
   const lastDate = points.reduce((last, point) => (point.date > last ? point.date : last), points[0].date);
   const endDate = dateRange?.end ?? lastDate;
-  const visibleRange = recentRange(endDate, rangeYears);
+  const visibleRange = fixedRange && dateRange ? dateRange : recentRange(endDate, rangeYears);
   const filteredSeries = series.map((item) => ({
     ...item,
     points: item.points.filter((point) => point.date >= visibleRange.start && point.date <= visibleRange.end)
@@ -129,7 +130,7 @@ export function MultiLineChart({ series, dateRange, height = 260, transform, val
 
   return (
     <div className="multi-chart-wrap">
-      <ChartRangeControl onChange={setRangeYears} value={rangeYears} />
+      {fixedRange ? null : <ChartRangeControl onChange={setRangeYears} value={rangeYears} />}
       <div className="chart-interactive-wrap" onPointerLeave={() => setHovered(null)} onPointerMove={handlePointerMove}>
       <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={valueLabel ?? "叠加走势图"}>
         {yTicks.map((tick) => {
